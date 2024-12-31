@@ -1,13 +1,15 @@
 import { ScreenContainer, Search } from "@/components";
 import { Card, Typography } from "@/components/ui";
 import { mockCardData } from "@/constants/Colors";
-import { Tabs } from "expo-router";
+import { Link, Tabs } from "expo-router";
 import { Dimensions, FlatList, SafeAreaView, ScrollView, StyleSheet } from "react-native";
 
 
 export default function HomeScreen() {
     return (
         <ScreenContainer style={[styles.container]} >
+            <Link href="/onbording">Onbording</Link>
+
             <Tabs.Screen options={{ header: () => <Search /> }} />
             <SafeAreaView >
                 <ScrollView contentContainerStyle={[styles.container]} showsVerticalScrollIndicator={false}>

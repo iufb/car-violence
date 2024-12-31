@@ -19,7 +19,7 @@ export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...prop
 
     return <View style={[style, styles.container]} {...props}>
         <MediasView medias={medias} setMedias={setMedias} openCamera={openCamera} />
-        <Select items={['Hello', 'World']} value={formData.city} onSelect={(value) => setFormData({ ...formData, city: value })} />
+        <Select label="Город" items={['Hello', 'World']} value={formData.city} onSelect={(value) => setFormData({ ...formData, city: value })} placeholder="Выберите город" />
         <Link href={'/'}><Typography variant="span">Правила размещения фото/видео</Typography></Link>
         <Button variant="primary">Отправить</Button>
     </View>
