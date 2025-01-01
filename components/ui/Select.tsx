@@ -47,7 +47,7 @@ export const Select = ({ label, value, placeholder, onSelect, items, style, ...p
     return <View style={[styles.container]}>
         <Typography color={Colors.light.background} variant="span">{label}</Typography>
         <Pressable onPress={toggle} style={[styles.label]}>
-            <Typography color={value ? Colors.light.primary : Colors.light.notSelected} variant="h3">{value ? value : placeholder}</Typography>
+            <Typography color={value ? Colors.light.primary : Colors.light.borderColor} variant="span">{value ? value : placeholder}</Typography>
             <Animated.View style={[iconStyle]} ><Entypo color={Colors.light.primary} name="chevron-right" size={28} /></Animated.View>
         </Pressable>
         <Animated.View style={[animatedStyle, styles.content]}>

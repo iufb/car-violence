@@ -7,12 +7,13 @@ import { MaskedTextInput, MaskedTextInputProps } from "react-native-mask-text";
 
 interface InputProps extends MaskedTextInputProps {
     label: string
+    bg?: 'light' | 'dark'
 }
-export const Input = ({ label, style, secureTextEntry, ...props }: InputProps) => {
+export const Input = ({ label, bg = 'light', style, secureTextEntry, ...props }: InputProps) => {
     const [focused, setFocused] = useState(false)
     const [secure, setSecure] = useState(secureTextEntry)
     return <View style={[styles.container]}>
-        <Typography variant="span">{label}</Typography>
+        <Typography color={bg == 'dark' ? Colors.light.background : Colors.light.text} variant="span">{label}</Typography>
         <MaskedTextInput secureTextEntry={secure} placeholderTextColor={Colors.light.borderColor} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} style={[styles.input, focused && styles.focused]} {...props} />
         {secureTextEntry &&
             <Pressable style={[styles.secureToggle]} onPress={() => setSecure(!secure)}>
@@ -30,6 +31,7 @@ const styles = StyleSheet.create({
     input: {
         height: 48,
         borderColor: Colors.light.borderColor,
+        backgroundColor: Colors.light.background,
         borderWidth: 1,
         paddingHorizontal: 16,
         borderRadius: 12,

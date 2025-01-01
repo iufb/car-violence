@@ -1,4 +1,4 @@
-import { Button, Select, Typography } from "@/components/ui"
+import { Button, DateTimePicker, Input, Select, Typography } from "@/components/ui"
 import { Video } from "@/components/Video"
 import { Colors } from "@/constants/Colors"
 import { Entypo, MaterialIcons } from "@expo/vector-icons"
@@ -14,12 +14,18 @@ const width = Dimensions.get('window').width
 
 export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...props }: SendViolenceFormProps) => {
     const [formData, setFormData] = useState({
-        city: ""
+        city: "",
+        street: ""
     })
+    const onChange = (key: string, value: string) => {
+        setFormData({ ...formData, [key]: value })
+    }
 
     return <View style={[style, styles.container]} {...props}>
         <MediasView medias={medias} setMedias={setMedias} openCamera={openCamera} />
-        <Select label="Город" items={['Hello', 'World']} value={formData.city} onSelect={(value) => setFormData({ ...formData, city: value })} placeholder="Выберите город" />
+        <Select label="Город" items={['Hello', 'World']} value={formData.city} onSelect={(value) => onChange('city', value)} placeholder="Выберите город" />
+        <Input bg="dark" placeholder="Укажите улицу" value={formData.street} onChangeText={(value) => onChange('street', value)} label="Улица" />
+        <DateTimePicker bg="dark" label="Дата и время" />
         <Link href={'/'}><Typography variant="span">Правила размещения фото/видео</Typography></Link>
         <Button variant="primary">Отправить</Button>
     </View>
@@ -123,7 +129,7 @@ const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
                 </View>
             } />
             <Pressable style={[styles.controlItem, styles.addNew]} onPress={openCamera}>
-                <Entypo name="plus" size={32} />
+                <Entypo name="plus" size={32} color={Colors.light.primary} />
             </Pressable>
         </View>
         </View>
@@ -134,6 +140,7 @@ const styles = StyleSheet.create({
     container: {
         justifyContent: 'center',
         gap: 10,
+        padding: 5
     },
     mediasViews: {
         gap: 20
@@ -151,7 +158,7 @@ const styles = StyleSheet.create({
         gap: 4
     },
     previewItem: {
-        width: width - 10, height: (width) * 9 / 16, borderRadius: 10
+        width: width - 20, height: (width) * 9 / 16, borderRadius: 10
     },
     controlItem: {
         width: 60, height: 40, borderRadius: 10, overflow: 'hidden', position: 'relative',
@@ -173,8 +180,8 @@ const styles = StyleSheet.create({
     addNew: {
         alignItems: 'center',
         justifyContent: 'center',
-        borderColor: Colors.light.borderColor,
-        borderWidth: 2,
+        borderColor: Colors.light.primary,
+        borderWidth: 1,
     },
     bottom: {
         paddingHorizontal: 15,

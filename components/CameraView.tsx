@@ -3,9 +3,9 @@ import { Colors } from '@/constants/Colors';
 import { pickImage } from '@/utils';
 import { Entypo, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import { CameraType, CameraView, Camera as ExpoCamera, useCameraPermissions } from 'expo-camera';
-import { usePathname, useRouter } from 'expo-router';
+import { usePathname } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Button, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Button, Dimensions, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -20,7 +20,6 @@ export function Camera({ setMedias, closeCameraOnEnd }: { setMedias: (media: str
     const { width, height } = useWindowDimensions()
     const insets = useSafeAreaInsets()
     const path = usePathname()
-    const router = useRouter()
     const cameraRef = useRef<CameraView>(null)
 
     if (!permission) {
@@ -87,7 +86,7 @@ export function Camera({ setMedias, closeCameraOnEnd }: { setMedias: (media: str
         <View style={[{ paddingBottom: insets.bottom }]}>
             <View style={[styles.container]}>
                 <CameraView ref={cameraRef} style={[{ width, height: height - CONTROLS_HEIGHT }]} facing={facing} mode={cameraMode} >
-                    <Pressable onPress={() => router.back()} style={[styles.close]}>
+                    <Pressable onPress={closeCameraOnEnd} style={[styles.close]}>
                         <MaterialCommunityIcons name='close' size={32} color='white' />
                     </Pressable>
                 </CameraView>
@@ -194,7 +193,7 @@ const ModeSelector = ({ selected, select }: { selected: CameraModeType, select: 
 
 const styles = StyleSheet.create({
     container: {
-        flexGrow: 1,
+        width: Dimensions.get('window').width,
     },
     controls: {
         paddingTop: 20,
