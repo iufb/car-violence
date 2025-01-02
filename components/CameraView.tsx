@@ -5,7 +5,7 @@ import { Entypo, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons
 import { CameraType, CameraView, Camera as ExpoCamera, useCameraPermissions } from 'expo-camera';
 import { usePathname, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Dimensions, Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -187,21 +187,23 @@ const ModeSelector = ({ mode: selected, selectMode: select }: ModeSelectorProps)
     const { width } = useWindowDimensions()
     const animatedStyle = useAnimatedStyle(() => {
         return {
-            transform: [{ translateX: translateX.value }]
+            transform: [{ translateX: `${translateX.value}%` }]
         }
     })
     useEffect(() => {
-        translateX.value = withSpring(selected == 'picture' ? 35 : -28, { duration: 1000, stiffness: 10, dampingRatio: 1 })
+        translateX.value = withSpring(selected == 'picture' ? 11 : -9, { duration: 1000, stiffness: 10, dampingRatio: 1 })
     }, [selected])
 
 
-    return <Animated.View style={[styles.modeSelector, animatedStyle]} >
-        {modes.map(mode =>
-            <Pressable onPress={() => select(mode.value)} key={mode.label}>
-                <Typography color={selected == mode.value ? "#CD9C07" : Colors.light.background} variant='h3'>
-                    {mode.label}
-                </Typography>
-            </Pressable>)}
+    return <Animated.View style={[styles.modeSelector]} >
+        <Pressable style={[styles.modePressable]} onPress={() => select(selected == 'video' ? 'picture' : 'video')} >
+            <Animated.View style={[styles.modePressable, animatedStyle]}>
+                {modes.map(mode =>
+                    <Typography key={mode.label} color={selected == mode.value ? "#CD9C07" : Colors.light.background} variant='h3'>
+                        {mode.label}
+                    </Typography>
+                )}</Animated.View></Pressable>
+
     </Animated.View>
 }
 
@@ -240,14 +242,14 @@ const styles = StyleSheet.create({
         width: 56, height: 56, backgroundColor: 'rgba(255,255,255,.2)', borderRadius: 100, justifyContent: 'center', alignItems: 'center'
     },
     modeSelector: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'center',
+        width: Dimensions.get('window').width,
         color: Colors.light.background,
         gap: 10,
     },
     modePressable: {
-        width: 30,
-        height: '100%'
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 25,
     }
 });
