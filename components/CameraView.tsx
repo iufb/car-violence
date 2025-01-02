@@ -92,7 +92,6 @@ export function Camera({ setMedias, closeCameraOnEnd }: { setMedias: (media: str
                 </CameraView>
                 <Controls save={(value) => {
                     setMedias(value)
-                    closeCameraOnEnd()
                 }} isRecording={isRecording} mode={cameraMode} setMode={mode => {
                     setCameraMode(mode)
                     if (isRecording) {
@@ -129,7 +128,7 @@ const CaptureBtn = ({ mode, capture, isRecording }: { mode: CameraModeType, capt
         const backgroundColor = interpolateColor(
             progress.value,
             [0, 1],
-            [Colors.light.background, 'red'] // Transition from red to blue
+            [Colors.light.background, 'red']
         );
         return { backgroundColor };
     });
