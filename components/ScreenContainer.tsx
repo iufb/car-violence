@@ -12,7 +12,7 @@ export const ScreenContainer = ({ style, children }: { children: ReactNode } & V
 const styles = StyleSheet.create({
     container: {
         paddingTop: Constants.statusBarHeight,
-        paddingHorizontal: 20,
+        padding: 20,
         backgroundColor: Colors.light.background,
         height: '100%',
     }

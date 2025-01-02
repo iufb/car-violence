@@ -5,6 +5,7 @@ import { SendViolenceForm } from "@/components/forms";
 import Constants from "expo-constants";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
+
 type ViewType = 'camera' | 'form'
 
 export default function Add() {
@@ -45,11 +46,11 @@ export default function Add() {
         <Tabs.Screen options={{ headerShown: false }} />
         {view == 'camera' &&
             <Camera setMedias={media => setMedias([...medias, ...media])} closeCameraOnEnd={closeCameraOnEnd} />}
-        {view == 'form' && <View style={{ flex: 1 }}>
+        {view == 'form' &&
             <SendViolenceForm setMedias={(value) => setMedias(() => {
                 return value
             })} medias={medias} openCamera={() => setView('camera')} />
-        </View>}
+        }
     </View>
 }
 
@@ -57,7 +58,6 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: 'rgba(0,0,0,.95)',
         paddingTop: Constants.statusBarHeight,
-        justifyContent: 'space-between',
-        flex: 1,
+        flex: 1
     }
 })

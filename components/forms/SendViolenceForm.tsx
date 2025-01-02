@@ -1,10 +1,11 @@
+import { FormContainer } from "@/components/forms/FormContainer"
 import { Button, DateTimePicker, Input, Select, Typography } from "@/components/ui"
 import { Video } from "@/components/Video"
 import { Colors } from "@/constants/Colors"
 import { Entypo, MaterialIcons } from "@expo/vector-icons"
 import { Link } from "expo-router"
 import { useCallback, useRef, useState } from "react"
-import { Dimensions, FlatList, Image, Keyboard, KeyboardAvoidingView, Pressable, StyleSheet, TouchableOpacity, View, ViewProps, ViewToken } from "react-native"
+import { Dimensions, FlatList, Image, Keyboard, Pressable, StyleSheet, TouchableOpacity, View, ViewProps, ViewToken } from "react-native"
 
 interface SendViolenceFormProps extends ViewProps {
     medias: string[]
@@ -24,24 +25,20 @@ export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...prop
     const onChange = (key: string, value: string | Date) => {
         setFormData({ ...formData, [key]: value })
     }
-    return <View style={[style, styles.container]} {...props}>
+    return <FormContainer style={[style, styles.container]} {...props}>
         <MediasView medias={medias} setMedias={setMedias} openCamera={openCamera} />
         <TouchableOpacity activeOpacity={1} onPress={() => Keyboard.dismiss()}>
-            <KeyboardAvoidingView
-                behavior={'padding'} style={[styles.form]} >
+            <View style={[styles.form]}>
                 <Input
-                    enablesReturnKeyAutomatically
                     multiline numberOfLines={3} bg="dark" placeholder="Опишите нарушение" value={formData.violence} onChangeText={(_, value) => onChange('violence', value)} label="Описание" />
-
                 <Select label="Город" items={['Hello', 'World']} value={formData.city} onSelect={(value) => onChange('city', value)} placeholder="Выберите город" />
                 <Input bg="dark" placeholder="Укажите улицу" value={formData.street} onChangeText={(_, value) => onChange('street', value)} label="Улица" />
                 <DateTimePicker dateValue={formData.date} timeValue={formData.time} setValue={(key, value) => onChange(key, value)} bg="dark" label="Дата и время" />
                 <Link href={'/'}><Typography color={Colors.light.primary} variant="span">Правила размещения фото/видео</Typography></Link>
                 <Button variant="primary">Отправить</Button>
-            </KeyboardAvoidingView>
+            </View>
         </TouchableOpacity>
-
-    </View>
+    </FormContainer>
 }
 
 interface MediasViewProps {
@@ -112,7 +109,7 @@ const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
             }
         }
     };
-    return <View style={[styles.container]}>
+    return <View style={[styles.mediaContainer]}>
         <FlatList
             initialNumToRender={1}
             removeClippedSubviews={true}
@@ -152,9 +149,12 @@ const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
 const styles = StyleSheet.create({
     container: {
         justifyContent: 'center',
+        flex: 1,
         gap: 10,
-        zIndex: 10,
-        padding: 5
+        padding: 5,
+    },
+    mediaContainer: {
+        gap: 10,
     },
     mediasViews: {
         gap: 20
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
         gap: 4
     },
     previewItem: {
-        width: width - 20, height: (width) * 9 / 16, borderRadius: 10
+        width: width - 20, height: width * 9 / 16, borderRadius: 10,
     },
     controlItem: {
         width: 60, height: 40, borderRadius: 10, overflow: 'hidden', position: 'relative',
