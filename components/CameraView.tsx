@@ -3,9 +3,9 @@ import { Colors } from '@/constants/Colors';
 import { pickImage } from '@/utils';
 import { Entypo, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import { CameraType, CameraView, Camera as ExpoCamera, useCameraPermissions } from 'expo-camera';
-import { usePathname } from 'expo-router';
+import { usePathname, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Button, Dimensions, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -20,22 +20,14 @@ export function Camera({ setMedias, closeCameraOnEnd }: { setMedias: (media: str
     const { width, height } = useWindowDimensions()
     const insets = useSafeAreaInsets()
     const path = usePathname()
+    const router = useRouter()
     const cameraRef = useRef<CameraView>(null)
 
-    if (!permission) {
-        // Camera permissions are still loading.
-        return <View />;
-    }
-
-    if (!permission.granted) {
-        // Camera permissions are not granted yet.
-        return (
-            <View style={styles.container}>
-                <Text >We need your permission to show the camera</Text>
-                <Button onPress={requestPermission} title="grant permission" />
-            </View>
-        );
-    }
+    useEffect(() => {
+        if (!permission || !permission.granted) {
+            requestPermission()
+        }
+    }, [permission])
 
     function toggleCameraFacing() {
         setFacing(current => (current === 'back' ? 'front' : 'back'));
@@ -86,13 +78,14 @@ export function Camera({ setMedias, closeCameraOnEnd }: { setMedias: (media: str
         <View style={[{ paddingBottom: insets.bottom }]}>
             <View style={[styles.container]}>
                 <CameraView ref={cameraRef} style={[{ width, height: height - CONTROLS_HEIGHT }]} facing={facing} mode={cameraMode} >
-                    <Pressable onPress={closeCameraOnEnd} style={[styles.close]}>
+                    <Pressable onPress={() => router.back()} style={[styles.close]}>
                         <MaterialCommunityIcons name='close' size={32} color='white' />
                     </Pressable>
                 </CameraView>
-                <Controls save={(value) => {
+                <Controls toggleCameraFacing={toggleCameraFacing} save={(value) => {
                     setMedias(value)
-                }} isRecording={isRecording} mode={cameraMode} setMode={mode => {
+                    closeCameraOnEnd()
+                }} isRecording={isRecording} mode={cameraMode} selectMode={mode => {
                     setCameraMode(mode)
                     if (isRecording) {
                         stopRecord()
@@ -104,20 +97,23 @@ export function Camera({ setMedias, closeCameraOnEnd }: { setMedias: (media: str
     );
 }
 
-const Controls = ({ mode, setMode, capture, save, isRecording }: { mode: CameraModeType, setMode: (mode: CameraModeType) => void, capture: () => void, save: (value: string[]) => void, isRecording: boolean }) => {
+const Controls = ({ mode, selectMode, capture, save, isRecording, toggleCameraFacing }: CaptureBtnProps & FlipBtnProps & ImportBtnProps & ModeSelectorProps) => {
     return <View style={[styles.controls]}>
         <View style={[styles.topControls]}>
             <ImportBtn save={save} />
             <CaptureBtn mode={mode} capture={capture} isRecording={isRecording} />
-            <FlipBtn />
+            <FlipBtn toggleCameraFacing={toggleCameraFacing} />
         </View>
         <View style={[styles.bottomControls]}>
-            <ModeSelector selected={mode} select={setMode} />
+            <ModeSelector mode={mode} selectMode={selectMode} />
         </View>
     </View>
 
 }
-const CaptureBtn = ({ mode, capture, isRecording }: { mode: CameraModeType, capture: () => void, isRecording: boolean }) => {
+interface CaptureBtnProps {
+    mode: CameraModeType, capture: () => void, isRecording: boolean
+}
+const CaptureBtn = ({ mode, capture, isRecording }: CaptureBtnProps) => {
     const size = useSharedValue(57)
     const radius = useSharedValue(100)
     const progress = useSharedValue(0)
@@ -128,7 +124,7 @@ const CaptureBtn = ({ mode, capture, isRecording }: { mode: CameraModeType, capt
         const backgroundColor = interpolateColor(
             progress.value,
             [0, 1],
-            [Colors.light.background, 'red']
+            [Colors.light.background, 'red'] // Transition from red to blue
         );
         return { backgroundColor };
     });
@@ -145,13 +141,30 @@ const CaptureBtn = ({ mode, capture, isRecording }: { mode: CameraModeType, capt
         </Pressable>
     </View>
 }
-const FlipBtn = () => {
+interface FlipBtnProps {
+    toggleCameraFacing: () => void
+}
+const FlipBtn = ({ toggleCameraFacing }: FlipBtnProps) => {
+    const rotate = useSharedValue(0)
+    const animatedStyle = useAnimatedStyle(() => {
+        return { transform: [{ rotate: `${rotate.value}deg` }] }
+    })
     return <View style={[styles.btn]}>
-        <Pressable><FontAwesome6 name='arrows-rotate' size={24} color={Colors.light.background} /></Pressable>
+        <Pressable onPress={() => {
+            rotate.value = withTiming(rotate.value == 0 ? 180 : 0, { duration: 300 });
+            toggleCameraFacing()
+        }}>
+            <Animated.View style={[animatedStyle]}>
+                <FontAwesome6 name='arrows-rotate' size={24} color={Colors.light.background} />
+            </Animated.View>
+        </Pressable>
     </View>
 
 }
-const ImportBtn = ({ save }: { save: (value: string[]) => void }) => {
+interface ImportBtnProps {
+    save: (value: string[]) => void
+}
+const ImportBtn = ({ save }: ImportBtnProps) => {
     return <View style={[styles.btn]}>
         <Pressable onPress={() => pickImage(save)}><Entypo name='image' size={24} color={Colors.light.background} /></Pressable>
     </View>
@@ -166,8 +179,10 @@ const modes: { label: string, value: CameraModeType }[] = [
         label: "ВИДЕО", value: "video"
     },
 ]
-
-const ModeSelector = ({ selected, select }: { selected: CameraModeType, select: (mode: CameraModeType) => void }) => {
+interface ModeSelectorProps {
+    mode: CameraModeType, selectMode: (mode: CameraModeType) => void
+}
+const ModeSelector = ({ mode: selected, selectMode: select }: ModeSelectorProps) => {
     const translateX = useSharedValue(0)
     const { width } = useWindowDimensions()
     const animatedStyle = useAnimatedStyle(() => {
@@ -175,24 +190,24 @@ const ModeSelector = ({ selected, select }: { selected: CameraModeType, select: 
             transform: [{ translateX: translateX.value }]
         }
     })
-    console.log(width)
     useEffect(() => {
         translateX.value = withSpring(selected == 'picture' ? 35 : -28, { duration: 1000, stiffness: 10, dampingRatio: 1 })
     }, [selected])
 
 
     return <Animated.View style={[styles.modeSelector, animatedStyle]} >
-        {modes.map(mode => <Pressable onPress={() => select(mode.value)} key={mode.label}>
-            <Typography color={selected == mode.value ? "#CD9C07" : Colors.light.background} variant='h3'>
-                {mode.label}
-            </Typography>
-        </Pressable>)}
+        {modes.map(mode =>
+            <Pressable onPress={() => select(mode.value)} key={mode.label}>
+                <Typography color={selected == mode.value ? "#CD9C07" : Colors.light.background} variant='h3'>
+                    {mode.label}
+                </Typography>
+            </Pressable>)}
     </Animated.View>
 }
 
 const styles = StyleSheet.create({
     container: {
-        width: Dimensions.get('window').width,
+        flexGrow: 1,
     },
     controls: {
         paddingTop: 20,
@@ -230,5 +245,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         color: Colors.light.background,
         gap: 10,
+    },
+    modePressable: {
+        width: 30,
+        height: '100%'
     }
 });

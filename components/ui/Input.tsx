@@ -9,12 +9,12 @@ interface InputProps extends MaskedTextInputProps {
     label: string
     bg?: 'light' | 'dark'
 }
-export const Input = ({ label, bg = 'light', style, secureTextEntry, ...props }: InputProps) => {
+export const Input = ({ label, bg = 'light', style, secureTextEntry, onChangeText, ...props }: InputProps) => {
     const [focused, setFocused] = useState(false)
     const [secure, setSecure] = useState(secureTextEntry)
     return <View style={[styles.container]}>
         <Typography color={bg == 'dark' ? Colors.light.background : Colors.light.text} variant="span">{label}</Typography>
-        <MaskedTextInput secureTextEntry={secure} placeholderTextColor={Colors.light.borderColor} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} style={[styles.input, focused && styles.focused]} {...props} />
+        <MaskedTextInput onChangeText={onChangeText} secureTextEntry={secure} placeholderTextColor={Colors.light.borderColor} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} style={[styles.base, props.multiline ? styles.textarea : styles.input, focused && styles.focused]} {...props} />
         {secureTextEntry &&
             <Pressable style={[styles.secureToggle]} onPress={() => setSecure(!secure)}>
                 <Feather size={20} name={secure ? "eye-off" : "eye"} />
@@ -28,14 +28,19 @@ const styles = StyleSheet.create({
         position: 'relative',
         gap: 7
     },
-    input: {
-        height: 48,
+    base: {
         borderColor: Colors.light.borderColor,
         backgroundColor: Colors.light.background,
         borderWidth: 1,
         paddingHorizontal: 16,
         borderRadius: 12,
         fontSize: 16
+    },
+    textarea: {
+        height: 72,
+    },
+    input: {
+        height: 48,
     },
     focused: {
         borderWidth: 2,

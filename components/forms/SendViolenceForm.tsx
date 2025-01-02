@@ -4,7 +4,8 @@ import { Colors } from "@/constants/Colors"
 import { Entypo, MaterialIcons } from "@expo/vector-icons"
 import { Link } from "expo-router"
 import { useCallback, useRef, useState } from "react"
-import { Dimensions, FlatList, Image, Pressable, StyleSheet, View, ViewProps, ViewToken } from "react-native"
+import { Dimensions, FlatList, Image, Keyboard, KeyboardAvoidingView, Pressable, StyleSheet, TouchableOpacity, View, ViewProps, ViewToken } from "react-native"
+
 interface SendViolenceFormProps extends ViewProps {
     medias: string[]
     setMedias: (value: string[]) => void;
@@ -15,19 +16,31 @@ const width = Dimensions.get('window').width
 export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...props }: SendViolenceFormProps) => {
     const [formData, setFormData] = useState({
         city: "",
-        street: ""
+        street: "",
+        date: new Date(),
+        time: new Date(),
+        violence: "",
     })
-    const onChange = (key: string, value: string) => {
+    const onChange = (key: string, value: string | Date) => {
         setFormData({ ...formData, [key]: value })
     }
-
     return <View style={[style, styles.container]} {...props}>
         <MediasView medias={medias} setMedias={setMedias} openCamera={openCamera} />
-        <Select label="Город" items={['Hello', 'World']} value={formData.city} onSelect={(value) => onChange('city', value)} placeholder="Выберите город" />
-        <Input bg="dark" placeholder="Укажите улицу" value={formData.street} onChangeText={(value) => onChange('street', value)} label="Улица" />
-        <DateTimePicker bg="dark" label="Дата и время" />
-        <Link href={'/'}><Typography variant="span">Правила размещения фото/видео</Typography></Link>
-        <Button variant="primary">Отправить</Button>
+        <TouchableOpacity activeOpacity={1} onPress={() => Keyboard.dismiss()}>
+            <KeyboardAvoidingView
+                behavior={'padding'} style={[styles.form]} >
+                <Input
+                    enablesReturnKeyAutomatically
+                    multiline numberOfLines={3} bg="dark" placeholder="Опишите нарушение" value={formData.violence} onChangeText={(_, value) => onChange('violence', value)} label="Описание" />
+
+                <Select label="Город" items={['Hello', 'World']} value={formData.city} onSelect={(value) => onChange('city', value)} placeholder="Выберите город" />
+                <Input bg="dark" placeholder="Укажите улицу" value={formData.street} onChangeText={(_, value) => onChange('street', value)} label="Улица" />
+                <DateTimePicker dateValue={formData.date} timeValue={formData.time} setValue={(key, value) => onChange(key, value)} bg="dark" label="Дата и время" />
+                <Link href={'/'}><Typography color={Colors.light.primary} variant="span">Правила размещения фото/видео</Typography></Link>
+                <Button variant="primary">Отправить</Button>
+            </KeyboardAvoidingView>
+        </TouchableOpacity>
+
     </View>
 }
 
@@ -140,6 +153,7 @@ const styles = StyleSheet.create({
     container: {
         justifyContent: 'center',
         gap: 10,
+        zIndex: 10,
         padding: 5
     },
     mediasViews: {
@@ -152,6 +166,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         flexDirection: 'row',
         gap: 5,
+    },
+    form: {
+        gap: 10
     },
     controlsList: {
         marginRight: 60,

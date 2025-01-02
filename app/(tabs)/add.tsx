@@ -45,7 +45,7 @@ export default function Add() {
         <Tabs.Screen options={{ headerShown: false }} />
         {view == 'camera' &&
             <Camera setMedias={media => setMedias([...medias, ...media])} closeCameraOnEnd={closeCameraOnEnd} />}
-        {view == 'form' && <View>
+        {view == 'form' && <View style={{ flex: 1 }}>
             <SendViolenceForm setMedias={(value) => setMedias(() => {
                 return value
             })} medias={medias} openCamera={() => setView('camera')} />
@@ -58,6 +58,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,.95)',
         paddingTop: Constants.statusBarHeight,
         justifyContent: 'space-between',
-        height: '100%',
+        flex: 1,
     }
 })

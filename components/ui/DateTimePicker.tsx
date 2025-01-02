@@ -1,22 +1,27 @@
 import { Typography } from "@/components/ui/Typography"
 import { Colors } from "@/constants/Colors"
+import { GetDate, GetTime } from "@/utils"
 import { Entypo, MaterialIcons } from "@expo/vector-icons"
 import DateTimePickerLib, { DateTimePickerEvent } from '@react-native-community/datetimepicker'
 import { useState } from "react"
 import { Platform, Pressable, StyleSheet, View, ViewProps } from "react-native"
 interface DateTimePickerProps extends ViewProps {
+    dateValue: Date
+    timeValue: Date
+    setValue: (key: 'date' | 'time', value: Date) => void
     label: string
     bg?: 'light' | 'dark'
 }
-export const DateTimePicker = ({ label, bg = 'light', style, ...props }: DateTimePickerProps) => {
-    const [date, setDate] = useState(new Date(1598051730000));
-    const [mode, setMode] = useState('date');
+export const DateTimePicker = ({ dateValue, timeValue, setValue, label, bg = 'light', style, ...props }: DateTimePickerProps) => {
+    const [mode, setMode] = useState<'date' | 'time'>('date');
     const [show, setShow] = useState(false);
 
     const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
         const currentDate = selectedDate;
         setShow(false);
-        setDate(currentDate ?? new Date());
+        if (currentDate) {
+            setValue(mode, currentDate);
+        }
     };
 
     const showMode = (currentMode: 'date' | 'time') => {
@@ -34,14 +39,12 @@ export const DateTimePicker = ({ label, bg = 'light', style, ...props }: DateTim
     return <View style={[styles.container]}>
         <Typography color={bg == 'dark' ? Colors.light.background : Colors.light.text} variant="span">{label}</Typography>
         <View style={[styles.field]}>
-            <Typography variant="span">{date.getUTCDate()}</Typography>
-            <Typography variant="span"></Typography>
             {Platform.OS == 'ios' ? <View
                 style={[styles.IOSpicker]}>
                 <DateTimePickerLib
                     style={[styles.picker]}
                     testID="dateTimePicker"
-                    value={date}
+                    value={dateValue}
                     mode={'date'}
                     onChange={onChange}
                 />
@@ -49,32 +52,36 @@ export const DateTimePicker = ({ label, bg = 'light', style, ...props }: DateTim
                     testID="dateTimePicker"
 
                     style={[styles.picker]}
-                    value={date}
+                    value={timeValue}
                     mode={'time'}
                     onChange={onChange}
                 />
 
-            </View> : <View style={[styles.actionsWrapper]}>
-                <Pressable onPress={showDatepicker} style={[styles.action]}><Entypo size={22} name="calendar" color={Colors.light.background} />
-                    {show && mode == 'date' &&
-                        <DateTimePickerLib
-                            testID="dateTimePicker"
-                            value={date}
-                            mode={'date'}
-                            onChange={onChange}
-                        />}
-                </Pressable>
-                <Pressable onPress={showTimepicker} style={[styles.action]}><MaterialIcons size={22} name="access-time" color={Colors.light.background} />
-                    {show && mode == 'time' &&
-                        <DateTimePickerLib
-                            testID="dateTimePicker"
-                            value={date}
-                            mode={'time'}
-                            onChange={onChange}
-                        />}
+            </View> : <><View style={[styles.values]}>
+                <Typography color={Colors.light.notSelected} variant="p2">{GetDate(dateValue)} ,</Typography>
+                <Typography color={Colors.light.notSelected} variant="p2">{GetTime(timeValue)}</Typography>
+            </View>
+                <View style={[styles.actionsWrapper]}>
+                    <Pressable onPress={showDatepicker} style={[styles.action]}><Entypo size={22} name="calendar" color={Colors.light.background} />
+                        {show && mode == 'date' &&
+                            <DateTimePickerLib
+                                testID="dateTimePicker"
+                                value={dateValue}
+                                mode={'date'}
+                                onChange={onChange}
+                            />}
+                    </Pressable>
+                    <Pressable onPress={showTimepicker} style={[styles.action]}><MaterialIcons size={22} name="access-time" color={Colors.light.background} />
+                        {show && mode == 'time' &&
+                            <DateTimePickerLib
+                                testID="dateTimePicker"
+                                value={dateValue}
+                                mode={'time'}
+                                onChange={onChange}
+                            />}
 
-                </Pressable>
-            </View>}
+                    </Pressable>
+                </View></>}
         </View>
 
     </View>
@@ -94,7 +101,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         paddingHorizontal: 16,
         borderRadius: 12,
-        fontSize: 16
+        fontSize: 16,
+        justifyContent: 'center'
 
     },
     actionsWrapper: {
@@ -122,5 +130,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         maxHeight: 28
 
+    },
+    values: {
+        justifyContent: 'center',
+        flexDirection: "row",
+        gap: 4,
+        maxWidth: 150,
     }
 })

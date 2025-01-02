@@ -1,3 +1,4 @@
+import { FormContainer } from "@/components/forms/FormContainer"
 import { Button, Checkbox, Input, Typography } from "@/components/ui"
 import { Colors } from "@/constants/Colors"
 import { Link, useRouter } from "expo-router"
@@ -13,7 +14,7 @@ export const RegisterForm = () => {
         confirmPassword: "",
         rulesConfirm: false
     })
-    return <View style={[styles.container]}>
+    return <FormContainer><View style={[styles.container]}>
         <Input value={formData.name} onChangeText={value => setFormData({ ...formData, name: value })} label="ФИО" placeholder="Ваше ФИО" />
         <Input keyboardType="number-pad" value={formData.tel} onChangeText={value => setFormData({ ...formData, tel: value })} mask="+7 (999) 999 99 99" label="Номер телефона" placeholder="+7 (777) 322 32 32" />
         <Input secureTextEntry value={formData.password} onChangeText={value => setFormData({ ...formData, password: value })} label="Пароль" placeholder="Создайте пароль" />
@@ -28,7 +29,7 @@ export const RegisterForm = () => {
             router.push(`/(auth)/confirmation?info=${formData.tel}`)
         }}  >Создать аккаунт</Button>
         <Typography style={{ marginTop: 10, textAlign: 'center' }} variant="span">Есть аккаунт? <Link style={[styles.link]} href={'/(auth)/login'}>Войти</Link></Typography>
-    </View>
+    </View></FormContainer>
 }
 const styles = StyleSheet.create({
     container: {
