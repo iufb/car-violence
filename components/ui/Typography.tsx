@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/Colors"
+import { rMS } from "@/utils"
 import { StyleSheet, Text, TextProps } from "react-native"
 
 export const Typography = ({ color, variant, children, center, style, ...props }: TextProps & { variant: "h1" | "h2" | "h3" | "p1" | 'p2' | "span", center?: boolean, color?: string }) => {
@@ -9,33 +10,33 @@ export const Typography = ({ color, variant, children, center, style, ...props }
 
 const styles = StyleSheet.create({
     h1: {
-        fontSize: 28,
+        fontSize: rMS(28, .5),
         fontWeight: "bold",
-        lineHeight: 34,
+        lineHeight: rMS(34, .5),
     },
     h2: {
-        fontSize: 20,
+        fontSize: rMS(20, .5),
         fontWeight: "bold"
 
     },
     h3: {
-        fontSize: 16,
+        fontSize: rMS(16, .5),
         fontWeight: "bold"
 
     },
     p1: {
-        fontSize: 18,
+        fontSize: rMS(18, .5),
         fontWeight: "bold",
         color: Colors.light.notSelected
 
     },
     p2: {
-        fontSize: 16,
+        fontSize: rMS(16, .5),
         color: Colors.light.notSelected
 
     },
     span: {
-        fontSize: 14
+        fontSize: rMS(14, .5)
     },
     center: {
         textAlign: 'center'

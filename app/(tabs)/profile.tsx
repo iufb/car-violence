@@ -1,4 +1,5 @@
 import { CustomHeader, ListItem, LogoutButton, ProfileSection, ScreenContainer, UserBalance } from "@/components";
+import { rS } from "@/utils";
 import { Tabs } from "expo-router";
 import { ScrollView, StyleSheet } from "react-native";
 
@@ -16,6 +17,6 @@ export default function Profile() {
 
 const styles = StyleSheet.create({
     container: {
-        gap: 20
+        gap: rS(20)
     }
 })

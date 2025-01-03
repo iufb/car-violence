@@ -1,5 +1,6 @@
 import { Typography } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
+import { rS, rV } from "@/utils";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Contants from 'expo-constants';
 import { useState } from "react";
@@ -11,7 +12,7 @@ export const Search = () => {
     return <View style={[styles.container]}>
         <Pressable style={[styles.trigger]} onPress={() => setModalVisible(true)}>
             <FontAwesome5 name="search" size={20} color={Colors.light.primary} />
-            <Typography color={Colors.light.notSelected} variant="p2">Введите номер нарушения...</Typography>
+            <Typography color={Colors.light.notSelected} variant="span">Введите номер нарушения...</Typography>
         </Pressable>
         <Modal visible={modalVisible} onRequestClose={closeModal} animationType="fade"  >
             <View style={[styles.modal]}>
@@ -28,17 +29,20 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.light.slate200,
         marginTop: Contants.statusBarHeight,
         alignItems: 'center',
-        paddingVertical: 10,
+        paddingVertical: rV(10),
+        paddingHorizontal: rS(10),
     },
     trigger: {
-        height: 45,
+        width: '100%',
+        height: rV(45),
         backgroundColor: Colors.light.background,
         borderColor: Colors.light.primary,
         borderWidth: 1,
         borderRadius: 24,
-        paddingVertical: 10,
-        paddingHorizontal: 16,
-        flexDirection: 'row', gap: 16
+        paddingVertical: rS(5),
+        paddingHorizontal: rS(16),
+        flexDirection: 'row', gap: rS(16),
+        alignItems: 'center',
     },
     modal: {
         paddingTop: Contants.statusBarHeight

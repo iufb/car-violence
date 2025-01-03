@@ -9,7 +9,7 @@ export default function MyVideos() {
     return <ScreenContainer>
         <Tabs.Screen options={{ header: (props) => <CustomHeader showBack={false} title="Мои видео" /> }} />
         <SafeAreaView>
-            <ScrollView contentContainerStyle={[styles.container]}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.container]}>
                 {mockCardData.map(item => <Card key={item.title} color={Colors.light.status['2']} variant="horizontal" {...item} />)}
             </ScrollView>
         </SafeAreaView>

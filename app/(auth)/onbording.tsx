@@ -2,6 +2,7 @@
 import { ScreenContainer } from "@/components";
 import { Button, Typography } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
+import { rS, rV } from "@/utils";
 import { Link, Tabs, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Image, LayoutChangeEvent, Pressable, StyleSheet, View } from "react-native";
@@ -56,7 +57,7 @@ export default function Onbording() {
         }} />}
         <Animated.View key={step} style={[style.textContainer]} entering={FadeInRight} exiting={FadeOutLeft}>
             <Typography variant="h1" style={{ textAlign: 'center' }}>{steps[step].title}</Typography>
-            <Typography variant="p1" style={{ textAlign: 'center' }}>{steps[step].desc}</Typography>
+            <Typography color={Colors.light.notSelected} variant="p1" style={{ textAlign: 'center' }}>{steps[step].desc}</Typography>
         </Animated.View>
 
         <View style={[style.btnContainer]}>
@@ -94,7 +95,7 @@ const Stepper = ({ current, handlePress }: { current: number, handlePress: (step
 
         {new Array(4).fill('.').map((step, idx) => <Pressable key={idx} onPress={() => handlePress(idx)} style={{ flex: 1 }}><View style={[{
             borderRadius: 10,
-            height: 8,
+            height: rV(8),
             backgroundColor: Colors.light.gray,
         }]} /></Pressable>)}
     </View>
@@ -104,11 +105,12 @@ const Stepper = ({ current, handlePress }: { current: number, handlePress: (step
 const style = StyleSheet.create({
     container: {
         display: 'flex',
+        flex: 1,
         alignItems: 'center',
         justifyContent: "space-evenly"
     },
     image: {
-        width: 300, height: 300
+        width: rS(300), height: rV(300)
     },
     signin: {
         color: Colors.light.primary,
@@ -119,22 +121,21 @@ const style = StyleSheet.create({
     },
     textContainer: {
         display: 'flex',
-        justifyContent: 'flex-end',
-        gap: 20,
-        marginBottom: 30,
-        height: 200,
+        justifyContent: 'center',
+        gap: rS(20),
+        marginBottom: rV(30),
     },
     stepper: {
         width: '80%',
-        gap: 10,
+        gap: rS(10),
         marginHorizontal: 'auto',
-        height: 8,
+        height: rV(8),
         display: 'flex',
         flexDirection: 'row'
     },
     step: {
         backgroundColor: Colors.light.notSelected,
-        height: 8,
+        height: rV(8),
     },
 })
 

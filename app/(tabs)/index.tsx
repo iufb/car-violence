@@ -1,6 +1,7 @@
 import { ScreenContainer, Search } from "@/components";
 import { Card, Typography } from "@/components/ui";
 import { mockCardData } from "@/constants/Colors";
+import { rS, rV } from "@/utils";
 import { Tabs } from "expo-router";
 import { Dimensions, FlatList, SafeAreaView, ScrollView, StyleSheet } from "react-native";
 
@@ -26,20 +27,20 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        gap: 20,
+        gap: rS(20),
     },
     violenceContainer: {
-        width: 400,
-        gap: 10
+        width: rS(400),
+        gap: rS(10)
     },
     newsContainer: {
         display: 'flex',
-        minHeight: 230,
-        gap: 20
+        minHeight: rV(230),
+        gap: rS(20)
     },
     violences: {
         width: Dimensions.get('window').width - 40,
-        height: 300
+        height: rV(300)
     },
     news: {
         width: Dimensions.get('window').width / 2,

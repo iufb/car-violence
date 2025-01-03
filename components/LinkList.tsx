@@ -12,7 +12,7 @@ interface LinkListProps extends ViewProps {
 
 }
 export const LinkList = ({ items, style, ...props }: LinkListProps) => {
-    return <SafeAreaView style={[style]} {...props}>
+    return <SafeAreaView style={[style, { flex: 1 }]} {...props}>
         <ScrollView contentContainerStyle={[styles.container]}>
             {items.map((item, idx) => <ListItem key={idx}  {...item} />)}
         </ScrollView>

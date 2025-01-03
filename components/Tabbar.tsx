@@ -107,7 +107,7 @@ export function Tabbar({ state, descriptors, navigation }: BottomTabBarProps) {
                                     <Animated.View style={[animatedIconStyle]}>
                                         {icon(isFocused ? Colors.light.selected : Colors.light.notSelected)}
                                     </Animated.View>
-                                    <Animated.Text style={[{ color: isFocused ? Colors.light.selected : Colors.light.notSelected, }, animatedTextStyle]}>
+                                    <Animated.Text allowFontScaling={false} style={[{ color: isFocused ? Colors.light.selected : Colors.light.notSelected, }, animatedTextStyle]}>
                                         {label}
                                     </Animated.Text>
                                 </View>
