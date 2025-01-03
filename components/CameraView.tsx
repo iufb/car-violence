@@ -6,7 +6,7 @@ import { CameraType, CameraView, Camera as ExpoCamera, useCameraPermissions } fr
 import { usePathname, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Dimensions, Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
-import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { interpolate, interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type CameraModeType = 'picture' | 'video'
@@ -77,12 +77,12 @@ export function Camera({ setMedias, closeCameraOnEnd }: { setMedias: (media: str
     return (
         <View style={[{ paddingBottom: insets.bottom }]}>
             <View style={[styles.container]}>
-                <CameraView ref={cameraRef} style={[{ width, height: height - CONTROLS_HEIGHT }]} facing={facing} mode={cameraMode} >
+                <CameraView videoQuality='1080p' ref={cameraRef} style={[{ width, height: height - CONTROLS_HEIGHT }]} facing={facing} mode={cameraMode} >
                     <Pressable onPress={() => router.back()} style={[styles.close]}>
                         <MaterialCommunityIcons name='close' size={32} color='white' />
                     </Pressable>
                 </CameraView>
-                <Controls toggleCameraFacing={toggleCameraFacing} save={(value) => {
+                <Controls facing={facing} toggleCameraFacing={toggleCameraFacing} save={(value) => {
                     setMedias(value)
                     closeCameraOnEnd()
                 }} isRecording={isRecording} mode={cameraMode} selectMode={mode => {
@@ -97,12 +97,12 @@ export function Camera({ setMedias, closeCameraOnEnd }: { setMedias: (media: str
     );
 }
 
-const Controls = ({ mode, selectMode, capture, save, isRecording, toggleCameraFacing }: CaptureBtnProps & FlipBtnProps & ImportBtnProps & ModeSelectorProps) => {
+const Controls = ({ facing, mode, selectMode, capture, save, isRecording, toggleCameraFacing }: CaptureBtnProps & FlipBtnProps & ImportBtnProps & ModeSelectorProps) => {
     return <View style={[styles.controls]}>
         <View style={[styles.topControls]}>
             <ImportBtn save={save} />
             <CaptureBtn mode={mode} capture={capture} isRecording={isRecording} />
-            <FlipBtn toggleCameraFacing={toggleCameraFacing} />
+            <FlipBtn facing={facing} toggleCameraFacing={toggleCameraFacing} />
         </View>
         <View style={[styles.bottomControls]}>
             <ModeSelector mode={mode} selectMode={selectMode} />
@@ -142,33 +142,33 @@ const CaptureBtn = ({ mode, capture, isRecording }: CaptureBtnProps) => {
     </View>
 }
 interface FlipBtnProps {
+    facing: "back" | 'front'
     toggleCameraFacing: () => void
 }
-const FlipBtn = ({ toggleCameraFacing }: FlipBtnProps) => {
+const FlipBtn = ({ facing, toggleCameraFacing }: FlipBtnProps) => {
     const rotate = useSharedValue(0)
     const animatedStyle = useAnimatedStyle(() => {
-        return { transform: [{ rotate: `${rotate.value}deg` }] }
+        const rotation = interpolate(rotate.value, [0, 1], [1, 3])
+        return { transform: [{ rotate: rotation + 'deg' }] }
     })
-    return <View style={[styles.btn]}>
-        <Pressable onPress={() => {
-            rotate.value = withTiming(rotate.value == 0 ? 180 : 0, { duration: 300 });
-            toggleCameraFacing()
-        }}>
-            <Animated.View style={[animatedStyle]}>
-                <FontAwesome6 name='arrows-rotate' size={24} color={Colors.light.background} />
-            </Animated.View>
-        </Pressable>
-    </View>
+    //IOS- FIX rotate animation
+    const flip = () => {
+        rotate.value = withTiming(rotate.value == 0 ? 90 : 0,
+        )
+        toggleCameraFacing()
+    }
+    return <Pressable style={[styles.btn]} onPress={flip}>
+        <Animated.View style={[animatedStyle]}>
+            <FontAwesome6 name='arrows-rotate' size={24} color={Colors.light.background} />
+        </Animated.View>
+    </Pressable>
 
 }
 interface ImportBtnProps {
     save: (value: string[]) => void
 }
 const ImportBtn = ({ save }: ImportBtnProps) => {
-    return <View style={[styles.btn]}>
-        <Pressable onPress={() => pickImage(save)}><Entypo name='image' size={24} color={Colors.light.background} /></Pressable>
-    </View>
-
+    return <Pressable style={[styles.btn]} onPress={() => pickImage(save)}><Entypo name='image' size={24} color={Colors.light.background} /></Pressable>
 }
 
 const modes: { label: string, value: CameraModeType }[] = [
@@ -251,5 +251,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         gap: 25,
+    },
+    pressable: {
+        width: '100%', height: '100%'
     }
 });
