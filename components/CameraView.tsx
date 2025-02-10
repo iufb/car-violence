@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 type CameraModeType = 'picture' | 'video'
 const CONTROLS_HEIGHT = 200
 
-export function Camera({ setMedias, closeCameraOnEnd }: { setMedias: (media: string[]) => void, closeCameraOnEnd: () => void }) {
+export function Camera({ medias, setMedias, closeCameraOnEnd }: { medias: string[], setMedias: (media: string[]) => void, closeCameraOnEnd: () => void }) {
     const [cameraMode, setCameraMode] = useState<CameraModeType>('picture')
     const [facing, setFacing] = useState<CameraType>('back');
     const [isRecording, setIsRecording] = useState(false);
@@ -78,7 +78,12 @@ export function Camera({ setMedias, closeCameraOnEnd }: { setMedias: (media: str
         <View style={[{ paddingBottom: insets.bottom }]}>
             <View style={[styles.container]}>
                 <CameraView videoQuality='1080p' ref={cameraRef} style={[{ width, height: height - CONTROLS_HEIGHT }]} facing={facing} mode={cameraMode} >
-                    <Pressable onPress={() => router.back()} style={[styles.close]}>
+                    {medias.length > 0 &&
+                        <Pressable hitSlop={30} onPress={() => closeCameraOnEnd()} style={[styles.back]}>
+                            <MaterialCommunityIcons name='chevron-left' size={32} color='white' />
+                        </Pressable>
+                    }
+                    <Pressable hitSlop={30} onPress={() => router.back()} style={[styles.close]}>
                         <MaterialCommunityIcons name='close' size={32} color='white' />
                     </Pressable>
                 </CameraView>
@@ -224,6 +229,12 @@ const styles = StyleSheet.create({
         top: 20,
         right: 20
     },
+    back: {
+        position: 'absolute',
+        top: 20,
+        left: 10
+    },
+
     topControls: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -254,5 +265,6 @@ const styles = StyleSheet.create({
     },
     pressable: {
         width: '100%', height: '100%'
-    }
+    },
+
 });

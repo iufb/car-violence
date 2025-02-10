@@ -44,7 +44,7 @@ export default function Add() {
     return <View style={[styles.container]}>
         <Tabs.Screen options={{ headerShown: false }} />
         {view == 'camera' &&
-            <Camera setMedias={media => setMedias([...medias, ...media])} closeCameraOnEnd={closeCameraOnEnd} />}
+            <Camera medias={medias} setMedias={media => setMedias([...medias, ...media])} closeCameraOnEnd={closeCameraOnEnd} />}
         {view == 'form' &&
             <SendViolenceForm setMedias={(value) => setMedias(() => {
                 return value
