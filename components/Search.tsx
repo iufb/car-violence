@@ -34,14 +34,13 @@ const styles = StyleSheet.create({
     },
     trigger: {
         width: '100%',
-        height: rV(45),
         backgroundColor: Colors.light.background,
         borderColor: Colors.light.primary,
         borderWidth: 1,
-        borderRadius: 24,
-        paddingVertical: rS(5),
+        borderRadius: 16,
+        paddingVertical: rS(8),
         paddingHorizontal: rS(16),
-        flexDirection: 'row', gap: rS(16),
+        flexDirection: 'row', gap: rS(8),
         alignItems: 'center',
     },
     modal: {

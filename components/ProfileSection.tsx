@@ -6,7 +6,7 @@ const lvl = [require("../assets/user/lvl-1.png"), require("../assets/user/lvl-2.
 export const ProfileSection = ({ style, ...props }: ViewProps) => {
     return <View style={[styles.container, style]}>
         <View>
-            <Image style={[styles.lvl]} source={lvl[0]} />
+            {/* <Image style={[styles.lvl]} source={lvl[0]} /> */}
             <Image style={[styles.img]} source={require('../assets/user/Avatar.png')} />
             <EditProfileButton />
         </View>

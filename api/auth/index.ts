@@ -3,6 +3,12 @@ import { customFetch } from "../"
 export const rConfirmCode = ({ tel }: { tel: string }) => {
     return customFetch({ method: "POST", path: 'send-code/', data: { phone_number: '+' + tel } })
 }
+export const rPasswordReset = (phone: string) => {
+    return customFetch({ method: "POST", path: 'auth/request_password_reset/', data: { phone_number: phone } })
+}
+export const rConfirmPasswordReset = (data: { phone_number: string, code: string, new_password: string }) => {
+    return customFetch({ method: "POST", path: 'auth/confirm_password_reset/', data })
+}
 export const rVerifyCode = (data: {
     phone_number: string,
     code: string,

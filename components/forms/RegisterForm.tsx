@@ -24,7 +24,7 @@ export const RegisterForm = () => {
     const submit: SubmitHandler<any> = (data) => {
         console.log(data)
         sendCode(data.tel).then(() => {
-            router.push(`/(auth)/confirmation?info=${JSON.stringify(data)}`)
+            router.push(`/(auth)/confirmation?info=${JSON.stringify(data)}&type=register`)
         })
     }
     const isDisabled = Object.keys(errors).length !== 0 || !rulesConfirm;

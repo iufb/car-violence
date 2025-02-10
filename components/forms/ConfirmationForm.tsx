@@ -1,7 +1,7 @@
-import { rConfirmCode, rVerifyCode } from "@/api/auth";
+import { rConfirmCode, rConfirmPasswordReset, rPasswordReset, rVerifyCode } from "@/api/auth";
 import { Button, Typography } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
-import { RegisterDTO } from "@/types";
+import { ConfirmationType, RegisterDTO, ResetPasswordDTO } from "@/types";
 import { showToast } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
@@ -16,9 +16,10 @@ import {
 
 const CELL_COUNT = 6;
 interface ConfirmationFormProps {
-    userData: RegisterDTO
+    userData: RegisterDTO & ResetPasswordDTO
+    type: 'register' | 'reset'
 }
-export const ConfirmationForm = ({ userData }: ConfirmationFormProps) => {
+export const ConfirmationForm = ({ type, userData }: ConfirmationFormProps) => {
     const [value, setValue] = useState('');
     const ref = useBlurOnFulfill({ value, cellCount: CELL_COUNT });
     const [props, getCellOnLayoutHandler] = useClearByFocusCell({
@@ -27,7 +28,6 @@ export const ConfirmationForm = ({ userData }: ConfirmationFormProps) => {
     });
     const router = useRouter()
     const { mutateAsync: verifyCode, isPending } = useMutation({
-
         mutationKey: ['verifyCode'], mutationFn: rVerifyCode,
         onSuccess: (data) => {
             console.log(data)
@@ -39,8 +39,26 @@ export const ConfirmationForm = ({ userData }: ConfirmationFormProps) => {
             console.log(e)
         }
     })
+    const { mutateAsync: confirmReset, isPending: isConfirmResetPending } = useMutation({
+        mutationKey: ['verifyCode'], mutationFn: rConfirmPasswordReset,
+        onSuccess: (data) => {
+            console.log(data)
+            showToast({ type: 'success', title: "Успешно", desc: "Пароль обновлен успешно" })
+            router.push('/(auth)/login')
+        },
+        onError: (e) => {
+            showToast({ type: 'error', title: "Ошибка", desc: "Неверный код" })
+            console.log(e)
+        }
+    })
     const submit = () => {
-        verifyCode({ password: userData.password, phone_number: '+' + userData.tel, code: value, full_name: "1" })
+        console.log({ phone_number: '+' + userData.phone, code: value, new_password: userData.new_password })
+        switch (type) {
+            case 'register': verifyCode({ password: userData.password, phone_number: '+' + userData.tel, code: value, full_name: " " })
+                break;
+            case 'reset': confirmReset({ phone_number: '+' + userData.phone, code: value, new_password: userData.new_password })
+                break;
+        }
     }
     return <View style={[styles.container]}>
         <CodeField
@@ -63,12 +81,12 @@ export const ConfirmationForm = ({ userData }: ConfirmationFormProps) => {
                 </Text>
             )}
         />
-        <AskCodeAgain tel={userData.tel} />
-        <Button disabled={isPending} loading={isPending} onPress={submit}>Продолжить</Button>
+        <AskCodeAgain tel={userData.tel ?? userData.phone} type={type} />
+        <Button disabled={isPending || isConfirmResetPending} loading={isPending || isConfirmResetPending} onPress={submit}>Продолжить</Button>
     </View>
 }
-const AskCodeAgain = ({ tel }: { tel: string }) => {
-    const { mutateAsync: sendCode } = useMutation({
+const AskCodeAgain = ({ tel, type }: { tel: string, type: ConfirmationType }) => {
+    const { mutateAsync: sendRegisterCode } = useMutation({
         mutationKey: ['sendConfirmCode'], mutationFn: (tel: string) => rConfirmCode({ tel }),
         onSuccess: () => {
             setTimer(60)
@@ -77,7 +95,17 @@ const AskCodeAgain = ({ tel }: { tel: string }) => {
             console.log(e)
         }
     })
-    console.log(tel)
+    const { mutateAsync: sendResetCode } = useMutation({
+        mutationKey: ['restorePassword'], mutationFn: (tel: string) => rPasswordReset('+' + tel),
+        onSuccess: () => {
+
+            setTimer(60)
+        },
+        onError: (e) => {
+            console.log(e)
+        }
+    })
+
     const [timer, setTimer] = useState(60)
     const disabled = timer > 0
     useEffect(() => {
@@ -89,7 +117,15 @@ const AskCodeAgain = ({ tel }: { tel: string }) => {
 
         return () => clearInterval(interval);
     }, [timer])
-    return <Pressable onPress={() => sendCode(tel)} disabled={disabled} style={[styles.again]}
+    const handlePress = () => {
+        switch (type) {
+            case 'register': sendRegisterCode(tel)
+                break;
+            case 'reset': sendResetCode(tel)
+                break;
+        }
+    }
+    return <Pressable onPress={handlePress} disabled={disabled} style={[styles.again]}
     >
         <Typography color={disabled ? Colors.light.notSelected : Colors.light.primary} style={[styles.center]} variant="p2">Отправить код заново {disabled && `через ${timer} секунд`}</Typography>
     </Pressable>

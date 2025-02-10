@@ -6,7 +6,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 interface ImageInputProps {
     label: string
     value: string
-    setImage: (value: string) => void
+    setImage: (value: string[]) => void
 }
 export const ImageInput = ({ label, value, setImage }: ImageInputProps) => {
     return <View style={[styles.container]}>

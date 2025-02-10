@@ -13,8 +13,7 @@ interface CardProps extends ViewProps {
     color?: string,
     desc: string,
     link: LinkProps['href'],
-}
-export const Card = ({ variant = 'base', link, title, color, img, subtitle, desc, style, ...props }: CardProps) => {
+} export const Card = ({ variant = 'base', link, title, color, img, subtitle, desc, style, ...props }: CardProps) => {
     const [uri, setUri] = useState(img)
     const handleImgError = () => {
         setUri(
@@ -50,7 +49,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 10,
         gap: 2,
-        height: rV(90)
+        height: rV(70)
     },
     horizontalImg: {
         flex: 4,
