@@ -11,7 +11,7 @@ interface ImageInputProps {
 export const ImageInput = ({ label, value, setImage }: ImageInputProps) => {
     return <View style={[styles.container]}>
         <Typography variant="span">{label}</Typography>
-        <Pressable style={[styles.input]} onPress={() => pickImage(setImage)} >
+        <Pressable style={[styles.input]} onPress={() => pickImage({ saveAsUri: setImage })} >
             <Entypo name="image" size={24} color={Colors.light.notSelected} />
             <Typography color={Colors.light.borderColor} variant="h3">Выберите фото</Typography>
         </Pressable>

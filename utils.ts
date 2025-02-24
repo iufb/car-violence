@@ -3,8 +3,13 @@ import * as ImagePicker from 'expo-image-picker';
 import * as SecureStore from 'expo-secure-store';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import Toast, { ToastType } from 'react-native-toast-message';
-export const pickImage = async (saveSelected: (value: string[]) => void) => {
-    // No permissions request is necessary for launching the image library
+export const pickImage = async ({
+    saveAsUri,
+    saveAsFile
+}: {
+    saveAsUri?: (value: string[]) => void,
+    saveAsFile?: (value: ImagePicker.ImagePickerAsset[]) => void
+}) => {    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images', 'videos'],
         allowsMultipleSelection: true,
@@ -15,7 +20,11 @@ export const pickImage = async (saveSelected: (value: string[]) => void) => {
 
 
     if (!result.canceled) {
-        saveSelected(result.assets.map(asset => asset.uri));
+        if (saveAsUri)
+            saveAsUri(result.assets.map(asset => asset.uri));
+        if (saveAsFile) {
+            saveAsFile(result.assets)
+        }
     }
 };
 

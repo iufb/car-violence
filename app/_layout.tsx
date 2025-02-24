@@ -15,6 +15,7 @@ import { ActivityIndicator, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -22,6 +23,8 @@ SplashScreen.preventAutoHideAsync();
 const navigationIntegration = Sentry.reactNavigationIntegration({
     enableTimeToInitialDisplay: !isRunningInExpoGo(),
 });
+
+
 
 export const client = new QueryClient()
 Sentry.init({
