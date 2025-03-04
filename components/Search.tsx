@@ -1,12 +1,12 @@
 import { Button, Typography } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
 import { useBackgroundUpload } from "@/hooks/useBackgroundUpload";
-import { pickImage, rS, rV } from "@/utils";
+import { rS, rV } from "@/utils";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Constants from 'expo-constants';
 import * as MediaLibrary from 'expo-media-library';
 import React, { useEffect, useState } from "react";
-import { Dimensions, Image, Modal, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { DeviceEventEmitter, Dimensions, Image, Modal, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 
 function getFileExtension(uri: string) {
     const match = /\.([a-zA-Z]+)$/.exec(uri)
@@ -52,7 +52,7 @@ export const Search = () => {
             <View style={[styles.modal]}>
                 <Pressable onPress={closeModal}>
                     <Typography variant="h1">Hello</Typography>
-                    <Pressable onPress={() => pickImage({ saveAsUri: (img) => setImage(img) })}>
+                    <Pressable onPress={() => DeviceEventEmitter.emit('openAssetsPicker', () => console.log('picker'))}>
 
                         <Typography variant="h3">Vibrat</Typography>
                     </Pressable>

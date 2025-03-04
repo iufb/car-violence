@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import React from 'react';
 
+import { AssetsPicker } from '@/components/Gallery';
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { isRunningInExpoGo } from 'expo';
@@ -99,6 +100,7 @@ function RootLayout() {
                     <InitialLayout />
                 </QueryClientProvider>
                 <Toast />
+                <AssetsPicker />
             </ThemeProvider>
         </GestureHandlerRootView>
     );
