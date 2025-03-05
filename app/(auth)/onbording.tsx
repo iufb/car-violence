@@ -43,9 +43,11 @@ export default function Onbording() {
     const router = useRouter()
     const handleNext = async () => {
         if (step == 4) {
-            await SecureStore.setItemAsync('isFirstBoot', 'false')
             router.push('/register')
             return;
+        }
+        if (step == 3) {
+            await SecureStore.setItemAsync('isFirstBoot', 'false')
         }
         setStep(step + 1)
     }
