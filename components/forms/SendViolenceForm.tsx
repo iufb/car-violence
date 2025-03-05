@@ -26,8 +26,8 @@ export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...prop
             console.log(data)
             showToast({ type: 'success', title: "Отправлено", desc: "Нарушение было отправлено!" })
             reset()
-            setMedias([])
             client.invalidateQueries({ queryKey: ['myVideos'] })
+            setMedias([])
         }, onError: (e) => {
             showToast({ type: 'error', title: "Ошибка", desc: "Произошла ошибка" })
             console.log(e)

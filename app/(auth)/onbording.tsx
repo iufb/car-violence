@@ -4,6 +4,7 @@ import { Button, Typography } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
 import { rS, rV } from "@/utils";
 import { Link, Tabs, useRouter } from "expo-router";
+import * as SecureStore from 'expo-secure-store';
 import { useEffect, useState } from "react";
 import { Image, LayoutChangeEvent, Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeInRight, FadeInUp, FadeOutLeft, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
@@ -40,8 +41,9 @@ const steps = [
 export default function Onbording() {
     const [step, setStep] = useState(0)
     const router = useRouter()
-    const handleNext = () => {
+    const handleNext = async () => {
         if (step == 4) {
+            await SecureStore.setItemAsync('isFirstBoot', 'false')
             router.push('/register')
             return;
         }

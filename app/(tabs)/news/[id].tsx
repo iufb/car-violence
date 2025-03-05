@@ -17,7 +17,6 @@ export default function NewsScreen() {
             return data
         }
     })
-    console.log(data, "NEWS")
     return <ScreenContainer keyDismiss={false}>
         <Tabs.Screen options={{ header: () => <CustomHeader title="Новости" /> }} />
         <SafeAreaView>

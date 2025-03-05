@@ -35,22 +35,32 @@ Sentry.init({
     ],
     enableNativeFramesTracking: !isRunningInExpoGo(), // Tracks slow and frozen frames in the application
 });
+
 const InitialLayout = () => {
 
     const router = useRouter();
-    const { isLoaded, isSignedIn } = useAuth();
+    const { isLoaded, isSignedIn, isFirstBoot } = useAuth();
     const segments = useSegments();
     const pathname = usePathname();
 
     useEffect(() => {
-        if (!isLoaded) return;
-        const inAuthGroup = segments[0] === '(auth)';
-        if (isSignedIn) {
-            router.replace('/');
+        const redirect = async () => {
+
+            if (!isLoaded) return;
+            if (isFirstBoot) {
+                router.replace('/onbording');
+                return;
+            }
+            if (isSignedIn) {
+                router.replace('/');
+                return;
+            }
+            if (!isSignedIn) {
+                router.replace('/(auth)/login');
+            }
         }
-        if (!isSignedIn) {
-            router.replace('/(auth)/login');
-        }
+        redirect()
+
     }, [isLoaded]);
 
     if (!isLoaded) {

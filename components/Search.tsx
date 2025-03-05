@@ -17,7 +17,7 @@ export const Search = () => {
         <Modal visible={modalVisible} onRequestClose={closeModal} animationType="fade"  >
             <View style={[styles.modal]}>
                 <Pressable onPress={closeModal}>
-                    <Typography variant="h1">Hello</Typography>
+                    <Typography variant="h1">Закрыть</Typography>
                 </Pressable>
             </View>
         </Modal>

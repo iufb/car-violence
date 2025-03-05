@@ -4,7 +4,7 @@ import { rS, rV } from "@/utils";
 import { Feather } from '@expo/vector-icons';
 import { useState } from "react";
 import { Control, Controller, RegisterOptions } from "react-hook-form";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, TextInput, View } from "react-native";
 import { MaskedTextInput, MaskedTextInputProps } from "react-native-mask-text";
 
 interface InputProps {
@@ -30,6 +30,7 @@ const getBorderStyle = (focused: boolean, error: boolean): "borderNormal" | "bor
 export const Input = ({ bg, error, rules, name, control, required = true, label, input: { secureTextEntry, onChangeText, ...inputProps } }: InputProps) => {
     const [focused, setFocused] = useState(false)
     const [secure, setSecure] = useState(secureTextEntry)
+    const Component = inputProps.mask ? MaskedTextInput : TextInput
     return <Controller name={name} control={control} render={({ field: { onChange, value, onBlur } }) => {
         return <View style={[styles.container]}>
             <View style={[styles.label]}>
@@ -38,10 +39,12 @@ export const Input = ({ bg, error, rules, name, control, required = true, label,
                 </Typography>
             </View>
             <View style={[styles.inputContainer, styles.border, styles[getBorderStyle(focused, !!error)], inputProps.multiline && { height: 90 }]}>
-                <MaskedTextInput onChangeText={(_, value) => onChange(value)} secureTextEntry={secure} placeholderTextColor={Colors.light.borderColor} onFocus={() => setFocused(true)} onBlur={() => {
-                    setFocused(false)
-                    onBlur()
-                }} style={[styles.input, styles.base]} {...inputProps} />
+                <Component
+                    //@ts-ignore
+                    type={'text'} onChangeText={inputProps.mask ? ((_, value) => onChange(value)) : ((value) => onChange(value))} secureTextEntry={secure} placeholderTextColor={Colors.light.borderColor} onFocus={() => setFocused(true)} onBlur={() => {
+                        setFocused(false)
+                        onBlur()
+                    }} style={[styles.input, styles.base]} {...inputProps} />
                 {secureTextEntry &&
                     <Pressable style={[styles.secureToggle]} onPress={() => setSecure(!secure)}>
                         <Feather size={20} name={secure ? "eye-off" : "eye"} />
