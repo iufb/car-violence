@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui";
+import { Typography } from "@/components/ui";
 import { rV } from "@/utils";
 import { useEffect, useState } from "react";
-import { DeviceEventEmitter, Dimensions, Modal, StyleSheet, Text, View } from "react-native";
+import { DeviceEventEmitter, Dimensions, Modal, Pressable, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 interface AssetsPickerBase {
@@ -24,16 +24,15 @@ export const AssetsPicker = () => {
         <View style={[styles.container]}>
             <View style={[styles.top]} />
 
-            <Button>123</Button>
             <Tabs />
         </View>
     </Modal></GestureHandlerRootView>
 
 };
-
+const tabs = ['Фото', 'Видео']
 const Tabs = () => {
-    return <View>
-        <Text></Text>
+    return <View >
+        {tabs.map(t => <Pressable><Typography key={t} variant="h3">{t}</Typography></Pressable>)}
     </View>
 
 }
@@ -54,6 +53,9 @@ const styles = StyleSheet.create({
         marginTop: rV(10),
         alignSelf: 'center',
         backgroundColor: 'black'
+    },
+    tabs: {
+        flexDirection: 'row'
     }
 
 })
