@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui";
 import { rV } from "@/utils";
 import { useEffect, useState } from "react";
 import { DeviceEventEmitter, Dimensions, Modal, StyleSheet, Text, View } from "react-native";
@@ -19,13 +20,15 @@ export const AssetsPicker = () => {
         return () => listener.remove();
     }, []);
 
-    return <GestureHandlerRootView><Modal visible={visible} transparent={true} animationType="slide" onRequestClose={() => setVisible(false)}>
+    return visible && <GestureHandlerRootView><Modal visible={visible} transparent={true} animationType="slide" onRequestClose={() => setVisible(false)}>
         <View style={[styles.container]}>
             <View style={[styles.top]} />
 
+            <Button>123</Button>
             <Tabs />
         </View>
     </Modal></GestureHandlerRootView>
+
 };
 
 const Tabs = () => {
