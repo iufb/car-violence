@@ -195,6 +195,7 @@ const styles = StyleSheet.create({
         padding: 5,
     },
     mediaContainer: {
+        minHeight: width * 9 / 16,
         gap: 10,
     },
     mediasViews: {

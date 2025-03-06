@@ -12,6 +12,7 @@ export default function Add() {
     const [medias, setMedias] = useState<string[]>([])
     const [view, setView] = useState<ViewType>('camera')
     const router = useRouter()
+    console.log(medias)
     const path = usePathname()
     useEffect(() => {
         if (path !== '/add') {
@@ -43,8 +44,7 @@ export default function Add() {
     }
     return <View style={[styles.container]}>
         <Tabs.Screen options={{ headerShown: false }} />
-        {view == 'camera' &&
-            <Camera setMedias={media => setMedias([...medias, ...media])} closeCameraOnEnd={closeCameraOnEnd} />}
+        {view == 'camera' && <Camera medias={medias} isActive={view == 'camera'} setMedias={media => setMedias([...medias, ...media])} closeCameraOnEnd={closeCameraOnEnd} />}
         {view == 'form' &&
             <SendViolenceForm setMedias={(value) => setMedias(() => {
                 return value

@@ -2,64 +2,88 @@ import { Typography } from '@/components/ui';
 import { Colors } from '@/constants/Colors';
 import { pickImage } from '@/utils';
 import { Entypo, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
-import { CameraType, CameraView, Camera as ExpoCamera, useCameraPermissions } from 'expo-camera';
+import { Camera as ExpoCamera, useCameraPermissions } from 'expo-camera';
 import { usePathname, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Dimensions, Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Dimensions, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, { interpolate, interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CameraPosition, Camera as CameraView, useCameraDevice, useCameraFormat } from 'react-native-vision-camera';
 
 type CameraModeType = 'picture' | 'video'
 const CONTROLS_HEIGHT = 200
 
-export function Camera({ setMedias, closeCameraOnEnd }: { setMedias: (media: string[]) => void, closeCameraOnEnd: () => void }) {
+export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isActive: boolean, medias: string[], setMedias: (media: string[]) => void, closeCameraOnEnd: () => void }) {
     const [cameraMode, setCameraMode] = useState<CameraModeType>('picture')
-    const [facing, setFacing] = useState<CameraType>('back');
+    const [facing, setFacing] = useState<CameraPosition>('back');
+    const device = useCameraDevice(facing)
     const [isRecording, setIsRecording] = useState(false);
+    const format = useCameraFormat(device, [
+        { videoAspectRatio: 16 / 9 },
+        { videoResolution: { width: 3048, height: 2160 } },
+        { fps: 60 }
+    ])
     const [permission, requestPermission] = useCameraPermissions();
     const { width, height } = useWindowDimensions()
     const insets = useSafeAreaInsets()
     const path = usePathname()
     const router = useRouter()
     const cameraRef = useRef<CameraView>(null)
-
     useEffect(() => {
         if (!permission || !permission.granted) {
             requestPermission()
         }
     }, [permission])
 
-    function toggleCameraFacing() {
-        setFacing(current => (current === 'back' ? 'front' : 'back'));
-    }
-    async function capturePhoto() {
+    if (!permission) return <View><Text>No permission</Text></View>
+
+    if (device == null) return <View><Text>No device</Text></View>
+    const capturePhoto = async () => {
         try {
-            let photo = await cameraRef.current?.takePictureAsync()
-            console.log(photo)
-            setMedias([photo?.uri ?? ""])
-            closeCameraOnEnd()
+            if (cameraRef.current) {
+                const photo = await cameraRef.current.takePhoto()
+                setMedias([...medias, 'file://' + photo.path])
+                closeCameraOnEnd()
+            }
         } catch (e) {
             console.log(e)
         }
     }
+    function toggleCameraFacing() {
+        setFacing(current => (current === 'back' ? 'front' : 'back'));
+    }
     async function recordMedia() {
         try {
-            await ExpoCamera.requestMicrophonePermissionsAsync()
-            setIsRecording(true)
-            let recording = await cameraRef.current?.recordAsync()
-            setMedias([recording?.uri ?? ""])
-            console.log(recording)
+            if (cameraRef.current) {
+                setIsRecording(true)
+                const microPermissions = await ExpoCamera.requestMicrophonePermissionsAsync()
+                if (!microPermissions) {
+                    return;
+                }
+                cameraRef.current.startRecording({
+                    onRecordingFinished: (video) => {
+                        setMedias([...medias, 'file://' + video.path])
+                        setIsRecording(false)
+                    },
+                    onRecordingError: (error) => {
+                        setIsRecording(false)
+                        console.error(error)
+                    }
+                })
+            }
         } catch (e) {
             console.log(e)
         }
 
     }
     async function stopRecord() {
-        cameraRef.current?.stopRecording()
-        setIsRecording(false)
-        setTimeout(() => {
-            closeCameraOnEnd()
-        }, 1000)
+        if (cameraRef.current) {
+            await cameraRef.current.stopRecording()
+            setIsRecording(false)
+            setTimeout(() => {
+                closeCameraOnEnd()
+            }, 1000)
+        }
     }
     const fn = () => {
         if (cameraMode == 'picture') {
@@ -77,11 +101,11 @@ export function Camera({ setMedias, closeCameraOnEnd }: { setMedias: (media: str
     return (
         <View style={[{ paddingBottom: insets.bottom }]}>
             <View style={[styles.container]}>
-                <CameraView videoQuality='1080p' ref={cameraRef} style={[{ width, height: height - CONTROLS_HEIGHT }]} facing={facing} mode={cameraMode} >
-                    <Pressable onPress={() => router.back()} style={[styles.close]}>
-                        <MaterialCommunityIcons name='close' size={32} color='white' />
-                    </Pressable>
-                </CameraView>
+                <CameraView style={[{ width, height: height - CONTROLS_HEIGHT }]} format={format} ref={cameraRef} device={device} isActive={isActive} photo video audio preview />
+                <Pressable onPress={() => router.back()} style={[styles.close]}>
+                    <MaterialCommunityIcons name='close' size={32} color='white' />
+                </Pressable>
+
                 <Controls facing={facing} toggleCameraFacing={toggleCameraFacing} save={(value) => {
                     setMedias(value)
                     closeCameraOnEnd()
@@ -142,7 +166,7 @@ const CaptureBtn = ({ mode, capture, isRecording }: CaptureBtnProps) => {
     </View>
 }
 interface FlipBtnProps {
-    facing: "back" | 'front'
+    facing: CameraPosition
     toggleCameraFacing: () => void
 }
 const FlipBtn = ({ facing, toggleCameraFacing }: FlipBtnProps) => {
@@ -209,7 +233,7 @@ const ModeSelector = ({ mode: selected, selectMode: select }: ModeSelectorProps)
 
 const styles = StyleSheet.create({
     container: {
-        flexGrow: 1,
+        flex: 1,
     },
     controls: {
         paddingTop: 20,
