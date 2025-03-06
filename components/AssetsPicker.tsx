@@ -1,5 +1,5 @@
 import { Typography } from "@/components/ui";
-import { rV } from "@/utils";
+import { DeviceWidth, rV } from "@/utils";
 import { useEffect, useState } from "react";
 import { DeviceEventEmitter, Dimensions, Modal, Pressable, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -23,7 +23,6 @@ export const AssetsPicker = () => {
     return visible && <GestureHandlerRootView><Modal visible={visible} transparent={true} animationType="slide" onRequestClose={() => setVisible(false)}>
         <View style={[styles.container]}>
             <View style={[styles.top]} />
-
             <Tabs />
         </View>
     </Modal></GestureHandlerRootView>
@@ -31,8 +30,9 @@ export const AssetsPicker = () => {
 };
 const tabs = ['Фото', 'Видео']
 const Tabs = () => {
-    return <View >
-        {tabs.map(t => <Pressable><Typography key={t} variant="h3">{t}</Typography></Pressable>)}
+    const [activeTab, setActiveTab] = useState(tabs[0])
+    return <View style={[styles.tabs]} >
+        {tabs.map(t => <Pressable key={t}><Typography variant="h3">{t}</Typography></Pressable>)}
     </View>
 
 }
@@ -43,19 +43,21 @@ const VideosView = ({ }: AssetsPickerBase) => { }
 const styles = StyleSheet.create({
     container: {
         position: 'relative',
-        backgroundColor: "#A0B4C2", width: Dimensions.get("window").width, height: Dimensions.get('window').height - rV(100), marginTop: rV(100), borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: 'hidden', padding: 10
+        backgroundColor: "#A0B4C2", width: Dimensions.get("window").width, height: Dimensions.get('window').height - rV(100), marginTop: rV(100), borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: 'hidden', padding: 10,
     },
     top: {
-        position: 'absolute',
-        width: Dimensions.get('window').width - 100,
+        width: DeviceWidth - 100,
         height: rV(4),
         borderRadius: 10,
-        marginTop: rV(10),
+        marginVertical: rV(5),
         alignSelf: 'center',
         backgroundColor: 'black'
     },
     tabs: {
-        flexDirection: 'row'
+        width: DeviceWidth,
+        flexDirection: 'row',
+        gap: 10,
+        justifyContent: 'center'
     }
 
 })
