@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import React from 'react';
 
+import { PermissionAlert } from '@/components/PermissionAlert';
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { isRunningInExpoGo } from 'expo';
@@ -106,6 +107,7 @@ function RootLayout() {
                     <InitialLayout />
                 </QueryClientProvider>
                 <Toast />
+                <PermissionAlert />
             </ThemeProvider>
         </GestureHandlerRootView>
     );

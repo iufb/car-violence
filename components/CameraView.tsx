@@ -1,11 +1,11 @@
-import { Typography } from '@/components/ui';
+import { Button, Typography } from '@/components/ui';
 import { Colors } from '@/constants/Colors';
 import { pickImage } from '@/utils';
 import { Entypo, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Camera as ExpoCamera, useCameraPermissions } from 'expo-camera';
+import { Camera as ExpoCamera } from 'expo-camera';
 import { usePathname, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Dimensions, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { DeviceEventEmitter, Dimensions, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, { interpolate, interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CameraPosition, Camera as CameraView, useCameraDevice, useCameraFormat } from 'react-native-vision-camera';
@@ -23,19 +23,12 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
         { videoResolution: { width: 3048, height: 2160 } },
         { fps: 60 }
     ])
-    const [permission, requestPermission] = useCameraPermissions();
     const { width, height } = useWindowDimensions()
     const insets = useSafeAreaInsets()
     const path = usePathname()
     const router = useRouter()
     const cameraRef = useRef<CameraView>(null)
-    useEffect(() => {
-        if (!permission || !permission.granted) {
-            requestPermission()
-        }
-    }, [permission])
 
-    if (!permission) return <View><Text>No permission</Text></View>
 
     if (device == null) return <View><Text>No device</Text></View>
     const capturePhoto = async () => {
@@ -55,19 +48,22 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
     async function recordMedia() {
         try {
             if (cameraRef.current) {
-                setIsRecording(true)
                 const microPermissions = await ExpoCamera.requestMicrophonePermissionsAsync()
-                if (!microPermissions) {
+                if (microPermissions.status === 'denied') {
+                    DeviceEventEmitter.emit('openPermissionAlert')
                     return;
                 }
+                setIsRecording(true)
                 cameraRef.current.startRecording({
                     onRecordingFinished: (video) => {
                         setMedias([...medias, 'file://' + video.path])
                         setIsRecording(false)
                     },
-                    onRecordingError: (error) => {
+                    onRecordingError: async (error) => {
                         setIsRecording(false)
-                        console.error(error)
+                        if (cameraRef.current)
+                            await cameraRef.current.cancelRecording()
+
                     }
                 })
             }
@@ -97,7 +93,6 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
             }
         }
     }
-
     return (
         <View style={[{ paddingBottom: insets.bottom }]}>
             <View style={[styles.container]}>
@@ -119,6 +114,16 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
 
         </View>
     );
+}
+const CameraNotFound = ({ requestPermission }: { requestPermission: () => void }) => {
+    const router = useRouter()
+    return <View >
+        <View >
+            <Typography color={Colors.light.primary} center variant='h2'>Произошла ошибка</Typography>
+            <Typography center variant='p1'>Камера не обнаружена</Typography>
+            <Button onPress={() => router.back()}>Назад</Button>
+        </View>
+    </View>
 }
 
 const Controls = ({ facing, mode, selectMode, capture, save, isRecording, toggleCameraFacing }: CaptureBtnProps & FlipBtnProps & ImportBtnProps & ModeSelectorProps) => {
@@ -278,5 +283,5 @@ const styles = StyleSheet.create({
     },
     pressable: {
         width: '100%', height: '100%'
-    }
+    },
 });

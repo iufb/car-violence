@@ -2,24 +2,27 @@ import { Camera } from "@/components";
 import { Tabs, usePathname, useRouter } from "expo-router";
 
 import { SendViolenceForm } from "@/components/forms";
+import { Button, Typography } from "@/components/ui";
+import { useCameraPermissions } from "expo-camera";
 import Constants from "expo-constants";
 import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { Colors } from "react-native/Libraries/NewAppScreen";
 
-type ViewType = 'camera' | 'form'
 
 export default function Add() {
     const [medias, setMedias] = useState<string[]>([])
-    const [view, setView] = useState<ViewType>('camera')
+    const [isActive, setIsActive] = useState(true)
+    const [permission, requestPermission] = useCameraPermissions();
     const router = useRouter()
     console.log(medias)
     const path = usePathname()
     useEffect(() => {
         if (path !== '/add') {
-            setView('form')
+            setIsActive(false)
         }
         if (path == '/add' && medias.length === 0) {
-            setView('camera')
+            setIsActive(true)
         }
     }, [path])
 
@@ -29,34 +32,55 @@ export default function Add() {
     }
     useEffect(() => {
         if (medias.length == 0) {
-            setView('camera')
+            setIsActive(true)
         }
     }, [medias])
     const closeCameraOnEnd = () => {
-        setMedias(prev => {
-            if (prev.length === 0) {
-                router.push('/')
-            } else {
-                setView('form')
-            }
-            return prev
-        })
+        setIsActive(false)
     }
+    if (!permission) return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={Colors.light.primary} />
+    </View>
+
+    if (!permission.granted) return <PermissionsPage requestPermission={requestPermission} />
     return <View style={[styles.container]}>
         <Tabs.Screen options={{ headerShown: false }} />
-        {view == 'camera' && <Camera medias={medias} isActive={view == 'camera'} setMedias={media => setMedias([...medias, ...media])} closeCameraOnEnd={closeCameraOnEnd} />}
-        {view == 'form' &&
+        {isActive ? <Camera medias={medias} isActive={isActive} setMedias={media => setMedias([...medias, ...media])} closeCameraOnEnd={closeCameraOnEnd} />
+            :
             <SendViolenceForm setMedias={(value) => setMedias(() => {
                 return value
-            })} medias={medias} openCamera={() => setView('camera')} />
+            })} medias={medias} openCamera={() => setIsActive(true)} />
         }
     </View>
 }
-
+const PermissionsPage = ({ requestPermission }: { requestPermission: () => void }) => {
+    const router = useRouter()
+    return <View style={[styles.permissionsContainer]}>
+        <Tabs.Screen options={{ headerTitle: "Запрос разрешений", headerShown: true }} />
+        <View style={[styles.permissionForm]}>
+            <Typography color={Colors.light.primary} center variant='h2'>Запрос разрешений</Typography>
+            <Typography center variant='p1'>Для корректной работы приложения необходимо разрешение на доступ к камере и микрофону.</Typography>
+            <Typography variant='p2'>Нажмите "Разрешить", чтобы продолжить использование приложения.</Typography>
+            <Button onPress={requestPermission}>Разрешить</Button>
+            <Button onPress={() => router.back()}>Назад</Button>
+        </View>
+    </View>
+}
 const styles = StyleSheet.create({
     container: {
         backgroundColor: 'rgba(0,0,0,.95)',
         paddingTop: Constants.statusBarHeight,
         flex: 1
+    },
+    permissionsContainer: {
+        flex: 1,
+        backgroundColor: 'white',
+        padding: 20,
+        justifyContent: 'center'
+    },
+    permissionForm: {
+        gap: 10
     }
+
+
 })
