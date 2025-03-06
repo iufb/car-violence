@@ -1,5 +1,5 @@
 import { Typography } from "@/components/ui";
-import { DeviceWidth, rV } from "@/utils";
+import { DeviceWidth, rS, rV } from "@/utils";
 import { useEffect, useState } from "react";
 import { DeviceEventEmitter, Dimensions, Modal, Pressable, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -32,7 +32,9 @@ const tabs = ['Фото', 'Видео']
 const Tabs = () => {
     const [activeTab, setActiveTab] = useState(tabs[0])
     return <View style={[styles.tabs]} >
-        {tabs.map(t => <Pressable key={t}><Typography variant="h3">{t}</Typography></Pressable>)}
+        <View style={[styles.tabsContent]}>
+            {tabs.map(t => <Pressable style={[styles.tab]} key={t}><Typography variant="h3">{t}</Typography></Pressable>)}
+        </View>
     </View>
 
 }
@@ -55,9 +57,14 @@ const styles = StyleSheet.create({
     },
     tabs: {
         width: DeviceWidth,
+        justifyContent: 'center'
+    },
+    tabsContent: {
         flexDirection: 'row',
         gap: 10,
-        justifyContent: 'center'
+    },
+    tab: {
+        width: rS(50)
     }
 
 })
