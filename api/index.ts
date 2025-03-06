@@ -17,7 +17,7 @@ interface customFetchProps {
     data?: dataType
 
 }
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+const BASE_URL = 'https://m.foxminded.space'
 export const customFetch = async <T>({
     path,
     method,
