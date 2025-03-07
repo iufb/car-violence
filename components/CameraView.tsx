@@ -22,7 +22,7 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
     const [isRecording, setIsRecording] = useState(false);
     const format = useCameraFormat(device, [
         { videoAspectRatio: 16 / 9 },
-        { videoResolution: { width: 3048, height: 2160 } },
+        { videoResolution: { width: 1920, height: 1080 } },
         { fps: 60 }
     ])
     const { width, height } = useWindowDimensions()
@@ -98,7 +98,7 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
     return (
         <View style={[{ paddingBottom: insets.bottom, paddingTop: Constants.statusBarHeight }]}>
             <View style={[styles.container]}>
-                <CameraView style={[{ width, height: height - CONTROLS_HEIGHT - Constants.statusBarHeight }]} format={format} ref={cameraRef} device={device} isActive={isActive} photo video audio preview />
+                <CameraView photoQualityBalance='balanced' style={[{ width, height: height - CONTROLS_HEIGHT - Constants.statusBarHeight }]} format={format} ref={cameraRef} device={device} isActive={isActive} photo video audio preview />
                 <Pressable onPress={() => router.back()} style={[styles.close]}>
                     <MaterialCommunityIcons name='close' size={32} color='white' />
                 </Pressable>
