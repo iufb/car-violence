@@ -43,6 +43,25 @@ export const Search = () => {
         startUpload("file:///storage/emulated/0/Download/Lovely.Runner.2024.S01E01.1080p.RGzsRutracker.mkv", (progress) => setRes({ ...res, progress }))
 
     }
+
+    const [permission, requestPermission] = MediaLibrary.usePermissions()
+    const handlePicker = async () => {
+        console.log(permission?.status, "STATUS")
+        if (!permission) return;
+        if (permission.status == 'denied') {
+            DeviceEventEmitter.emit('openPermissionAlert')
+            return;
+        }
+        if (permission.status !== 'granted') {
+            const res = await requestPermission();
+            console.log(res.status, 'ask status')
+            if (res.status == 'granted') {
+                DeviceEventEmitter.emit('openAssetsPicker', () => console.log('picker'))
+            }
+        } else {
+            DeviceEventEmitter.emit('openAssetsPicker', () => console.log('picker'))
+        }
+    }
     return <View style={[styles.container]}>
         <Pressable style={[styles.trigger]} onPress={() => setModalVisible(true)}>
             <FontAwesome5 name="search" size={20} color={Colors.light.primary} />
@@ -53,7 +72,7 @@ export const Search = () => {
                 <Pressable onPress={closeModal}>
                     <Typography variant="h1">Hello</Typography>
                 </Pressable>
-                <Pressable onPress={() => DeviceEventEmitter.emit('openAssetsPicker', () => console.log('picker'))}>
+                <Pressable onPress={handlePicker}>
 
                     <Typography variant="h3">Vibrat</Typography>
                 </Pressable>

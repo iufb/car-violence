@@ -38,6 +38,7 @@ export const PermissionAlert = () => {
 }
 const styles = StyleSheet.create({
     container: {
+        borderTopWidth: 1.4, borderLeftWidth: 1, borderRightWidth: 1, borderColor: 'gray',
         position: 'relative',
         backgroundColor: "white", width: Dimensions.get("window").width, height: Dimensions.get('window').height / 2, marginTop: Dimensions.get('window').height / 2, borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: 'hidden', padding: 10,
     },
