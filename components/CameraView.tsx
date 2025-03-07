@@ -1,11 +1,13 @@
 import { Button, Typography } from '@/components/ui';
+
 import { Colors } from '@/constants/Colors';
-import { pickImage } from '@/utils';
+import { pickImage, rS, rV } from '@/utils';
 import { Entypo, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Camera as ExpoCamera } from 'expo-camera';
-import { usePathname, useRouter } from 'expo-router';
+import Constants from "expo-constants";
+import { Tabs, usePathname, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter, Dimensions, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { DeviceEventEmitter, Dimensions, Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, { interpolate, interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CameraPosition, Camera as CameraView, useCameraDevice, useCameraFormat } from 'react-native-vision-camera';
@@ -29,13 +31,11 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
     const router = useRouter()
     const cameraRef = useRef<CameraView>(null)
 
-
-    if (device == null) return <View><Text>No device</Text></View>
     const capturePhoto = async () => {
         try {
             if (cameraRef.current) {
                 const photo = await cameraRef.current.takePhoto()
-                setMedias([...medias, 'file://' + photo.path])
+                setMedias(['file://' + photo.path])
                 closeCameraOnEnd()
             }
         } catch (e) {
@@ -56,7 +56,7 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
                 setIsRecording(true)
                 cameraRef.current.startRecording({
                     onRecordingFinished: (video) => {
-                        setMedias([...medias, 'file://' + video.path])
+                        setMedias(['file://' + video.path])
                         setIsRecording(false)
                     },
                     onRecordingError: async (error) => {
@@ -93,10 +93,12 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
             }
         }
     }
+
+    if (device == null) return <NoDeviceView />
     return (
-        <View style={[{ paddingBottom: insets.bottom }]}>
+        <View style={[{ paddingBottom: insets.bottom, paddingTop: Constants.statusBarHeight }]}>
             <View style={[styles.container]}>
-                <CameraView style={[{ width, height: height - CONTROLS_HEIGHT }]} format={format} ref={cameraRef} device={device} isActive={isActive} photo video audio preview />
+                <CameraView style={[{ width, height: height - CONTROLS_HEIGHT - Constants.statusBarHeight }]} format={format} ref={cameraRef} device={device} isActive={isActive} photo video audio preview />
                 <Pressable onPress={() => router.back()} style={[styles.close]}>
                     <MaterialCommunityIcons name='close' size={32} color='white' />
                 </Pressable>
@@ -235,10 +237,21 @@ const ModeSelector = ({ mode: selected, selectMode: select }: ModeSelectorProps)
 
     </Animated.View>
 }
-
+const NoDeviceView = () => {
+    const router = useRouter()
+    return <View style={[styles.noDeviceContainer]}>
+        <Tabs.Screen options={{ headerTitle: "Камера не найдена", headerShown: true }} />
+        <View style={[styles.noDeviceForm]}>
+            <Typography color={Colors.light.primary} center variant='h2'>Произошла ошибка</Typography>
+            <Typography center variant='p1'>Камера не найдена.</Typography>
+            <Button onPress={() => router.back()}>Вернуться назад</Button>
+        </View>
+    </View>
+}
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        paddingTop: Constants.statusBarHeight,
     },
     controls: {
         paddingTop: 20,
@@ -250,8 +263,8 @@ const styles = StyleSheet.create({
     },
     close: {
         position: 'absolute',
-        top: 20,
-        right: 20
+        top: rV(10),
+        right: rS(10)
     },
     topControls: {
         flexDirection: 'row',
@@ -284,4 +297,14 @@ const styles = StyleSheet.create({
     pressable: {
         width: '100%', height: '100%'
     },
+    noDeviceContainer: {
+        flex: 1,
+        backgroundColor: 'white',
+        justifyContent: 'center'
+    },
+    noDeviceForm: {
+        gap: 10,
+        padding: 10
+    }
+
 });

@@ -1,17 +1,19 @@
-import { rSendViolence } from "@/api/violence"
-import { client } from "@/app/_layout"
-import { FormContainer } from "@/components/forms/FormContainer"
-import { Button, DateTimePicker, Input, Select, Typography } from "@/components/ui"
-import { Video } from "@/components/Video"
-import { Colors } from "@/constants/Colors"
-import { errorMsgs } from "@/consts"
-import { GetDate, getFileDetails, GetTime, showToast } from "@/utils"
-import { Entypo, MaterialIcons } from "@expo/vector-icons"
-import { useMutation } from "@tanstack/react-query"
-import { Link } from "expo-router"
-import React, { useCallback, useRef, useState } from "react"
-import { Controller, useForm } from "react-hook-form"
-import { Dimensions, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, ViewProps, ViewToken } from "react-native"
+import { rSendViolence } from "@/api/violence";
+
+import { client } from "@/app/_layout";
+import { FormContainer } from "@/components/forms/FormContainer";
+import { Button, DateTimePicker, Input, Select, Typography } from "@/components/ui";
+import { Video } from "@/components/Video";
+import { Colors } from "@/constants/Colors";
+import { errorMsgs } from "@/consts";
+import { GetDate, getFileDetails, GetTime, showToast } from "@/utils";
+import { Entypo, MaterialIcons } from "@expo/vector-icons";
+import { useMutation } from "@tanstack/react-query";
+import Constants from "expo-constants";
+import { Link } from "expo-router";
+import React, { useCallback, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { Dimensions, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, ViewProps, ViewToken } from "react-native";
 interface SendViolenceFormProps extends ViewProps {
     medias: string[]
     setMedias: (value: string[]) => void;
@@ -192,6 +194,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flex: 1,
         gap: 10,
+        paddingTop: Constants.statusBarHeight,
         padding: 5,
     },
     mediaContainer: {

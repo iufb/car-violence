@@ -4,7 +4,6 @@ import { Tabs, usePathname, useRouter } from "expo-router";
 import { SendViolenceForm } from "@/components/forms";
 import { Button, Typography } from "@/components/ui";
 import { useCameraPermissions } from "expo-camera";
-import Constants from "expo-constants";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
@@ -38,7 +37,8 @@ export default function Add() {
     const closeCameraOnEnd = () => {
         setIsActive(false)
     }
-    if (!permission) return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    if (!permission) return <View style={{ flex: 1, backgroundColor: 'black', justifyContent: 'center', alignItems: 'center' }}>
+        <Tabs.Screen options={{ headerShown: false }} />
         <ActivityIndicator size="large" color={Colors.light.primary} />
     </View>
 
@@ -69,7 +69,6 @@ const PermissionsPage = ({ requestPermission }: { requestPermission: () => void 
 const styles = StyleSheet.create({
     container: {
         backgroundColor: 'rgba(0,0,0,.95)',
-        paddingTop: Constants.statusBarHeight,
         flex: 1
     },
     permissionsContainer: {

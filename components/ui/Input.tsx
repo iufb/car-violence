@@ -38,7 +38,7 @@ export const Input = ({ bg, error, rules, name, control, required = true, label,
                     {required && <Typography color="red" variant="span"> *</Typography>}
                 </Typography>
             </View>
-            <View style={[styles.inputContainer, styles.border, styles[getBorderStyle(focused, !!error)], inputProps.multiline && { height: 90 }]}>
+            <View style={[styles.inputContainer, styles.border, styles[getBorderStyle(focused, !!error)], inputProps.multiline && { height: rV(70) }]}>
                 <Component
                     //@ts-ignore
                     type={'text'} onChangeText={inputProps.mask ? ((_, value) => onChange(value)) : ((value) => onChange(value))} secureTextEntry={secure} placeholderTextColor={Colors.light.borderColor} onFocus={() => setFocused(true)} onBlur={() => {
@@ -69,9 +69,6 @@ const styles = StyleSheet.create({
     },
     label: {
         flexDirection: 'row',
-    },
-    textarea: {
-        height: rV(72),
     },
     input: {
         height: '100%'
