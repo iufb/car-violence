@@ -1,14 +1,38 @@
-import { rCheckToken } from "@/api/auth"
-import { useEffect, useState } from "react"
+import { rCheckToken } from "@/api/auth";
+import { getFromStorage } from "@/utils";
+import * as SecureStore from 'expo-secure-store';
+import { useEffect, useState } from "react";
 
+const checkFirstBoot = async () => {
+    // await SecureStore.deleteItemAsync('isFirstBoot')
+    const isFirstBoot = await SecureStore.getItemAsync('isFirstBoot')
+    if (!isFirstBoot) {
+        return true
+    } else {
+        return false
+    }
+}
 export const useAuth = () => {
     const [isLoaded, setIsLoaded] = useState(false)
+    const [isFirstBoot, setIsFirstBoot] = useState(false)
     const [isSignedIn, setIsSignedIn] = useState(false)
     useEffect(() => {
         const check = async () => {
-            console.log('started check')
-            rCheckToken().then(() => {
+            const boot = await checkFirstBoot()
+            console.log(boot, "BOOT")
+            if (boot) {
+                setIsFirstBoot(true)
+                setIsLoaded(true)
+                return;
+            }
+            const access = await getFromStorage('access')
+            if (!access) {
+                setIsSignedIn(false)
+                setIsLoaded(true)
+                return;
+            }
 
+            rCheckToken().then(() => {
                 console.log('success check')
                 setIsSignedIn(true)
             }).catch((e) => {
@@ -17,5 +41,5 @@ export const useAuth = () => {
         }
         check()
     }, [])
-    return { isLoaded, isSignedIn }
+    return { isLoaded, isSignedIn, isFirstBoot }
 }

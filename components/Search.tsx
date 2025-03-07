@@ -52,14 +52,14 @@ export const Search = () => {
             <View style={[styles.modal]}>
                 <Pressable onPress={closeModal}>
                     <Typography variant="h1">Hello</Typography>
-                    <Pressable onPress={() => DeviceEventEmitter.emit('openAssetsPicker', () => console.log('picker'))}>
-
-                        <Typography variant="h3">Vibrat</Typography>
-                    </Pressable>
-                    <Button onPress={read} disabled={!image}>Read</Button>
-                    <Typography variant="h3">{res.progress}</Typography>
-                    <Main />
                 </Pressable>
+                <Pressable onPress={() => DeviceEventEmitter.emit('openAssetsPicker', () => console.log('picker'))}>
+
+                    <Typography variant="h3">Vibrat</Typography>
+                </Pressable>
+                <Button onPress={read} disabled={!image}>Read</Button>
+                <Typography variant="h3">{res.progress}</Typography>
+                <Main />
             </View>
         </Modal>
     </View>

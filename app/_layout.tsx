@@ -3,6 +3,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import React from 'react';
 
+import { AssetsPicker } from '@/components/AssetsPicker';
+import { PermissionAlert } from '@/components/PermissionAlert';
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { isRunningInExpoGo } from 'expo';
@@ -15,7 +17,6 @@ import { ActivityIndicator, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import { AssetsPicker } from '@/components/AssetsPicker';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -39,22 +40,32 @@ Sentry.init({
     ],
     enableNativeFramesTracking: !isRunningInExpoGo(), // Tracks slow and frozen frames in the application
 });
+
 const InitialLayout = () => {
 
     const router = useRouter();
-    const { isLoaded, isSignedIn } = useAuth();
+    const { isLoaded, isSignedIn, isFirstBoot } = useAuth();
     const segments = useSegments();
     const pathname = usePathname();
 
     useEffect(() => {
-        if (!isLoaded) return;
-        const inAuthGroup = segments[0] === '(auth)';
-        if (isSignedIn) {
-            router.replace('/');
+        const redirect = async () => {
+
+            if (!isLoaded) return;
+            if (isFirstBoot) {
+                router.replace('/onbording');
+                return;
+            }
+            if (isSignedIn) {
+                router.replace('/');
+                return;
+            }
+            if (!isSignedIn) {
+                router.replace('/(auth)/login');
+            }
         }
-        if (!isSignedIn) {
-            router.replace('/(auth)/login');
-        }
+        redirect()
+
     }, [isLoaded]);
 
     if (!isLoaded) {
@@ -101,6 +112,7 @@ function RootLayout() {
                 </QueryClientProvider>
                 <Toast />
                 <AssetsPicker />
+                <PermissionAlert />
             </ThemeProvider>
         </GestureHandlerRootView>
     );

@@ -17,7 +17,7 @@ interface customFetchProps {
     data?: dataType
 
 }
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+const BASE_URL = 'https://m.foxminded.space'
 export const customFetch = async <T>({
     path,
     method,
@@ -51,7 +51,6 @@ export const customFetch = async <T>({
         // Append Authorization header if required
         if (withAuth) {
             const token = await getFromStorage('access');
-            console.log(token)
             if (token) {
                 headers.append('Authorization', `Bearer ${token}`);
             }
@@ -64,7 +63,10 @@ export const customFetch = async <T>({
             const timeout = 10000;
 
             // Wrap the abort call in an arrow function
-            const timeoutId = setTimeout(() => controller.abort(), timeout);
+            let timeoutId: NodeJS.Timeout | null = null
+            if (method == 'GET') {
+                timeoutId = setTimeout(() => controller.abort(), timeout);
+            }
 
             try {
                 const response = await fetch(url.toString(), {
@@ -75,7 +77,9 @@ export const customFetch = async <T>({
                 });
                 return response;
             } finally {
-                clearTimeout(timeoutId); // Ensure timeout is cleared regardless of success or error
+                if (timeoutId) {
+                    clearTimeout(timeoutId); // Ensure timeout is cleared regardless of success or error
+                }
             }
         };
 

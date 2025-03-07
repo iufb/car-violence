@@ -139,7 +139,7 @@ export const showToast = ({ type, title, desc }: { type: ToastType, title: strin
     });
 }
 
-export async function saveToStorage(key: string, value: string) {
+export async function saveToStorage(key: string, value: any) {
     await SecureStore.setItemAsync(key, value);
 }
 

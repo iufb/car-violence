@@ -26,7 +26,7 @@ interface CardProps extends ViewProps {
         <View style={[styles.textContainer, isHorizontal && styles.horizontalText]}>
             <Typography center={!isHorizontal} variant="h3">{title}</Typography>
             <Typography center={!isHorizontal} variant="span">{subtitle}</Typography>
-            <Typography variant="p2">{desc.length > 40 ? desc.slice(0, 40) + "..." : desc}</Typography>
+            <Typography variant="p2">{desc.length > 18 ? desc.slice(0, 18) + "..." : desc}</Typography>
         </View>
         {variant == 'horizontal' &&
             <Entypo name="chevron-right" size={32} color={Colors.light.notSelected} style={[styles.icon]} />}

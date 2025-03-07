@@ -1,65 +1,85 @@
-import { Typography } from '@/components/ui';
+import { Button, Typography } from '@/components/ui';
+
 import { Colors } from '@/constants/Colors';
-import { pickImage } from '@/utils';
+import { pickImage, rS, rV } from '@/utils';
 import { Entypo, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
-import { CameraType, CameraView, Camera as ExpoCamera, useCameraPermissions } from 'expo-camera';
-import { usePathname, useRouter } from 'expo-router';
+import { Camera as ExpoCamera } from 'expo-camera';
+import Constants from "expo-constants";
+import { Tabs, usePathname, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Dimensions, Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { DeviceEventEmitter, Dimensions, Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, { interpolate, interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CameraPosition, Camera as CameraView, useCameraDevice, useCameraFormat } from 'react-native-vision-camera';
 
 type CameraModeType = 'picture' | 'video'
 const CONTROLS_HEIGHT = 200
 
-export function Camera({ medias, setMedias, closeCameraOnEnd }: { medias: string[], setMedias: (media: string[]) => void, closeCameraOnEnd: () => void }) {
+export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isActive: boolean, medias: string[], setMedias: (media: string[]) => void, closeCameraOnEnd: () => void }) {
     const [cameraMode, setCameraMode] = useState<CameraModeType>('picture')
-    const [facing, setFacing] = useState<CameraType>('back');
+    const [facing, setFacing] = useState<CameraPosition>('back');
+    const device = useCameraDevice(facing)
     const [isRecording, setIsRecording] = useState(false);
-    const [permission, requestPermission] = useCameraPermissions();
+    const format = useCameraFormat(device, [
+        { videoAspectRatio: 16 / 9 },
+        { videoResolution: { width: 3048, height: 2160 } },
+        { fps: 60 }
+    ])
     const { width, height } = useWindowDimensions()
     const insets = useSafeAreaInsets()
     const path = usePathname()
     const router = useRouter()
     const cameraRef = useRef<CameraView>(null)
 
-    useEffect(() => {
-        if (!permission || !permission.granted) {
-            requestPermission()
-        }
-    }, [permission])
-
-    function toggleCameraFacing() {
-        setFacing(current => (current === 'back' ? 'front' : 'back'));
-    }
-    async function capturePhoto() {
+    const capturePhoto = async () => {
         try {
-            let photo = await cameraRef.current?.takePictureAsync()
-            console.log(photo)
-            setMedias([photo?.uri ?? ""])
-            closeCameraOnEnd()
+            if (cameraRef.current) {
+                const photo = await cameraRef.current.takePhoto()
+                setMedias(['file://' + photo.path])
+                closeCameraOnEnd()
+            }
         } catch (e) {
             console.log(e)
         }
     }
+    function toggleCameraFacing() {
+        setFacing(current => (current === 'back' ? 'front' : 'back'));
+    }
     async function recordMedia() {
         try {
-            await ExpoCamera.requestMicrophonePermissionsAsync()
-            setIsRecording(true)
-            let recording = await cameraRef.current?.recordAsync()
-            setMedias([recording?.uri ?? ""])
-            console.log(recording)
+            if (cameraRef.current) {
+                const microPermissions = await ExpoCamera.requestMicrophonePermissionsAsync()
+                if (microPermissions.status === 'denied') {
+                    DeviceEventEmitter.emit('openPermissionAlert')
+                    return;
+                }
+                setIsRecording(true)
+                cameraRef.current.startRecording({
+                    onRecordingFinished: (video) => {
+                        setMedias(['file://' + video.path])
+                        setIsRecording(false)
+                    },
+                    onRecordingError: async (error) => {
+                        setIsRecording(false)
+                        if (cameraRef.current)
+                            await cameraRef.current.cancelRecording()
+
+                    }
+                })
+            }
         } catch (e) {
             console.log(e)
         }
 
     }
     async function stopRecord() {
-        cameraRef.current?.stopRecording()
-        setIsRecording(false)
-        setTimeout(() => {
-            closeCameraOnEnd()
-        }, 1000)
+        if (cameraRef.current) {
+            await cameraRef.current.stopRecording()
+            setIsRecording(false)
+            setTimeout(() => {
+                closeCameraOnEnd()
+            }, 1000)
+        }
     }
     const fn = () => {
         if (cameraMode == 'picture') {
@@ -74,19 +94,15 @@ export function Camera({ medias, setMedias, closeCameraOnEnd }: { medias: string
         }
     }
 
+    if (device == null) return <NoDeviceView />
     return (
-        <View style={[{ paddingBottom: insets.bottom }]}>
+        <View style={[{ paddingBottom: insets.bottom, paddingTop: Constants.statusBarHeight }]}>
             <View style={[styles.container]}>
-                <CameraView videoQuality='1080p' ref={cameraRef} style={[{ width, height: height - CONTROLS_HEIGHT }]} facing={facing} mode={cameraMode} >
-                    {medias.length > 0 &&
-                        <Pressable hitSlop={30} onPress={() => closeCameraOnEnd()} style={[styles.back]}>
-                            <MaterialCommunityIcons name='chevron-left' size={32} color='white' />
-                        </Pressable>
-                    }
-                    <Pressable hitSlop={30} onPress={() => router.back()} style={[styles.close]}>
-                        <MaterialCommunityIcons name='close' size={32} color='white' />
-                    </Pressable>
-                </CameraView>
+                <CameraView style={[{ width, height: height - CONTROLS_HEIGHT - Constants.statusBarHeight }]} format={format} ref={cameraRef} device={device} isActive={isActive} photo video audio preview />
+                <Pressable onPress={() => router.back()} style={[styles.close]}>
+                    <MaterialCommunityIcons name='close' size={32} color='white' />
+                </Pressable>
+
                 <Controls facing={facing} toggleCameraFacing={toggleCameraFacing} save={(value) => {
                     setMedias(value)
                     closeCameraOnEnd()
@@ -100,6 +116,16 @@ export function Camera({ medias, setMedias, closeCameraOnEnd }: { medias: string
 
         </View>
     );
+}
+const CameraNotFound = ({ requestPermission }: { requestPermission: () => void }) => {
+    const router = useRouter()
+    return <View >
+        <View >
+            <Typography color={Colors.light.primary} center variant='h2'>Произошла ошибка</Typography>
+            <Typography center variant='p1'>Камера не обнаружена</Typography>
+            <Button onPress={() => router.back()}>Назад</Button>
+        </View>
+    </View>
 }
 
 const Controls = ({ facing, mode, selectMode, capture, save, isRecording, toggleCameraFacing }: CaptureBtnProps & FlipBtnProps & ImportBtnProps & ModeSelectorProps) => {
@@ -147,7 +173,7 @@ const CaptureBtn = ({ mode, capture, isRecording }: CaptureBtnProps) => {
     </View>
 }
 interface FlipBtnProps {
-    facing: "back" | 'front'
+    facing: CameraPosition
     toggleCameraFacing: () => void
 }
 const FlipBtn = ({ facing, toggleCameraFacing }: FlipBtnProps) => {
@@ -211,10 +237,21 @@ const ModeSelector = ({ mode: selected, selectMode: select }: ModeSelectorProps)
 
     </Animated.View>
 }
-
+const NoDeviceView = () => {
+    const router = useRouter()
+    return <View style={[styles.noDeviceContainer]}>
+        <Tabs.Screen options={{ headerTitle: "Камера не найдена", headerShown: true }} />
+        <View style={[styles.noDeviceForm]}>
+            <Typography color={Colors.light.primary} center variant='h2'>Произошла ошибка</Typography>
+            <Typography center variant='p1'>Камера не найдена.</Typography>
+            <Button onPress={() => router.back()}>Вернуться назад</Button>
+        </View>
+    </View>
+}
 const styles = StyleSheet.create({
     container: {
-        flexGrow: 1,
+        flex: 1,
+        paddingTop: Constants.statusBarHeight,
     },
     controls: {
         paddingTop: 20,
@@ -226,8 +263,8 @@ const styles = StyleSheet.create({
     },
     close: {
         position: 'absolute',
-        top: 20,
-        right: 20
+        top: rV(10),
+        right: rS(10)
     },
     back: {
         position: 'absolute',
@@ -266,5 +303,13 @@ const styles = StyleSheet.create({
     pressable: {
         width: '100%', height: '100%'
     },
-
+    noDeviceContainer: {
+        flex: 1,
+        backgroundColor: 'white',
+        justifyContent: 'center'
+    },
+    noDeviceForm: {
+        gap: 10,
+        padding: 10
+    }
 });

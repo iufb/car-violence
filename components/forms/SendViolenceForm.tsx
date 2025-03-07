@@ -1,17 +1,19 @@
-import { rSendViolence } from "@/api/violence"
-import { client } from "@/app/_layout"
-import { FormContainer } from "@/components/forms/FormContainer"
-import { Button, DateTimePicker, Input, Select, Typography } from "@/components/ui"
-import { Video } from "@/components/Video"
-import { Colors } from "@/constants/Colors"
-import { errorMsgs } from "@/consts"
-import { GetDate, getFileDetails, GetTime, showToast } from "@/utils"
-import { Entypo, MaterialIcons } from "@expo/vector-icons"
-import { useMutation } from "@tanstack/react-query"
-import { Link } from "expo-router"
-import React, { useCallback, useRef, useState } from "react"
-import { Controller, useForm } from "react-hook-form"
-import { Dimensions, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, ViewProps, ViewToken } from "react-native"
+import { rSendViolence } from "@/api/violence";
+
+import { client } from "@/app/_layout";
+import { FormContainer } from "@/components/forms/FormContainer";
+import { Button, DateTimePicker, Input, Select, Typography } from "@/components/ui";
+import { Video } from "@/components/Video";
+import { Colors } from "@/constants/Colors";
+import { errorMsgs } from "@/consts";
+import { GetDate, getFileDetails, GetTime, showToast } from "@/utils";
+import { Entypo, MaterialIcons } from "@expo/vector-icons";
+import { useMutation } from "@tanstack/react-query";
+import Constants from "expo-constants";
+import { Link } from "expo-router";
+import React, { useCallback, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { Dimensions, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, ViewProps, ViewToken } from "react-native";
 interface SendViolenceFormProps extends ViewProps {
     medias: string[]
     setMedias: (value: string[]) => void;
@@ -26,8 +28,8 @@ export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...prop
             console.log(data)
             showToast({ type: 'success', title: "Отправлено", desc: "Нарушение было отправлено!" })
             reset()
-            setMedias([])
             client.invalidateQueries({ queryKey: ['myVideos'] })
+            setMedias([])
         }, onError: (e) => {
             showToast({ type: 'error', title: "Ошибка", desc: "Произошла ошибка" })
             console.log(e)
@@ -75,7 +77,7 @@ export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...prop
                     onChange(updated)
                 }} bg="dark" label="Дата и время" />} />
                 <Link href={'/'}><Typography color={Colors.light.primary} variant="span">Правила размещения фото/видео</Typography></Link>
-                <Button disabled={isPending} loading={isPending} variant="primary" onPress={handleSubmit(submit)}>Отправить</Button>
+                <Button disabled={isPending || medias.length == 0} loading={isPending} variant="primary" onPress={handleSubmit(submit)}>Отправить</Button>
             </ScrollView>
         </TouchableOpacity>
     </FormContainer>
@@ -192,9 +194,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flex: 1,
         gap: 10,
+        paddingTop: Constants.statusBarHeight,
         padding: 5,
     },
     mediaContainer: {
+        minHeight: width * 9 / 16,
         gap: 10,
     },
     mediasViews: {

@@ -23,7 +23,7 @@ export default function MyVideos() {
             medias && medias.length > 0 ?
                 <SafeAreaView>
                     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.container]}>
-                        {medias.map(item => <Card link={`/(tabs)/video/${item.id}`} subtitle={item.city} key={item.id} color={Colors.light.status['2']} variant="horizontal"
+                        {medias.map(item => <Card link={`/(tabs)/video/${item.id}`} subtitle={item.city} key={item.id} color={Colors.light.status['1']} variant="horizontal"
                             title={item.id.toString()} desc={item.description} img={item.videos[0].video_file}
                         />)}
                     </ScrollView>

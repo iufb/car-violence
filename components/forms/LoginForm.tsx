@@ -4,9 +4,10 @@ import { Button, Input, Typography } from "@/components/ui"
 import { Colors } from "@/constants/Colors"
 import { errorMsgs } from "@/consts"
 import { LoginDTO } from "@/types"
-import { saveToStorage, showToast } from "@/utils"
+import { showToast } from "@/utils"
 import { useMutation } from "@tanstack/react-query"
 import { Link, useRouter } from "expo-router"
+import * as SecureStorage from 'expo-secure-store'
 import { SubmitHandler, useForm } from "react-hook-form"
 import { StyleSheet, View } from "react-native"
 
@@ -17,8 +18,8 @@ export const LoginForm = () => {
         onSuccess: async (data?: { access: string, refresh: string }) => {
             if (data) {
                 console.log(data)
-                await saveToStorage('access', data.access)
-                await saveToStorage('refresh', data.refresh)
+                await SecureStorage.setItemAsync('access', data.access)
+                await SecureStorage.setItemAsync('refresh', data.refresh)
                 router.push('/')
             }
             console.log(data)
@@ -43,7 +44,6 @@ export const LoginForm = () => {
             }} label="Номер телефона" rules={{ required: errorMsgs.required }} error={errors?.tel?.message} />
             <Input rules={{
                 required: errorMsgs.required,
-
             }} error={errors.password?.message} name="password" control={control} input={{ secureTextEntry: true, placeholder: "Пароль" }} label="Пароль" />
             <Link style={[styles.link]} href={'/(auth)/restore'}>Забыли пароль?</Link>
             <Button disabled={isPending} loading={isPending} onPress={handleSubmit(submit)}>Войти</Button>

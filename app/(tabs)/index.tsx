@@ -26,11 +26,12 @@ export default function HomeScreen() {
 
 const LastViolenceList = () => {
     const { data: medias, isLoading, isError, error } = useQuery({
-        queryKey: ['myVideos'], queryFn: async () => {
+        queryKey: ['lastViolence'], queryFn: async () => {
             const data = await rGetMediaList({ type: 'all', limit: 10 })
             return data
         }
     })
+    console.log(medias)
 
 
     return isLoading ? <View >
