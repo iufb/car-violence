@@ -105,7 +105,7 @@ function RootLayout() {
     }
 
     return (
-        <GestureHandlerRootView>
+        <GestureHandlerRootView style={{ flex: 1 }}>
             <ThemeProvider value={DefaultTheme}>
                 <QueryClientProvider client={client}>
                     <InitialLayout />

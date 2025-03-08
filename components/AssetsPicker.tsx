@@ -1,10 +1,10 @@
 import { Typography } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
-import { DeviceWidth, rS, rV } from "@/utils";
+import { DeviceHeigth, DeviceWidth, rS, rV } from "@/utils";
 import { useEffect, useState } from "react";
 import { DeviceEventEmitter, Dimensions, FlatList, Image, Modal, Pressable, StyleSheet, View } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Animated, { Easing, ReduceMotion, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
+import Animated, { Easing, ReduceMotion, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import * as MediaLibrary from 'expo-media-library';
 interface AssetsPickerBase {
@@ -27,9 +27,30 @@ export const AssetsPicker = () => {
     const [saveCb, setSaveCb] = useState<(() => void) | null>(null)
     const [activeTab, setActiveTab] = useState(tabs[0])
     const [selectedMap, setSelectedMap] = useState<Map<string, MediaLibrary.Asset>>(new Map())
+    const translateY = useSharedValue(0);
+    const pan = Gesture.Pan()
+        .onUpdate(e => {
+            translateY.value = e.translationY
+        })
+        .onEnd(e => {
+            if (e.translationY < 0) {
+                translateY.value = withTiming(0, { duration: 100 })
+            }
+            if (e.translationY > DeviceHeigth / 2) {
+                runOnJS(setVisible)(false)
+            } else {
+                translateY.value = withTiming(0, { duration: 100 })
+            }
 
+        })
+    const animatedStyles = useAnimatedStyle(() => ({
+        transform: [
+            { translateY: translateY.value },
+        ],
+    }));
     useEffect(() => {
         const listener = DeviceEventEmitter.addListener("openAssetsPicker", (callback: () => void) => {
+            translateY.value = 0
             setVisible(true);
             setSaveCb(() => callback)
         });
@@ -44,13 +65,18 @@ export const AssetsPicker = () => {
         })
     }
 
-    return visible && <GestureHandlerRootView><Modal visible={visible} transparent={true} animationType="slide" onRequestClose={() => setVisible(false)}>
-        <View style={[styles.container]}>
-            <View style={[styles.top]} />
-            <Tabs activeTab={activeTab} setActiveTab={(tab) => setActiveTab(tab)} />
-            {activeTab == tabs[0] ? <PhotosView handleSelect={handleSelect} /> : <VideosView handleSelect={handleSelect} />}
-        </View>
-    </Modal></GestureHandlerRootView>
+    return visible && <Modal visible={visible} transparent={true} animationType="slide" onRequestClose={() => setVisible(false)}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <GestureDetector gesture={pan}>
+                <Animated.View style={[styles.container, animatedStyles]}>
+                    <View style={[styles.top]} />
+                    <Tabs activeTab={activeTab} setActiveTab={(tab) => setActiveTab(tab)} />
+                    {activeTab == tabs[0] ? <PhotosView handleSelect={handleSelect} /> : <VideosView handleSelect={handleSelect} />}
+                </Animated.View>
+            </GestureDetector>
+        </GestureHandlerRootView>
+    </Modal>
+
 
 };
 const tabs = ['Фото', 'Видео']
@@ -91,7 +117,6 @@ const PhotosView = ({ }: AssetsPickerBase) => {
     useEffect(() => {
         getAssets('photo', (assets) => setPhotos(assets))
     }, [])
-    console.log(photos, "PHOTOS")
     return <View>
         <Typography variant="h2">Photos</Typography>
         <AssetsView assets={photos} />
@@ -126,12 +151,13 @@ const styles = StyleSheet.create({
         backgroundColor: "white", width: Dimensions.get("window").width, height: Dimensions.get('window').height - rV(100), marginTop: rV(100), borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: 'hidden', padding: 10,
     },
     top: {
-        width: DeviceWidth - 100,
+        width: DeviceWidth - DeviceWidth / 1.5,
         height: rV(4),
         borderRadius: 10,
-        marginVertical: rV(10),
+        marginTop: rV(5),
+        marginBottom: rV(10),
         alignSelf: 'center',
-        backgroundColor: 'rgba(0,0,0,.7)'
+        backgroundColor: 'rgba(0,0,0,.33)'
     },
     tabs: {
         maxWidth: DeviceWidth,
@@ -141,6 +167,7 @@ const styles = StyleSheet.create({
     tabsContent: {
         flexDirection: 'row',
         gap: 10,
+        paddingVertical: rV(3),
         alignSelf: 'flex-start',
     },
     tab: {
