@@ -14,7 +14,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 
@@ -105,16 +104,14 @@ function RootLayout() {
     }
 
     return (
-        <GestureHandlerRootView style={{ flex: 1 }}>
-            <ThemeProvider value={DefaultTheme}>
-                <QueryClientProvider client={client}>
-                    <InitialLayout />
-                </QueryClientProvider>
-                <Toast />
-                <AssetsPicker />
-                <PermissionAlert />
-            </ThemeProvider>
-        </GestureHandlerRootView>
+        <ThemeProvider value={DefaultTheme}>
+            <QueryClientProvider client={client}>
+                <InitialLayout />
+            </QueryClientProvider>
+            <Toast />
+            <AssetsPicker />
+            <PermissionAlert />
+        </ThemeProvider>
     );
 }
 export default Sentry.wrap(RootLayout)

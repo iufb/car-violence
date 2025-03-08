@@ -1,5 +1,6 @@
 import { rGetMediaList } from "@/api/violence";
 import { LoaderView, NewsList, ScreenContainer, Search } from "@/components";
+import { AssetsPickerBtn } from "@/components/AssetsPicker";
 import { Card, Typography } from "@/components/ui";
 import { rS, rV } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -13,6 +14,7 @@ export default function HomeScreen() {
     return (
         <ScreenContainer style={[styles.container]} >
             <Tabs.Screen options={{ header: () => <Search /> }} />
+            <AssetsPickerBtn />
             <SafeAreaView >
                 <ScrollView contentContainerStyle={[styles.container]} showsVerticalScrollIndicator={false}>
                     <NewsList />
