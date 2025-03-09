@@ -1,6 +1,7 @@
 
 export { Camera } from './CameraView';
 export { CustomHeader } from "./CustomHeader";
+export { CustomToast } from './CustomToast';
 export { LinkList, ListItem } from "./LinkList";
 export { LoaderView } from './LoaderView';
 export { LogoutButton } from './LogoutButton';

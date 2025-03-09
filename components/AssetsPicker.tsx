@@ -21,12 +21,10 @@ const getAssets = async (mediaType: MediaLibrary.MediaTypeValue, save: (assets: 
         promises.push(MediaLibrary.getAssetsAsync({ album, mediaType }))
     })
     const res = (await Promise.all(promises)).map(page => page.assets)
-    console.log(res, mediaType)
     save(res[0])
 }
 export const AssetsPickerBtn = () => {
     const [assets, setAssets] = useState<MediaLibrary.Asset[]>([])
-    console.log("PICKED", assets)
     return <Pressable onPress={() => pickAssets((assets) => setAssets(assets))}>
         <Typography variant="h3">Picker</Typography>
     </Pressable>
@@ -38,22 +36,21 @@ export const AssetsPicker = () => {
     const [saveCb, setSaveCb] = useState<((assets: MediaLibrary.Asset[]) => void) | null>(null)
     const [activeTab, setActiveTab] = useState(tabs[0])
     const [pickedAssets, setSelectedMap] = useState<Map<string, MediaLibrary.Asset>>(new Map())
-    useEffect(() => {
-        if (visible) {
-            requestPermission().then(res => {
-                if (!res) return;
-                console.log(res, "RES")
-                if (res.status == 'denied') {
-                    DeviceEventEmitter.emit('openPermissionAlert')
-                    handleClose()
-                    return;
-                }
-            })
-        }
-    }, [visible])
+    const handleClose = () => {
+        setVisible(false)
+    };
     useEffect(() => {
         const listener = DeviceEventEmitter.addListener("openAssetsPicker", (callback: (assets: MediaLibrary.Asset[]) => void) => {
-            setVisible(true);
+            requestPermission().then(res => {
+                if (!res) return;
+                if (res.status == 'denied') {
+                    handleClose()
+                    DeviceEventEmitter.emit('openPermissionAlert')
+                    return;
+                } else {
+                    setVisible(true);
+                }
+            })
             setSaveCb(() => callback)
         });
 
@@ -70,22 +67,20 @@ export const AssetsPicker = () => {
             return newMap
         })
     }
-    const handleClose = () => {
-        setVisible(false)
-    }
     const handleDone = () => {
         if (!saveCb) return;
         saveCb(Array.from(pickedAssets.values()))
         setSelectedMap(new Map())
-        handleClose()
     }
-    return <ViewModal visible={visible} handleClose={handleClose} modalOffset={rS(100)}>
+    return <ViewModal doneBtn={
+        <Pressable disabled={pickedAssets.size == 0} onPress={handleDone}>
+            <Typography style={{ textAlign: 'right' }} color={pickedAssets.size == 0 ? 'gray' : Colors.light.primary} variant="p2">Выбрать</Typography>
+        </Pressable>
+
+    } visible={visible} handleClose={handleClose} modalOffset={rS(100)}>
         <View style={{ flex: 1 }}>
             <View style={[styles.topView]}>
                 <Tabs activeTab={activeTab} setActiveTab={(tab) => setActiveTab(tab)} />
-                <Pressable onPress={handleDone}>
-                    <Typography color={Colors.light.primary} variant="p2">Выбрать</Typography>
-                </Pressable>
             </View>
             {activeTab == tabs[0] ? <PhotosView pickedAssets={pickedAssets} handleSelect={handleSelect} /> : <VideosView pickedAssets={pickedAssets} handleSelect={handleSelect} />}
         </View>

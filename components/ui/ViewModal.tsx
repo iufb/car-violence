@@ -1,22 +1,21 @@
 import { DeviceHeigth, DeviceWidth, rS, rV } from '@/utils';
-import { ReactNode, useEffect } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import React, { cloneElement, ReactElement, ReactNode, useEffect } from 'react';
+import { Dimensions, PressableProps, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 interface ViewModalProps {
     visible: boolean, handleClose: () => void
     children: ReactNode
     modalOffset: number
+    doneBtn?: ReactElement<PressableProps>
 }
-export const ViewModal = ({ visible, handleClose, children, modalOffset }: ViewModalProps) => {
-    const translateY = useSharedValue(0);
-
+export const ViewModal = ({ visible, handleClose, doneBtn, children, modalOffset }: ViewModalProps) => {
+    const translateY = useSharedValue(-1);
 
     const onClose = () => {
         translateY.value = withTiming(DeviceHeigth, { duration: 300 }, () => {
             runOnJS(handleClose)()
         })
-
     }
     const pan = Gesture.Pan()
         .onUpdate(e => {
@@ -57,6 +56,18 @@ export const ViewModal = ({ visible, handleClose, children, modalOffset }: ViewM
             <GestureDetector gesture={pan}>
                 <Animated.View style={[styles.container, animatedStyles]}>
                     <View style={[styles.top]} />
+                    {React.isValidElement(doneBtn)
+                        ? cloneElement(doneBtn, {
+                            onPress: (e) => {
+                                if (doneBtn) {
+                                    const { onPress } = doneBtn.props
+                                    if (onPress) {
+                                        onPress(e)
+                                    }
+                                }
+                                onClose()
+                            }
+                        }) : doneBtn}
                     {children}
                 </Animated.View>
             </GestureDetector>
@@ -64,6 +75,7 @@ export const ViewModal = ({ visible, handleClose, children, modalOffset }: ViewM
     </View>
 
 };
+export default ViewModal
 const styles = StyleSheet.create({
     overlay: {
         position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,.3)', zIndex: 1, elevation: 1
@@ -73,7 +85,7 @@ const styles = StyleSheet.create({
     },
     container: {
         position: 'relative',
-        backgroundColor: "white", gap: rS(15), width: Dimensions.get("window").width, height: Dimensions.get('window').height, borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: 'hidden', padding: 10,
+        backgroundColor: "white", gap: rS(15), width: Dimensions.get("window").width, height: DeviceHeigth * 2, borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: 'hidden', padding: 10,
     },
     top: {
         width: DeviceWidth - DeviceWidth / 1.5,

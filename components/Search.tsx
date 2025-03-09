@@ -1,13 +1,14 @@
 import { Button, Typography } from "@/components/ui";
-import { Progressbar } from "@/components/ui/Progressbar";
 import { Colors } from "@/constants/Colors";
 import { useBackgroundUpload } from "@/hooks/useBackgroundUpload";
 import { pickAssets, rS, rV } from "@/utils";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Constants from 'expo-constants';
+import { FileSystemUploadResult } from "expo-file-system";
 import * as MediaLibrary from 'expo-media-library';
 import React, { useEffect, useState } from "react";
 import { Dimensions, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import Toast from "react-native-toast-message";
 
 function getFileExtension(uri: string) {
     const match = /\.([a-zA-Z]+)$/.exec(uri)
@@ -35,8 +36,13 @@ export const Search = () => {
 
     const { startUpload } = useBackgroundUpload()
     const read = async () => {
-        const promises = image.map(i => startUpload(i.uri, (progress) => setRes({ ...res, progress })))
-        const images = await Promise.all(promises)
+        const images: FileSystemUploadResult[] = []
+        for (const i of image) {
+            const data = await startUpload(i, (progress) => setRes({ ...res, progress }))
+            if (data)
+                images.push(data)
+            setRes({ ...res, progress: 0 })
+        }
         const final = await fetch('http://10.0.2.2:3000/final', {
             method: 'POST',
             headers: {
@@ -48,7 +54,7 @@ export const Search = () => {
                 secondParam: 'yourOtherValue',
             }),
         })
-        console.log(final)
+        Toast.show({ type: 'success', text1: "Загрузка завершена", text2: "Загрузка прошла успешна" })
 
         const b = await final.json()
         console.log(b, "FINAL")
@@ -65,8 +71,8 @@ export const Search = () => {
                 <Typography variant="h1">Hello</Typography>
             </Pressable>
             <Button onPress={read} disabled={!image}>Read</Button>
-            <Progressbar value={res.progress} />
-            <Typography variant="h3">{res.progress}</Typography>
+            {/* <Progressbar value={res.progress} /> */}
+            {/* <Typography variant="h3">{res.progress}</Typography> */}
             <Main />
         </View>
         }

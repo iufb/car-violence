@@ -10,6 +10,10 @@ export const Progressbar = ({ value }: ProgressbarProps) => {
     const [width, setWidth] = useState(0)
     const progress = useSharedValue(0)
     useEffect(() => {
+        if (value == 100) {
+            progress.value = 0
+            return;
+        }
         progress.value = withTiming(value * width / 100, { duration: 300 });
     }, [value, width]);
 
@@ -27,7 +31,7 @@ const styles = StyleSheet.create({
     container: {
         height: 14,
         backgroundColor: '#e2e2e2',
-        borderRadius: 5
+        borderRadius: 5,
 
     },
     progress: {

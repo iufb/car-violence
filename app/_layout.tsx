@@ -4,6 +4,7 @@ import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import React from 'react';
 
 import { AssetsPicker } from '@/components/AssetsPicker';
+import { toastConfig } from '@/components/CustomToast';
 import { PermissionAlert } from '@/components/PermissionAlert';
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -108,7 +109,7 @@ function RootLayout() {
             <QueryClientProvider client={client}>
                 <InitialLayout />
             </QueryClientProvider>
-            <Toast />
+            <Toast config={toastConfig} />
             <AssetsPicker />
             <PermissionAlert />
         </ThemeProvider>
