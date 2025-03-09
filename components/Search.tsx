@@ -1,12 +1,13 @@
 import { Button, Typography } from "@/components/ui";
+import { Progressbar } from "@/components/ui/Progressbar";
 import { Colors } from "@/constants/Colors";
 import { useBackgroundUpload } from "@/hooks/useBackgroundUpload";
-import { rS, rV } from "@/utils";
+import { pickAssets, rS, rV } from "@/utils";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Constants from 'expo-constants';
 import * as MediaLibrary from 'expo-media-library';
 import React, { useEffect, useState } from "react";
-import { DeviceEventEmitter, Dimensions, Image, Modal, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 
 function getFileExtension(uri: string) {
     const match = /\.([a-zA-Z]+)$/.exec(uri)
@@ -26,7 +27,7 @@ function getMimeType(extension: string) {
 export const Search = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const closeModal = () => setModalVisible(false);
-    const [image, setImage] = useState<string[]>([])
+    const [image, setImage] = useState<MediaLibrary.Asset[]>([])
     const [res, setRes] = useState({
         status: "",
         progress: 0
@@ -34,53 +35,41 @@ export const Search = () => {
 
     const { startUpload } = useBackgroundUpload()
     const read = async () => {
-        // readFileInChunks("file:///storage/14EB-310C/Download/[MV] IU(아이유) _ Palette(팔레트) (Feat. G-DRAGON).mp4")
+        const promises = image.map(i => startUpload(i.uri, (progress) => setRes({ ...res, progress })))
+        const images = await Promise.all(promises)
+        const final = await fetch('http://10.0.2.2:3000/final', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                images: images.map(i => JSON.parse(i?.body ?? '').file),
+                firstParam: 'yourValue',
+                secondParam: 'yourOtherValue',
+            }),
+        })
+        console.log(final)
 
-        // uploadFileInChunks("file:///storage/14EB-310C/Download/[MV] IU(아이유) _ Palette(팔레트) (Feat. G-DRAGON).mp4", 1024 * 1024);
-        // uploadFileInChunks("file:///storage/emulated/0/Download/Lovely.Runner.2024.S01E01.1080p.RGzsRutracker.mkv", 1024 * 1024);
-        // const { url } = await fetch('http://10.0.2.2:1080/s3').then(res => res.json())
-        // console.log(url)
-        startUpload("file:///storage/emulated/0/Download/Lovely.Runner.2024.S01E01.1080p.RGzsRutracker.mkv", (progress) => setRes({ ...res, progress }))
-
+        const b = await final.json()
+        console.log(b, "FINAL")
     }
 
-    const [permission, requestPermission] = MediaLibrary.usePermissions()
-    const handlePicker = async () => {
-        console.log(permission?.status, "STATUS")
-        if (!permission) return;
-        if (permission.status == 'denied') {
-            DeviceEventEmitter.emit('openPermissionAlert')
-            return;
-        }
-        if (permission.status !== 'granted') {
-            const res = await requestPermission();
-            console.log(res.status, 'ask status')
-            if (res.status == 'granted') {
-                DeviceEventEmitter.emit('openAssetsPicker', () => console.log('picker'))
-            }
-        } else {
-            DeviceEventEmitter.emit('openAssetsPicker', () => console.log('picker'))
-        }
-    }
+
     return <View style={[styles.container]}>
         <Pressable style={[styles.trigger]} onPress={() => setModalVisible(true)}>
             <FontAwesome5 name="search" size={20} color={Colors.light.primary} />
             <Typography color={Colors.light.notSelected} variant="span">Введите номер нарушения...</Typography>
         </Pressable>
-        <Modal visible={modalVisible} onRequestClose={closeModal} animationType="fade"  >
-            <View style={[styles.modal]}>
-                <Pressable onPress={closeModal}>
-                    <Typography variant="h1">Hello</Typography>
-                </Pressable>
-                <Pressable onPress={handlePicker}>
-
-                    <Typography variant="h3">Vibrat</Typography>
-                </Pressable>
-                <Button onPress={read} disabled={!image}>Read</Button>
-                <Typography variant="h3">{res.progress}</Typography>
-                <Main />
-            </View>
-        </Modal>
+        {modalVisible && <View style={[styles.modal]}>
+            <Pressable onPress={() => pickAssets((a) => setImage(a))}>
+                <Typography variant="h1">Hello</Typography>
+            </Pressable>
+            <Button onPress={read} disabled={!image}>Read</Button>
+            <Progressbar value={res.progress} />
+            <Typography variant="h3">{res.progress}</Typography>
+            <Main />
+        </View>
+        }
     </View>
 }
 const Main = () => {

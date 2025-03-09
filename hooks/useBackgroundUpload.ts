@@ -25,7 +25,7 @@ export const useBackgroundUpload = () => {
             );
 
             const response = await uploadTask.uploadAsync();
-            console.log('Upload response:', response);
+            return response
         } catch (error) {
             console.error('Error uploading file:', error);
         } finally {

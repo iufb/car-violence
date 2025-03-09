@@ -1,11 +1,15 @@
 import * as ImagePicker from 'expo-image-picker';
 
+import * as MediaLibrary from 'expo-media-library';
 import * as SecureStore from 'expo-secure-store';
-import { Dimensions } from 'react-native';
+import { DeviceEventEmitter, Dimensions } from 'react-native';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import Toast, { ToastType } from 'react-native-toast-message';
 export const DeviceWidth = Dimensions.get('window').width
 export const DeviceHeigth = Dimensions.get('window').height
+export const pickAssets = async (handleSave: (assets: MediaLibrary.Asset[]) => void) => {
+    DeviceEventEmitter.emit('openAssetsPicker', handleSave)
+}
 export const pickImage = async ({
     saveAsUri,
     saveAsFile

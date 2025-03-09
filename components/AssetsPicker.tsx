@@ -1,11 +1,11 @@
-import { Typography } from "@/components/ui";
+import { Typography, ViewModal } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
-import { DeviceHeigth, DeviceWidth, rS, rV } from "@/utils";
+import { DeviceWidth, pickAssets, rS, rV } from "@/utils";
 import { useEffect, useState } from "react";
-import { DeviceEventEmitter, Dimensions, FlatList, Image, Pressable, StyleSheet, View } from "react-native";
-import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
-import Animated, { Easing, ReduceMotion, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { DeviceEventEmitter, FlatList, Image, Pressable, StyleSheet, View } from "react-native";
+import Animated, { Easing, ReduceMotion, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
+import { LoaderView } from "@/components/LoaderView";
 import { FontAwesome } from "@expo/vector-icons";
 import * as MediaLibrary from 'expo-media-library';
 interface AssetsPickerBase {
@@ -21,29 +21,13 @@ const getAssets = async (mediaType: MediaLibrary.MediaTypeValue, save: (assets: 
         promises.push(MediaLibrary.getAssetsAsync({ album, mediaType }))
     })
     const res = (await Promise.all(promises)).map(page => page.assets)
+    console.log(res, mediaType)
     save(res[0])
 }
 export const AssetsPickerBtn = () => {
-    const [permission, requestPermission] = MediaLibrary.usePermissions()
-    const handlePicker = async () => {
-        console.log(permission?.status, "STATUS")
-        if (!permission) return;
-        if (permission.status == 'denied') {
-            DeviceEventEmitter.emit('openPermissionAlert')
-            return;
-        }
-        if (permission.status !== 'granted') {
-            const res = await requestPermission();
-            console.log(res.status, 'ask status')
-            if (res.status == 'granted') {
-                DeviceEventEmitter.emit('openAssetsPicker', () => console.log('picker'))
-            }
-        } else {
-            DeviceEventEmitter.emit('openAssetsPicker', () => console.log('picker'))
-        }
-    }
-
-    return <Pressable onPress={handlePicker}>
+    const [assets, setAssets] = useState<MediaLibrary.Asset[]>([])
+    console.log("PICKED", assets)
+    return <Pressable onPress={() => pickAssets((assets) => setAssets(assets))}>
         <Typography variant="h3">Picker</Typography>
     </Pressable>
 
@@ -51,33 +35,24 @@ export const AssetsPickerBtn = () => {
 export const AssetsPicker = () => {
     const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
     const [visible, setVisible] = useState(false);
-    const [saveCb, setSaveCb] = useState<(() => void) | null>(null)
+    const [saveCb, setSaveCb] = useState<((assets: MediaLibrary.Asset[]) => void) | null>(null)
     const [activeTab, setActiveTab] = useState(tabs[0])
     const [pickedAssets, setSelectedMap] = useState<Map<string, MediaLibrary.Asset>>(new Map())
-    const translateY = useSharedValue(0);
-    const pan = Gesture.Pan()
-        .onUpdate(e => {
-            translateY.value = e.translationY
-        })
-        .onEnd(e => {
-            if (e.translationY < 0) {
-                translateY.value = withTiming(0, { duration: 100 })
-            }
-            if (e.translationY > DeviceHeigth / 2) {
-                runOnJS(setVisible)(false)
-            } else {
-                translateY.value = withTiming(0, { duration: 100 })
-            }
-
-        })
-    const animatedStyles = useAnimatedStyle(() => ({
-        transform: [
-            { translateY: translateY.value },
-        ],
-    }));
     useEffect(() => {
-        const listener = DeviceEventEmitter.addListener("openAssetsPicker", (callback: () => void) => {
-            translateY.value = withTiming(0, { duration: 300 })
+        if (visible) {
+            requestPermission().then(res => {
+                if (!res) return;
+                console.log(res, "RES")
+                if (res.status == 'denied') {
+                    DeviceEventEmitter.emit('openPermissionAlert')
+                    handleClose()
+                    return;
+                }
+            })
+        }
+    }, [visible])
+    useEffect(() => {
+        const listener = DeviceEventEmitter.addListener("openAssetsPicker", (callback: (assets: MediaLibrary.Asset[]) => void) => {
             setVisible(true);
             setSaveCb(() => callback)
         });
@@ -95,35 +70,26 @@ export const AssetsPicker = () => {
             return newMap
         })
     }
-    const onClose = () => {
-        translateY.value = withTiming(DeviceHeigth, { duration: 300 }, () => {
-            runOnJS(setVisible)(false)
-        })
+    const handleClose = () => {
+        setVisible(false)
     }
-
-    return visible && <View style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,.3)', zIndex: 1, elevation: 1 }}>
-        <GestureHandlerRootView style={{ flex: 1, width: '100%' }}>
-            <GestureDetector gesture={pan}>
-                <Animated.View style={[styles.container, animatedStyles]}>
-                    <View style={[styles.top]} />
-                    <View style={[styles.topView]}>
-                        <Pressable hitSlop={20} onPress={onClose}>
-                            <Typography color={Colors.light.primary} variant="p2">Назад  </Typography>
-                        </Pressable>
-                        <Tabs activeTab={activeTab} setActiveTab={(tab) => setActiveTab(tab)} />
-                        <Pressable>
-                            <Typography color={Colors.light.primary} variant="p2">Выбрать</Typography>
-                        </Pressable>
-
-                    </View>
-                    {activeTab == tabs[0] ? <PhotosView pickedAssets={pickedAssets} handleSelect={handleSelect} /> : <VideosView pickedAssets={pickedAssets} handleSelect={handleSelect} />}
-                </Animated.View>
-            </GestureDetector>
-        </GestureHandlerRootView>
-
-    </View>
-
-
+    const handleDone = () => {
+        if (!saveCb) return;
+        saveCb(Array.from(pickedAssets.values()))
+        setSelectedMap(new Map())
+        handleClose()
+    }
+    return <ViewModal visible={visible} handleClose={handleClose} modalOffset={rS(100)}>
+        <View style={{ flex: 1 }}>
+            <View style={[styles.topView]}>
+                <Tabs activeTab={activeTab} setActiveTab={(tab) => setActiveTab(tab)} />
+                <Pressable onPress={handleDone}>
+                    <Typography color={Colors.light.primary} variant="p2">Выбрать</Typography>
+                </Pressable>
+            </View>
+            {activeTab == tabs[0] ? <PhotosView pickedAssets={pickedAssets} handleSelect={handleSelect} /> : <VideosView pickedAssets={pickedAssets} handleSelect={handleSelect} />}
+        </View>
+    </ViewModal>
 };
 const tabs = ['Фото', 'Видео']
 interface TabsProps {
@@ -131,7 +97,7 @@ interface TabsProps {
     setActiveTab: (tab: string) => void
 }
 const Tabs = ({ activeTab, setActiveTab }: TabsProps) => {
-    const translateX = useSharedValue<number>(0);
+    const translateX = useSharedValue<number>(activeTab == tabs[0] ? 0 : rS(75) + 10);
 
     const handlePress = (tab: string) => {
         setActiveTab(tab)
@@ -159,23 +125,18 @@ const Tabs = ({ activeTab, setActiveTab }: TabsProps) => {
 
 
 const PhotosView = ({ pickedAssets, handleSelect }: AssetsPickerBase) => {
-    const [photos, setPhotos] = useState<MediaLibrary.Asset[]>([])
-    useEffect(() => {
-        getAssets('photo', (assets) => setPhotos(assets))
-    }, [])
-    return <View>
-        <AssetsView pickedAssets={pickedAssets} assets={photos} handleSelect={handleSelect} />
-    </View>
+    const { loading, assets } = useMediaLibrary('photo')
+    if (loading) return <LoaderView />
+    if (assets.length == 0) return <Typography variant="p2" color="gray">Фото не найдены.</Typography>
+    return <AssetsView pickedAssets={pickedAssets} assets={assets} handleSelect={handleSelect} />
 }
 
 const VideosView = ({ pickedAssets, handleSelect }: AssetsPickerBase) => {
-    const [videos, setVideos] = useState<MediaLibrary.Asset[]>([])
-    useEffect(() => {
-        getAssets('video', (assets) => setVideos(assets))
-    }, [])
-    return <View>
-        <AssetsView pickedAssets={pickedAssets} assets={videos} handleSelect={handleSelect} />
-    </View>
+    const { loading, assets } = useMediaLibrary('video')
+    if (loading) return <LoaderView />
+    if (assets.length == 0) return <Typography variant="p2" color="gray">Видео не найдены.</Typography>
+    return <AssetsView pickedAssets={pickedAssets} assets={assets} handleSelect={handleSelect} />
+
 
 }
 const AssetsView = ({ assets, handleSelect, pickedAssets }: { assets: MediaLibrary.Asset[] } & AssetsPickerBase) => {
@@ -192,29 +153,28 @@ interface AssetItemProps {
     asset: MediaLibrary.Asset
 }
 const AssetItem = ({ asset, handleSelect, pickedAssets }: AssetItemProps & AssetsPickerBase) => {
-    return <Pressable onPress={() => handleSelect(asset)} style={{ position: 'relative', width: (DeviceWidth - 20) / 4, height: (DeviceWidth - 20) / 4 }}>
-        {pickedAssets.has(asset.id) && <View style={{ position: 'absolute', inset: 0, zIndex: 10000, backgroundColor: 'rgba(0,0,0,.5)' }} >
-            <View style={[{ marginTop: 4, marginLeft: 4, backgroundColor: Colors.light.primary, borderRadius: 100, width: 30, height: 30, alignItems: 'center', justifyContent: 'center' }]}>
-                <FontAwesome name="check" color={'white'} size={15} />
+    return <Pressable onPress={() => handleSelect(asset)} style={[styles.asset]}>
+        {pickedAssets.has(asset.id) && <View style={[styles.assetOverlay]} >
+            <View style={[styles.check]}>
+                <FontAwesome name="check" color={'white'} size={12} />
             </View>
         </View>}
         <Image resizeMode="cover" source={{ uri: asset.uri }} width={DeviceWidth / 4} height={DeviceWidth / 4} />
     </Pressable >
 }
+const useMediaLibrary = (mediaType: MediaLibrary.MediaTypeValue) => {
+    const [assets, setAssets] = useState<MediaLibrary.Asset[]>([])
+    const [loading, setLoading] = useState(true)
+    useEffect(() => {
+        getAssets(mediaType, (a) => setAssets(a))
+        setLoading(false)
+    }, [])
+    return { assets, loading }
+}
 const styles = StyleSheet.create({
-    container: {
-        position: 'relative',
-        backgroundColor: "white", gap: rS(15), width: Dimensions.get("window").width, height: Dimensions.get('window').height, marginTop: rV(100), borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: 'hidden', padding: 10,
-    },
-    top: {
-        width: DeviceWidth - DeviceWidth / 1.5,
-        height: rV(4),
-        borderRadius: 10,
-        marginTop: rV(5),
-        alignSelf: 'center',
-        backgroundColor: 'rgba(0,0,0,.33)'
-    },
     topView: {
+        marginLeft: DeviceWidth / 4,
+        marginBottom: 20,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center'
@@ -238,6 +198,10 @@ const styles = StyleSheet.create({
     tab: {
         width: rS(75),
         alignSelf: 'center',
-    }
+    },
+    check: { marginTop: 8, marginLeft: 8, backgroundColor: Colors.light.primary, borderRadius: 100, width: 20, height: 20, alignItems: 'center', justifyContent: 'center' },
+    asset: { position: 'relative', width: (DeviceWidth - 20) / 4, height: (DeviceWidth - 20) / 4, overflow: 'hidden' },
+    assetOverlay: { position: 'absolute', inset: 0, zIndex: 10000, backgroundColor: 'rgba(0,0,0,.5)' }
+
 
 })
