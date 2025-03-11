@@ -68,7 +68,10 @@ export const AssetsPicker = () => {
         })
     }
     const handleDone = () => {
+
+        console.log(Array.from(pickedAssets.values()), 'pikcer')
         if (!saveCb) return;
+        console.log('savesb founded')
         saveCb(Array.from(pickedAssets.values()))
         setSelectedMap(new Map())
     }

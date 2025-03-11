@@ -166,7 +166,7 @@ const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
             initialNumToRender={1}
             removeClippedSubviews={true}
             ref={flatListRef} keyExtractor={(item, idx) => `${item.id}`} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.mediasViews]} data={medias} renderItem={({ item }: { item: MediaLibrary.Asset }) => {
-                if (item.uri.includes('mp4') || item.uri.includes('mov')) {
+                if (item.uri.includes('mp4') || item.uri.includes('mov') || item.uri.includes('mkv')) {
                     return <Video source={item.uri} style={[styles.previewItem]} />
                 }
                 return <Image source={{ uri: item.uri }} style={[styles.previewItem]} />

@@ -9,7 +9,7 @@ export const useBackgroundUpload = () => {
     async function startUpload(asset: MediaLibrary.Asset, media_id: string) {
         const token = await getFromStorage('access');
         if (!token) {
-            console.error('NO token')
+            console.error('No token')
             return
         }
 
@@ -23,7 +23,6 @@ export const useBackgroundUpload = () => {
                     uploadType: FileSystem.FileSystemUploadType.MULTIPART,
                     fieldName: 'video',
                     headers: {
-                        'Content-Type': 'multipart/form-data',
                         "Authorization": `Bearer ${token}`
                     },
                     parameters: {
@@ -34,7 +33,7 @@ export const useBackgroundUpload = () => {
                     if (!showToast) {
                         const progressPercent = (p.totalBytesSent / p.totalBytesExpectedToSend) * 100;
 
-                        Toast.show({ type: 'upload', props: { progress: progressPercent, fileName: asset.filename }, autoHide: false })
+                        Toast.show({ type: 'upload', props: { progress: Math.floor(progressPercent), fileName: asset.filename }, autoHide: false })
                         setShowToast(true)
                     }
                 }
@@ -45,7 +44,6 @@ export const useBackgroundUpload = () => {
             console.error('Error uploading file:', error);
         } finally {
             Toast.hide()
-            setProgress(0)
             setShowToast(false)
         }
     }

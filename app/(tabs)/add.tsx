@@ -3,6 +3,7 @@ import { Tabs, usePathname, useRouter } from "expo-router";
 
 import { SendViolenceForm } from "@/components/forms";
 import { Button, Typography } from "@/components/ui";
+import { useAppState } from "@/hooks";
 import { useCameraPermissions } from "expo-camera";
 import * as MediaLibrary from 'expo-media-library';
 import { useEffect, useState } from "react";
@@ -15,7 +16,6 @@ export default function Add() {
     const [isActive, setIsActive] = useState(true)
     const [permission, requestPermission] = useCameraPermissions();
     const router = useRouter()
-    console.log(medias)
     const path = usePathname()
     useEffect(() => {
         if (path !== '/add') {
@@ -38,6 +38,13 @@ export default function Add() {
     const closeCameraOnEnd = () => {
         setIsActive(false)
     }
+    // if (appState !== 'active') {
+    //     return <View style={{ flex: 1, backgroundColor: 'black', justifyContent: 'center', alignItems: 'center' }}>
+    //         <Tabs.Screen options={{ headerShown: false }} />
+    //         <ActivityIndicator size="large" color={Colors.light.primary} />
+    //     </View>
+    //
+    // }
     if (!permission) return <View style={{ flex: 1, backgroundColor: 'black', justifyContent: 'center', alignItems: 'center' }}>
         <Tabs.Screen options={{ headerShown: false }} />
         <ActivityIndicator size="large" color={Colors.light.primary} />

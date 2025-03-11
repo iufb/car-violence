@@ -1,20 +1,27 @@
 import { rGetMediaList } from "@/api/violence";
 import { LoaderView, NewsList, ScreenContainer, Search } from "@/components";
-import { AssetsPickerBtn } from "@/components/AssetsPicker";
-import { Card, Typography } from "@/components/ui";
+import { Button, Card, Typography } from "@/components/ui";
+import { Progressbar } from "@/components/ui/Progressbar";
 import { rS, rV } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs } from "expo-router";
-import React from 'react';
+import React, { useState } from 'react';
 import { Dimensions, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 
 
 export default function HomeScreen() {
-
+    const [progress, setProgress] = useState(0)
+    const onPlus = () => {
+        setProgress(prev => {
+            if (prev == 100) return 0
+            return prev + 10
+        })
+    }
     return (
         <ScreenContainer style={[styles.container]} >
             <Tabs.Screen options={{ header: () => <Search /> }} />
-            <AssetsPickerBtn />
+            <Progressbar value={progress} />
+            <Button onPress={onPlus}>+</Button>
             <SafeAreaView >
                 <ScrollView contentContainerStyle={[styles.container]} showsVerticalScrollIndicator={false}>
                     <NewsList />
