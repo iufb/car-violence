@@ -1,7 +1,7 @@
 import { Button, Typography } from '@/components/ui';
 
 import { Colors } from '@/constants/Colors';
-import { pickImage, rS, rV } from '@/utils';
+import { pickAssets, rS, rV } from '@/utils';
 import { Entypo, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Camera as ExpoCamera } from 'expo-camera';
 import Constants from "expo-constants";
@@ -10,19 +10,36 @@ import { useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Dimensions, Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, { interpolate, interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import * as MediaLibrary from 'expo-media-library';
 import { CameraPosition, Camera as CameraView, useCameraDevice, useCameraFormat } from 'react-native-vision-camera';
 
 type CameraModeType = 'picture' | 'video'
 const CONTROLS_HEIGHT = 200
 
-export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isActive: boolean, medias: string[], setMedias: (media: string[]) => void, closeCameraOnEnd: () => void }) {
+const saveToGallery = async (fileUri: string) => {
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    if (status !== "granted") {
+        console.error("Permission to access media library denied.");
+        return;
+    }
+
+    try {
+        const asset = await MediaLibrary.createAssetAsync(fileUri);
+        console.log("Asset created:", asset);
+        return asset;
+    } catch (error) {
+        console.error("Error creating asset:", error);
+    }
+};
+export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isActive: boolean, medias: MediaLibrary.Asset[], setMedias: (media: MediaLibrary.Asset[]) => void, closeCameraOnEnd: () => void }) {
     const [cameraMode, setCameraMode] = useState<CameraModeType>('picture')
     const [facing, setFacing] = useState<CameraPosition>('back');
     const device = useCameraDevice(facing)
     const [isRecording, setIsRecording] = useState(false);
     const format = useCameraFormat(device, [
         { videoAspectRatio: 16 / 9 },
-        { videoResolution: { width: 3048, height: 2160 } },
+        { videoResolution: { width: 1920, height: 1080 } },
         { fps: 60 }
     ])
     const { width, height } = useWindowDimensions()
@@ -35,7 +52,9 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
         try {
             if (cameraRef.current) {
                 const photo = await cameraRef.current.takePhoto()
-                setMedias(['file://' + photo.path])
+                const asset = await saveToGallery(photo.path)
+                if (!asset) return;
+                setMedias([asset])
                 closeCameraOnEnd()
             }
         } catch (e) {
@@ -55,8 +74,10 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
                 }
                 setIsRecording(true)
                 cameraRef.current.startRecording({
-                    onRecordingFinished: (video) => {
-                        setMedias(['file://' + video.path])
+                    onRecordingFinished: async (video) => {
+                        const asset = await saveToGallery(video.path)
+                        if (!asset) return
+                        setMedias([asset])
                         setIsRecording(false)
                     },
                     onRecordingError: async (error) => {
@@ -196,10 +217,10 @@ const FlipBtn = ({ facing, toggleCameraFacing }: FlipBtnProps) => {
 
 }
 interface ImportBtnProps {
-    save: (value: string[]) => void
+    save: (value: MediaLibrary.Asset[]) => void
 }
 const ImportBtn = ({ save }: ImportBtnProps) => {
-    return <Pressable style={[styles.btn]} onPress={() => pickImage(save)}><Entypo name='image' size={24} color={Colors.light.background} /></Pressable>
+    return <Pressable style={[styles.btn]} onPress={() => pickAssets(save)}><Entypo name='image' size={24} color={Colors.light.background} /></Pressable>
 }
 
 const modes: { label: string, value: CameraModeType }[] = [

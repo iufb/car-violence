@@ -4,13 +4,14 @@ import { Tabs, usePathname, useRouter } from "expo-router";
 import { SendViolenceForm } from "@/components/forms";
 import { Button, Typography } from "@/components/ui";
 import { useCameraPermissions } from "expo-camera";
+import * as MediaLibrary from 'expo-media-library';
 import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 
 
 export default function Add() {
-    const [medias, setMedias] = useState<string[]>([])
+    const [medias, setMedias] = useState<MediaLibrary.Asset[]>([])
     const [isActive, setIsActive] = useState(true)
     const [permission, requestPermission] = useCameraPermissions();
     const router = useRouter()
@@ -27,7 +28,7 @@ export default function Add() {
 
     const deleteMedia = (value: string) => {
 
-        setMedias(prev => prev.filter(m => m !== value))
+        setMedias(prev => prev.filter(m => m.uri !== value))
     }
     useEffect(() => {
         if (medias.length == 0) {
@@ -47,9 +48,7 @@ export default function Add() {
         <Tabs.Screen options={{ headerShown: false }} />
         {isActive ? <Camera medias={medias} isActive={isActive} setMedias={media => setMedias([...medias, ...media])} closeCameraOnEnd={closeCameraOnEnd} />
             :
-            <SendViolenceForm setMedias={(value) => setMedias(() => {
-                return value
-            })} medias={medias} openCamera={() => setIsActive(true)} />
+            <SendViolenceForm setMedias={(m) => setMedias(m)} medias={medias} openCamera={() => setIsActive(true)} />
         }
     </View>
 }

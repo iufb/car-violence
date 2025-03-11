@@ -39,6 +39,7 @@ export const Search = () => {
     const handleFind = () => {
         if (!id) return;
         router.push(`/(tabs)/video/${id}`)
+        setId('')
     }
     return <View style={[styles.container]}>
         <TextInput value={id} onChangeText={text => setId(text)} placeholder='Введите номер нарушения...' style={[styles.trigger]} />

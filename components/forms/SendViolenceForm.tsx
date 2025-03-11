@@ -6,30 +6,39 @@ import { Button, DateTimePicker, Input, Select, Typography } from "@/components/
 import { Video } from "@/components/Video";
 import { Colors } from "@/constants/Colors";
 import { errorMsgs } from "@/consts";
-import { GetDate, getFileDetails, GetTime, showToast } from "@/utils";
+import { useBackgroundUpload } from "@/hooks/useBackgroundUpload";
+import { GetDate, GetTime, showToast } from "@/utils";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
 import Constants from "expo-constants";
+import * as MediaLibrary from 'expo-media-library';
 import { Link } from "expo-router";
 import React, { useCallback, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Dimensions, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, ViewProps, ViewToken } from "react-native";
 interface SendViolenceFormProps extends ViewProps {
-    medias: string[]
-    setMedias: (value: string[]) => void;
+    medias: MediaLibrary.Asset[]
+    setMedias: (value: MediaLibrary.Asset[]) => void;
     openCamera: () => void
 }
 export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...props }: SendViolenceFormProps) => {
     const { control, formState: { errors }, handleSubmit, reset } = useForm({
         defaultValues
     })
+    const { startUpload } = useBackgroundUpload()
     const { mutate: send, isPending } = useMutation({
-        mutationKey: ['sendViolence'], mutationFn: rSendViolence, onSuccess: (data) => {
-            console.log(data)
-            showToast({ type: 'success', title: "Отправлено", desc: "Нарушение было отправлено!" })
+        mutationKey: ['sendViolence'], mutationFn: rSendViolence, onSuccess: async (violence) => {
+            if (!violence) return;
+            console.log(violence.id)
+            for (const i of medias) {
+                const data = await startUpload(i, violence.id.toString())
+
+
+            }
             reset()
             client.invalidateQueries({ queryKey: ['myVideos'] })
             setMedias([])
+            showToast({ type: 'success', title: "Отправлено", desc: "Нарушение было отправлено!" })
         }, onError: (e) => {
             showToast({ type: 'error', title: "Ошибка", desc: "Произошла ошибка" })
             console.log(e)
@@ -37,14 +46,15 @@ export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...prop
     })
     const submit = (data: typeof defaultValues) => {
         const body = new FormData()
-        medias.forEach(media => {
-            const details = getFileDetails(media)
-            body.append('videos', {
-                uri: media,
-                name: details?.fileName,
-                type: details?.mimeType
-            } as any)
-        })
+        // medias.forEach(media => {
+        //     const details = getFileDetails(media)
+        //     body.append('videos', {
+        //         uri: media,
+        //         name: details?.fileName,
+        //         type: details?.mimeType
+        //     } as any)
+        // })
+
         body.append('city', data.city)
         body.append('street', data.street)
         body.append('description', data.description)
@@ -84,13 +94,13 @@ export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...prop
 }
 
 interface MediasViewProps {
-    medias: string[]
-    setMedias: (value: string[]) => void;
+    medias: MediaLibrary.Asset[]
+    setMedias: (value: MediaLibrary.Asset[]) => void;
     openCamera: () => void
 }
 
 const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
-    const [currentItem, setCurrentItem] = useState<string | null>(null);
+    const [currentItem, setCurrentItem] = useState<MediaLibrary.Asset | null>(null);
     const isManuallyScrolling = useRef(false);
     const viewabilityConfig = useRef({
         viewAreaCoveragePercentThreshold: 50, // Item is considered "in view" if at least 50% is visible
@@ -135,13 +145,13 @@ const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
     }, [medias]);
 
     const deleteMedia = (itemToDelete: string) => {
-        const newMedias = medias.filter((item) => item !== itemToDelete); // Remove the item
+        const newMedias = medias.filter((item) => item.id !== itemToDelete); // Remove the item
         setMedias(newMedias);
 
-        if (currentItem === itemToDelete) {
+        if (currentItem?.id === itemToDelete) {
             if (newMedias.length > 0) {
                 const nextIndex = Math.min(
-                    medias.indexOf(itemToDelete),
+                    medias.findIndex(item => item.id == itemToDelete),
                     newMedias.length - 1
                 ); // Choose the next valid index
                 setCurrentItem(newMedias[nextIndex]);
@@ -155,20 +165,20 @@ const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
         <FlatList
             initialNumToRender={1}
             removeClippedSubviews={true}
-            ref={flatListRef} keyExtractor={(item, idx) => `${item}*idx`} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.mediasViews]} data={medias} renderItem={({ item }: { item: string }) => {
-                if (item.includes('mp4') || item.includes('mov')) {
-                    return <Video source={item} style={[styles.previewItem]} />
+            ref={flatListRef} keyExtractor={(item, idx) => `${item.id}`} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.mediasViews]} data={medias} renderItem={({ item }: { item: MediaLibrary.Asset }) => {
+                if (item.uri.includes('mp4') || item.uri.includes('mov')) {
+                    return <Video source={item.uri} style={[styles.previewItem]} />
                 }
-                return <Image source={{ uri: item }} style={[styles.previewItem]} />
+                return <Image source={{ uri: item.uri }} style={[styles.previewItem]} />
             }}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
         />
         <View style={[styles.bottom]}><View style={[styles.mediasControls]}>
-            <FlatList ref={controlsFlatListRef} keyExtractor={(item, idx) => `${item}***idx`} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.controlsList]} data={medias} renderItem={({ item, index }) =>
+            <FlatList ref={controlsFlatListRef} keyExtractor={(item, idx) => `${item.uri}`} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.controlsList]} data={medias} renderItem={({ item, index }) =>
                 <View style={[styles.controlItem]}>
                     {currentItem == item ?
-                        <Pressable style={[styles.deleteItem]} onPress={() => deleteMedia(item)}>
+                        <Pressable style={[styles.deleteItem]} onPress={() => deleteMedia(item.id)}>
                             <MaterialIcons name="delete" color={Colors.light.background} size={23} />
                         </Pressable>
                         :
@@ -177,7 +187,7 @@ const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
                             scrollToSelected(index)
                         }} style={[styles.selectItem]}>
                         </Pressable>}
-                    <Image source={{ uri: item }} style={{ width: '100%', height: '100%' }} />
+                    <Image source={{ uri: item.uri }} style={{ width: '100%', height: '100%' }} />
                 </View>
             } />
             <Pressable style={[styles.controlItem, styles.addNew]} onPress={openCamera}>

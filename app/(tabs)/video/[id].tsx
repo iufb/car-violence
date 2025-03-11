@@ -17,6 +17,7 @@ export default function VideoScreen() {
             return data
         }
     })
+    console.log(data?.videos)
     return <ScreenContainer keyDismiss={false}>
         <Tabs.Screen options={{ header: () => <CustomHeader title="Видео" /> }} />
         <SafeAreaView>

@@ -14,7 +14,7 @@ export const CustomToast = ({ props: { fileName, progress } }: ToastConfigParams
             <Typography variant='h3'>Загрузка файла</Typography>
             <Typography numberOfLines={1} variant='p2'>{fileName.length > 40 ? fileName.slice(0, 40) + '...' : fileName}</Typography>
             <Progressbar value={progress} />
-            <Typography center color="black" variant="h3">{Math.floor(progress)}%</Typography>
+            <Typography center color="black" variant="h3">{progress}%</Typography>
         </View>
     );
 };

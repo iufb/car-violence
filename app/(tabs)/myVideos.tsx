@@ -14,6 +14,7 @@ export default function MyVideos() {
             return data
         }
     })
+    console.log(medias, "MEDIADMY")
     return <ScreenContainer>
         <Tabs.Screen options={{ header: (props) => <CustomHeader showBack={false} title="Мои видео" /> }} />
         {isLoading ? <View>
@@ -24,7 +25,7 @@ export default function MyVideos() {
                 <SafeAreaView>
                     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.container]}>
                         {medias.map(item => <Card link={`/(tabs)/video/${item.id}`} subtitle={item.city} key={item.id} color={Colors.light.status['1']} variant="horizontal"
-                            title={item.id.toString()} desc={item.description} img={item.videos[0].video_file}
+                            title={item.id.toString()} desc={item.description} img={item.videos[0]?.video_file}
                         />)}
                     </ScrollView>
                 </SafeAreaView>

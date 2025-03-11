@@ -8,6 +8,7 @@ interface ProgressbarProps {
 
 export const Progressbar = ({ value }: ProgressbarProps) => {
     const [width, setWidth] = useState(0)
+    const [pState, setPState] = useState(value)
     const progress = useSharedValue(0)
     useEffect(() => {
         if (value == 100) {

@@ -1,3 +1,4 @@
+import { getFromStorage } from '@/utils';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import { useState } from 'react';
@@ -5,26 +6,34 @@ import Toast from 'react-native-toast-message';
 
 export const useBackgroundUpload = () => {
     const [showToast, setShowToast] = useState(false)
-    const [progress, setProgress] = useState(0)
-    async function startUpload(asset: MediaLibrary.Asset) {
+    async function startUpload(asset: MediaLibrary.Asset, media_id: string) {
+        const token = await getFromStorage('access');
+        if (!token) {
+            console.error('NO token')
+            return
+        }
 
         try {
             const uploadTask = FileSystem.createUploadTask(
-                'https://m.foxminded.space/api/mediafiles/upload-media/',
+                'https://m.foxminded.space/api/v1/mediafiles/upload-media/',
                 asset.uri,
                 {
                     sessionType: FileSystem.FileSystemSessionType.BACKGROUND,
                     httpMethod: 'POST',
                     uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-                    fieldName: 'file',
-
+                    fieldName: 'video',
                     headers: {
                         'Content-Type': 'multipart/form-data',
+                        "Authorization": `Bearer ${token}`
                     },
+                    parameters: {
+                        media_id
+                    }
                 },
-                (progress) => {
+                (p) => {
                     if (!showToast) {
-                        const progressPercent = (progress.totalBytesSent / progress.totalBytesExpectedToSend) * 100;
+                        const progressPercent = (p.totalBytesSent / p.totalBytesExpectedToSend) * 100;
+
                         Toast.show({ type: 'upload', props: { progress: progressPercent, fileName: asset.filename }, autoHide: false })
                         setShowToast(true)
                     }
@@ -36,6 +45,7 @@ export const useBackgroundUpload = () => {
             console.error('Error uploading file:', error);
         } finally {
             Toast.hide()
+            setProgress(0)
             setShowToast(false)
         }
     }

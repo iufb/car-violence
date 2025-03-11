@@ -9,7 +9,7 @@ export const rGetMediaList = (query: { type: string, limit: number }): Promise<M
 export const rGetMediaById = (id: number): Promise<MediaDTO | undefined> => {
     return customFetch({ path: `mediafiles/detail`, method: "GET", withAuth: true, query: { id } })
 }
-export const rSendViolence = (body: FormData) => {
+export const rSendViolence = (body: FormData): Promise<{ id: number } | undefined> => {
     return customFetch({ path: 'mediafiles/upload/', method: "POST", data: body, withAuth: true })
 }
 
