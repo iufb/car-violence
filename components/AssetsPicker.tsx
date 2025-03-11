@@ -21,7 +21,7 @@ const getAssets = async (mediaType: MediaLibrary.MediaTypeValue, save: (assets: 
         promises.push(MediaLibrary.getAssetsAsync({ album, mediaType }))
     })
     const res = (await Promise.all(promises)).map(page => page.assets)
-    save(res[0])
+    save(res.flat())
 }
 export const AssetsPickerBtn = () => {
     const [assets, setAssets] = useState<MediaLibrary.Asset[]>([])
@@ -110,7 +110,7 @@ const Tabs = ({ activeTab, setActiveTab }: TabsProps) => {
     }));
     return <View style={[styles.tabs]} >
         <View style={[styles.tabsContent]}>
-            <Animated.View style={[{ position: 'absolute', backgroundColor: Colors.light.primary, width: rS(75), paddingVertical: rV(12), pointerEvents: 'none', borderRadius: 10 }, animatedStyles]} />
+            <Animated.View style={[{ position: 'absolute', backgroundColor: Colors.light.primary, width: rS(75), height: '100%', pointerEvents: 'none', borderRadius: 10 }, animatedStyles]} />
             {tabs.map(t => <Pressable onPress={() => handlePress(t)} style={[styles.tab]} key={t}><Typography center color={activeTab == t ? 'white' : 'gray'} variant="h3">{t}</Typography></Pressable>)}
         </View>
     </View>
@@ -187,8 +187,8 @@ const styles = StyleSheet.create({
     tabsContent: {
         flexDirection: 'row',
         gap: 10,
-        paddingVertical: rV(3),
         alignSelf: 'flex-start',
+        height: 32
     },
     tab: {
         width: rS(75),

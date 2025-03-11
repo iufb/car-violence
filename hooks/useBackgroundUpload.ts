@@ -5,11 +5,12 @@ import Toast from 'react-native-toast-message';
 
 export const useBackgroundUpload = () => {
     const [showToast, setShowToast] = useState(false)
-    async function startUpload(asset: MediaLibrary.Asset, setProgress: (progress: number) => void) {
+    const [progress, setProgress] = useState(0)
+    async function startUpload(asset: MediaLibrary.Asset) {
 
         try {
             const uploadTask = FileSystem.createUploadTask(
-                'http://10.0.2.2:3000/upload',
+                'https://m.foxminded.space/api/mediafiles/upload-media/',
                 asset.uri,
                 {
                     sessionType: FileSystem.FileSystemSessionType.BACKGROUND,
