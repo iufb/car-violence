@@ -29,7 +29,7 @@ export default function VideoScreen() {
                 <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.container]}>
                     <Alert title="Ожидается оплата" subtitle="Выплата будет отправлена на ваш счет" variant="rejected" />
                     <FlatList removeClippedSubviews contentContainerStyle={[styles.medias]} showsHorizontalScrollIndicator={false} keyExtractor={item => `${item.id}`} horizontal data={data.videos} renderItem={({ item }) =>
-                        <MediaViewer media={item.video_file} itemStyle={styles.media} style={[styles.mediaContainer]} />
+                        <MediaViewer media={item?.video_file} itemStyle={styles.media} style={[styles.mediaContainer]} />
                     } />
                     <View style={[styles.textContainer]}>
                         <Typography color={Colors.light.primary} variant="h2">№ {data.id}</Typography>

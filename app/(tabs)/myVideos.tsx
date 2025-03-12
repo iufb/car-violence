@@ -1,10 +1,10 @@
 import { rGetMediaList } from "@/api/violence";
 import { CustomHeader, LoaderView, ScreenContainer } from "@/components";
 import { Card, Typography } from "@/components/ui";
-import { Colors } from "@/constants/Colors";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs } from "expo-router";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
+import { Colors } from "react-native/Libraries/NewAppScreen";
 
 
 export default function MyVideos() {
@@ -14,7 +14,6 @@ export default function MyVideos() {
             return data
         }
     })
-    console.log(medias, "MEDIADMY")
     return <ScreenContainer>
         <Tabs.Screen options={{ header: (props) => <CustomHeader showBack={false} title="Мои видео" /> }} />
         {isLoading ? <View>
@@ -25,7 +24,7 @@ export default function MyVideos() {
                 <SafeAreaView>
                     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.container]}>
                         {medias.map(item => <Card link={`/(tabs)/video/${item.id}`} subtitle={item.city} key={item.id} color={Colors.light.status['1']} variant="horizontal"
-                            title={item.id.toString()} desc={item.description} img={item.videos[0]?.video_file}
+                            title={item.id.toString()} desc={item.description} img={item?.videos[0]?.video_file}
                         />)}
                     </ScrollView>
                 </SafeAreaView>

@@ -50,7 +50,7 @@ const LastViolenceList = () => {
         medias && medias.length > 0 ?
             <View style={[styles.violenceContainer]}>
                 {medias.map(item => <Card link={`/(tabs)/video/${item.id}`} style={[styles.violences]} subtitle={item.city} key={item.id} variant="base"
-                    title={item.id.toString()} desc={item.description} img={item.videos[0].video_file}
+                    title={item.id.toString()} desc={item.description} img={item.videos[0]?.video_file}
                 />)
                 }
             </View>

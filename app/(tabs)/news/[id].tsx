@@ -26,7 +26,7 @@ export default function NewsScreen() {
             {data ?
                 <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.container]}>
                     <FlatList removeClippedSubviews contentContainerStyle={[styles.medias]} showsHorizontalScrollIndicator={false} keyExtractor={item => `${item.id}`} horizontal data={data.media} renderItem={({ item }) =>
-                        <MediaViewer media={item.video_file} itemStyle={styles.media} style={[styles.mediaContainer]} />
+                        <MediaViewer media={item?.video_file} itemStyle={styles.media} style={[styles.mediaContainer]} />
                     } />
                     <View style={[styles.textContainer]}>
                         <Typography color={Colors.light.primary} variant="h2">{data.title}</Typography>

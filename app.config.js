@@ -1,4 +1,4 @@
-{
+export default {
     "expo": {
         "name": "Oko",
         "slug": "car-violence",
@@ -16,7 +16,8 @@
                 "foregroundImage": "./assets/images/adaptive-icon.png",
                 "backgroundColor": "#ffffff"
             },
-            "package": "com.iufb2.carviolence",
+            "googleServicesFile": process.env.GOOGLE_SERVICES_JSON ?? './google-services.json',
+            "package": "com.ispark.oko",
             "permissions": [
                 "android.permission.RECORD_AUDIO",
                 "android.permission.CAMERA"

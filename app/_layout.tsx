@@ -6,6 +6,7 @@ import React from 'react';
 import { AssetsPicker } from '@/components/AssetsPicker';
 import { toastConfig } from '@/components/CustomToast';
 import { PermissionAlert } from '@/components/PermissionAlert';
+import { usePushNotifications } from '@/hooks';
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { isRunningInExpoGo } from 'expo';
@@ -47,6 +48,9 @@ const InitialLayout = () => {
     const { isLoaded, isSignedIn, isFirstBoot } = useAuth();
     const segments = useSegments();
     const pathname = usePathname();
+
+    usePushNotifications()
+
 
     useEffect(() => {
         const redirect = async () => {
