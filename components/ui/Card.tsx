@@ -3,26 +3,22 @@ import { Colors } from "@/constants/Colors";
 import { rV } from "@/utils";
 import { Entypo } from "@expo/vector-icons";
 import { Link, LinkProps } from "expo-router";
-import { useState } from "react";
 import { Image, StyleSheet, View, ViewProps } from "react-native";
+
 interface CardProps extends ViewProps {
     variant: 'base' | 'horizontal',
-    img: string,
+    img?: string,
     title: string,
     subtitle?: string,
     color?: string,
     desc: string,
     link: LinkProps['href'],
-} export const Card = ({ variant = 'base', link, title, color, img, subtitle, desc, style, ...props }: CardProps) => {
-    const [uri, setUri] = useState(img)
-    const handleImgError = () => {
-        setUri(
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiJ5rAqr1pIi6pHOdFGGijRXcE4HLHqWJNSw&s'
-        )
-    }
+}
+
+export const Card = ({ variant = 'base', link, title, color, img, subtitle, desc, style, ...props }: CardProps) => {
     const isHorizontal = variant == 'horizontal'
     return <Link href={link}><View style={[style, styles[variant], { backgroundColor: color }, styles.container,]} {...props}>
-        <Image style={[{ width: "100%", height: '100%', borderRadius: 10, flex: 2 }, isHorizontal && styles.horizontalImg]} source={{ uri }} onError={handleImgError} />
+        <Image fadeDuration={100} defaultSource={require('../../assets/fallback.png')} style={[{ width: "100%", height: '100%', borderRadius: 10, flex: 2 }, isHorizontal && styles.horizontalImg]} source={{ uri: img }} />
         <View style={[styles.textContainer, isHorizontal && styles.horizontalText]}>
             <Typography center={!isHorizontal} variant="h3">{title}</Typography>
             <Typography center={!isHorizontal} variant="span">{subtitle}</Typography>

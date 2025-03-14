@@ -10,6 +10,25 @@ export const DeviceHeigth = Dimensions.get('window').height
 export const pickAssets = async (handleSave: (assets: MediaLibrary.Asset[]) => void) => {
     DeviceEventEmitter.emit('openAssetsPicker', handleSave)
 }
+
+export const mimeTypes = {
+    jpeg: "image/jpeg",
+    jpg: "image/jpeg",
+    png: "image/png",
+    gif: "image/gif",
+    bmp: "image/bmp",
+    webp: "image/webp",
+    tiff: "image/tiff",
+    svg: "image/svg+xml",
+    ico: "image/x-icon",
+
+    mp4: "video/mp4",
+    webm: "video/webm",
+    ogg: "video/ogg",
+    avi: "video/x-msvideo",
+    mkv: "video/x-matroska",
+    mov: "video/quicktime",
+};
 export const pickImage = async ({
     saveAsUri,
     saveAsFile

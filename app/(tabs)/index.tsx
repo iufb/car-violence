@@ -1,7 +1,6 @@
 import { rGetMediaList } from "@/api/violence";
 import { LoaderView, NewsList, ScreenContainer, Search } from "@/components";
-import { Button, Card, Typography } from "@/components/ui";
-import { Progressbar } from "@/components/ui/Progressbar";
+import { Card, Typography } from "@/components/ui";
 import { rS, rV } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs } from "expo-router";
@@ -20,8 +19,6 @@ export default function HomeScreen() {
     return (
         <ScreenContainer style={[styles.container]} >
             <Tabs.Screen options={{ header: () => <Search /> }} />
-            <Progressbar value={progress} />
-            <Button onPress={onPlus}>+</Button>
             <SafeAreaView >
                 <ScrollView contentContainerStyle={[styles.container]} showsVerticalScrollIndicator={false}>
                     <NewsList />

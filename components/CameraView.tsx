@@ -122,7 +122,7 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
     return (
         <View style={[{ paddingBottom: insets.bottom, paddingTop: Constants.statusBarHeight }]}>
             <View style={[styles.container]}>
-                <CameraView style={[{ width, height: height - CONTROLS_HEIGHT - Constants.statusBarHeight }]} format={format} ref={cameraRef} device={device} isActive={isActive && appState == 'active'} photo video audio preview />
+                <CameraView style={[{ width, height: height - CONTROLS_HEIGHT - Constants.statusBarHeight }]} format={format} ref={cameraRef} device={device} isActive={isActive} photo video audio preview />
                 <Pressable onPress={() => router.back()} style={[styles.close]}>
                     <MaterialCommunityIcons name='close' size={32} color='white' />
                 </Pressable>

@@ -2,13 +2,14 @@ import { rSendViolence } from "@/api/violence";
 
 import { client } from "@/app/_layout";
 import { FormContainer } from "@/components/forms/FormContainer";
-import { Button, DateTimePicker, Input, Select, Typography } from "@/components/ui";
+import { Button, DateTimePicker, Input, Select, Typography, ViewModal } from "@/components/ui";
 import { Video } from "@/components/Video";
 import { Colors } from "@/constants/Colors";
 import { errorMsgs } from "@/consts";
 import { useBackgroundUpload } from "@/hooks/useBackgroundUpload";
-import { GetDate, GetTime, showToast } from "@/utils";
-import { Entypo, MaterialIcons } from "@expo/vector-icons";
+import { useCreateModal } from "@/hooks/useCreateModal";
+import { GetDate, GetTime, pickAssets, showToast } from "@/utils";
+import { Entypo, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
 import Constants from "expo-constants";
 import * as MediaLibrary from 'expo-media-library';
@@ -16,6 +17,7 @@ import { Link } from "expo-router";
 import React, { useCallback, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Dimensions, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, ViewProps, ViewToken } from "react-native";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 interface SendViolenceFormProps extends ViewProps {
     medias: MediaLibrary.Asset[]
     setMedias: (value: MediaLibrary.Asset[]) => void;
@@ -29,38 +31,30 @@ export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...prop
     const { mutate: send, isPending } = useMutation({
         mutationKey: ['sendViolence'], mutationFn: rSendViolence, onSuccess: async (violence) => {
             if (!violence) return;
-            console.log(violence.id)
-            for (const i of medias) {
-                const data = await startUpload(i, violence.id.toString())
-
-
+            try {
+                for (const i of medias) {
+                    await startUpload(i, violence.id.toString())
+                }
+                reset()
+                client.invalidateQueries({ queryKey: ['myVideos'] })
+                setMedias([])
+                showToast({ type: 'success', title: "Отправлено", desc: "Нарушение было отправлено!" })
+            } catch (e) {
+                showToast({ type: 'error', title: "Ошибка", desc: "Нарушение не было отправлено!" })
             }
-            reset()
-            client.invalidateQueries({ queryKey: ['myVideos'] })
-            setMedias([])
-            showToast({ type: 'success', title: "Отправлено", desc: "Нарушение было отправлено!" })
+
         }, onError: (e) => {
             showToast({ type: 'error', title: "Ошибка", desc: "Произошла ошибка" })
             console.log(e)
         }
     })
-    const submit = (data: typeof defaultValues) => {
+    const submit = async (data: typeof defaultValues) => {
         const body = new FormData()
-        // medias.forEach(media => {
-        //     const details = getFileDetails(media)
-        //     body.append('videos', {
-        //         uri: media,
-        //         name: details?.fileName,
-        //         type: details?.mimeType
-        //     } as any)
-        // })
-
         body.append('city', data.city)
         body.append('street', data.street)
         body.append('description', data.description)
         body.append('was_at_date', GetDate(data.dateTime.date))
         body.append('was_at_time', GetTime(data.dateTime.time) + ":00")
-        console.log(body)
         send(body)
     }
     return <FormContainer style={[style, styles.container]} {...props}>
@@ -190,14 +184,63 @@ const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
                     <Image source={{ uri: item.uri }} style={{ width: '100%', height: '100%' }} />
                 </View>
             } />
-            <Pressable style={[styles.controlItem, styles.addNew]} onPress={openCamera}>
-                <Entypo name="plus" size={32} color={Colors.light.primary} />
-            </Pressable>
+
+            <AddNewButton medias={medias} setMedias={setMedias} openCamera={openCamera} />
         </View>
         </View>
     </View>
 }
+interface AddNewButtonProps {
+    openCamera: () => void
+    medias: MediaLibrary.Asset[],
+    setMedias: (value: MediaLibrary.Asset[]) => void
+}
+const AddNewButton = ({ openCamera, medias, setMedias }: AddNewButtonProps) => {
+    const [visible, setVisible] = useState(false)
+    const height = useSharedValue(0)
+    const onPress = () => {
 
+    }
+    const onClose = () => {
+        setVisible(false)
+        height.value = withTiming(0, { duration: 300 })
+    }
+    const animatedStyle = useAnimatedStyle(() => ({
+        height: height.value
+    }))
+    const handleCameraPress = () => {
+        openCamera()
+        onClose()
+    }
+    const handleGalleryPress = () => {
+        pickAssets((newMedias) => setMedias([...medias, ...newMedias]))
+        onClose()
+    }
+
+    return <>
+        <View style={[styles.addNewContainer]}>
+            <Pressable style={[styles.controlItem, styles.addNew]} onPress={onPress}>
+                <Entypo name="plus" size={32} color={Colors.light.primary} />
+            </Pressable>
+            <Animated.View style={[animatedStyle, styles.addNewContent]}>
+            </Animated.View>
+        </View></>
+
+}
+const SelectImportModal = ({ openCamera, setMedias, medias }: AddNewButtonProps) => {
+    const { visible, setSaveCb, handleClose } = useCreateModal()
+    const handleCameraPress = () => {
+        openCamera()
+    }
+    const handleGalleryPress = () => {
+        pickAssets((newMedias) => setMedias([...medias, ...newMedias]))
+    }
+    return <ViewModal visible={visible} handleClose={handleClose} modalOffset={400}>
+        <Pressable onPress={handleCameraPress}>{visible && <FontAwesome color={Colors.light.primary} name="camera" size={24} />}</Pressable>
+        <Pressable onPress={handleGalleryPress}>{visible && <FontAwesome color={Colors.light.primary} name="image" size={24} />}</Pressable>
+    </ViewModal>
+
+}
 const width = Dimensions.get('window').width
 const styles = StyleSheet.create({
     container: {
@@ -233,7 +276,7 @@ const styles = StyleSheet.create({
         width: width - 20, height: width * 9 / 16, borderRadius: 10,
     },
     controlItem: {
-        width: 60, height: 40, borderRadius: 10, overflow: 'hidden', position: 'relative',
+        width: 60, height: 40, borderRadius: 10, overflow: 'hidden',
         borderWidth: 2,
         borderColor: Colors.light.borderColor
     },
@@ -249,12 +292,41 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0)',
         zIndex: 20,
     },
+    addNewContainer: {
+        position: 'relative'
+    },
+    overlay: {
+        position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,.5)', zIndex: 9, flex: 1
+    },
+    addNewContent: {
+        paddingHorizontal: 10,
+        width: 'auto',
+        minWidth: 44,
+        justifyContent: 'space-around',
+        position: 'absolute',
+        backgroundColor: 'white',
+        borderRadius: 20,
+        elevation: 10,
+        right: 0,
+        top: 40,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 10,
+        },
+        shadowOpacity: 0.53,
+        shadowRadius: 13.97,
+
+        zIndex: 10,
+    },
+
     addNew: {
         alignItems: 'center',
         justifyContent: 'center',
         borderColor: Colors.light.primary,
         borderWidth: 1,
     },
+
     bottom: {
         paddingHorizontal: 15,
         gap: 8
