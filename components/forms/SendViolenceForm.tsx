@@ -2,22 +2,20 @@ import { rSendViolence } from "@/api/violence";
 
 import { client } from "@/app/_layout";
 import { FormContainer } from "@/components/forms/FormContainer";
-import { Button, DateTimePicker, Input, Select, Typography, ViewModal } from "@/components/ui";
+import { Button, DateTimePicker, Input, Select, Typography } from "@/components/ui";
 import { Video } from "@/components/Video";
 import { Colors } from "@/constants/Colors";
 import { errorMsgs } from "@/consts";
 import { useBackgroundUpload } from "@/hooks/useBackgroundUpload";
-import { useCreateModal } from "@/hooks/useCreateModal";
 import { GetDate, GetTime, pickAssets, showToast } from "@/utils";
-import { Entypo, FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
 import Constants from "expo-constants";
 import * as MediaLibrary from 'expo-media-library';
 import { Link } from "expo-router";
 import React, { useCallback, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Dimensions, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, ViewProps, ViewToken } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { DeviceEventEmitter, Dimensions, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, ViewProps, ViewToken } from "react-native";
 interface SendViolenceFormProps extends ViewProps {
     medias: MediaLibrary.Asset[]
     setMedias: (value: MediaLibrary.Asset[]) => void;
@@ -197,50 +195,20 @@ interface AddNewButtonProps {
 }
 const AddNewButton = ({ openCamera, medias, setMedias }: AddNewButtonProps) => {
     const [visible, setVisible] = useState(false)
-    const height = useSharedValue(0)
-    const onPress = () => {
+    const handlePress = () => {
+        DeviceEventEmitter.emit('showImportVariants', {
+            openCamera, openGallery: () => {
+                pickAssets((newMedias) => setMedias([...medias, ...newMedias]))
+            }
+        })
 
     }
-    const onClose = () => {
-        setVisible(false)
-        height.value = withTiming(0, { duration: 300 })
-    }
-    const animatedStyle = useAnimatedStyle(() => ({
-        height: height.value
-    }))
-    const handleCameraPress = () => {
-        openCamera()
-        onClose()
-    }
-    const handleGalleryPress = () => {
-        pickAssets((newMedias) => setMedias([...medias, ...newMedias]))
-        onClose()
-    }
-
-    return <>
-        <View style={[styles.addNewContainer]}>
-            <Pressable style={[styles.controlItem, styles.addNew]} onPress={onPress}>
-                <Entypo name="plus" size={32} color={Colors.light.primary} />
-            </Pressable>
-            <Animated.View style={[animatedStyle, styles.addNewContent]}>
-            </Animated.View>
-        </View></>
-
+    return <Pressable style={[styles.controlItem, styles.addNew]} onPress={handlePress}>
+        <Entypo name="plus" size={32} color={Colors.light.primary} />
+    </Pressable>
 }
-const SelectImportModal = ({ openCamera, setMedias, medias }: AddNewButtonProps) => {
-    const { visible, setSaveCb, handleClose } = useCreateModal()
-    const handleCameraPress = () => {
-        openCamera()
-    }
-    const handleGalleryPress = () => {
-        pickAssets((newMedias) => setMedias([...medias, ...newMedias]))
-    }
-    return <ViewModal visible={visible} handleClose={handleClose} modalOffset={400}>
-        <Pressable onPress={handleCameraPress}>{visible && <FontAwesome color={Colors.light.primary} name="camera" size={24} />}</Pressable>
-        <Pressable onPress={handleGalleryPress}>{visible && <FontAwesome color={Colors.light.primary} name="image" size={24} />}</Pressable>
-    </ViewModal>
 
-}
+
 const width = Dimensions.get('window').width
 const styles = StyleSheet.create({
     container: {

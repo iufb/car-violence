@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import React from 'react';
 
+import { ImportVariantsModal } from '@/components';
 import { AssetsPicker } from '@/components/AssetsPicker';
 import { toastConfig } from '@/components/CustomToast';
 import { PermissionAlert } from '@/components/PermissionAlert';
@@ -116,6 +117,7 @@ function RootLayout() {
             <Toast config={toastConfig} />
             <AssetsPicker />
             <PermissionAlert />
+            <ImportVariantsModal />
         </ThemeProvider>
     );
 }

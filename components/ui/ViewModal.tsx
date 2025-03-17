@@ -1,5 +1,5 @@
 import { DeviceHeigth, DeviceWidth, rS, rV } from '@/utils';
-import React, { cloneElement, ReactElement, ReactNode, useEffect } from 'react';
+import React, { cloneElement, forwardRef, ReactElement, ReactNode, useEffect, useImperativeHandle } from 'react';
 import { Dimensions, PressableProps, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
@@ -9,14 +9,17 @@ interface ViewModalProps {
     modalOffset: number
     doneBtn?: ReactElement<PressableProps>
 }
-export const ViewModal = ({ visible, handleClose, doneBtn, children, modalOffset }: ViewModalProps) => {
-    const translateY = useSharedValue(-1);
+const ViewModal = forwardRef(({ visible, handleClose, doneBtn, children, modalOffset }: ViewModalProps, ref) => {
+    const translateY = useSharedValue(0);
 
     const onClose = () => {
         translateY.value = withTiming(DeviceHeigth, { duration: 300 }, () => {
             runOnJS(handleClose)()
         })
     }
+    useImperativeHandle(ref, () => ({
+        close: onClose,
+    }));
     const pan = Gesture.Pan()
         .onUpdate(e => {
             translateY.value = e.translationY
@@ -74,7 +77,7 @@ export const ViewModal = ({ visible, handleClose, doneBtn, children, modalOffset
         </GestureHandlerRootView>
     </View>
 
-};
+});
 export default ViewModal
 const styles = StyleSheet.create({
     overlay: {

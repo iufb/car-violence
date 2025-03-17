@@ -1,19 +1,22 @@
 import { useEffect, useState } from "react";
 import { DeviceEventEmitter } from "react-native";
 
-export const useCreateModal = () => {
+interface useCreateModalProps {
+    event: string;
+}
+export const useCreateModal = <T>({ event }: useCreateModalProps) => {
     const [visible, setVisible] = useState(false);
-    const [saveCb, setSaveCb] = useState<(() => void) | null>(null)
+    const [callbacks, setCallbacks] = useState<T | null>(null)
     const handleClose = () => {
         setVisible(false)
     };
     useEffect(() => {
-        const listener = DeviceEventEmitter.addListener("openAssetsPicker", (callback: () => void) => {
+        const listener = DeviceEventEmitter.addListener(event, (callbacks: T) => {
             setVisible(true);
-            setSaveCb(() => callback)
+            setCallbacks(callbacks)
         });
         return () => listener.remove();
     }, []);
 
-    return { visible, setSaveCb, handleClose }
+    return { visible, callbacks, handleClose }
 }
