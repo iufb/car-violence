@@ -1,6 +1,8 @@
 import { rGetMediaList } from "@/api/violence";
 import { CustomHeader, LoaderView, ScreenContainer } from "@/components";
-import { Card, Typography } from "@/components/ui";
+import { Card } from "@/components/ui";
+import { Error } from "@/components/ui/Error";
+import { NotFound } from "@/components/ui/NotFound";
 import { Colors } from "@/constants/Colors";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs } from "expo-router";
@@ -19,7 +21,7 @@ export default function MyVideos() {
         {isLoading ? <View>
             <LoaderView />
         </View> : isError && error?.cause !== 404 ?
-            <Typography center variant="span" color="red">Ошибка</Typography> :
+            <Error /> :
             medias && medias.length > 0 ?
                 <SafeAreaView>
                     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.container]}>
@@ -29,7 +31,7 @@ export default function MyVideos() {
                     </ScrollView>
                 </SafeAreaView>
                 :
-                <Typography center variant="span" color="green">Не найдено</Typography>
+                <NotFound />
         }
     </ScreenContainer>
 

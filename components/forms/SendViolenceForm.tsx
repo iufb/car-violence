@@ -2,6 +2,7 @@ import { rSendViolence } from "@/api/violence";
 
 import { client } from "@/app/_layout";
 import { FormContainer } from "@/components/forms/FormContainer";
+import { MediaViewer } from "@/components/MediaViewer";
 import { Button, DateTimePicker, Input, Select, Typography } from "@/components/ui";
 import { Video } from "@/components/Video";
 import { Colors } from "@/constants/Colors";
@@ -161,7 +162,7 @@ const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
                 if (item.uri.includes('mp4') || item.uri.includes('mov') || item.uri.includes('mkv')) {
                     return <Video source={item.uri} style={[styles.previewItem]} />
                 }
-                return <Image source={{ uri: item.uri }} style={[styles.previewItem]} />
+                return <MediaViewer itemStyle={[styles.previewItem]} media={item.uri} />
             }}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}

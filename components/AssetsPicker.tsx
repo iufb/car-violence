@@ -1,6 +1,6 @@
 import { Typography, ViewModal } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
-import { DeviceWidth, pickAssets, rS, rV } from "@/utils";
+import { DeviceWidth, rS, rV } from "@/utils";
 import { useEffect, useState } from "react";
 import { DeviceEventEmitter, FlatList, Image, Pressable, StyleSheet, View } from "react-native";
 import Animated, { Easing, ReduceMotion, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
@@ -23,13 +23,7 @@ const getAssets = async (mediaType: MediaLibrary.MediaTypeValue, save: (assets: 
     const res = (await Promise.all(promises)).map(page => page.assets)
     save(res.flat())
 }
-export const AssetsPickerBtn = () => {
-    const [assets, setAssets] = useState<MediaLibrary.Asset[]>([])
-    return <Pressable onPress={() => pickAssets((assets) => setAssets(assets))}>
-        <Typography variant="h3">Picker</Typography>
-    </Pressable>
 
-}
 export const AssetsPicker = () => {
     const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
     const [visible, setVisible] = useState(false);
@@ -68,10 +62,7 @@ export const AssetsPicker = () => {
         })
     }
     const handleDone = () => {
-
-        console.log(Array.from(pickedAssets.values()), 'pikcer')
         if (!saveCb) return;
-        console.log('savesb founded')
         saveCb(Array.from(pickedAssets.values()))
         setSelectedMap(new Map())
     }
@@ -131,6 +122,7 @@ const PhotosView = ({ pickedAssets, handleSelect }: AssetsPickerBase) => {
 
 const VideosView = ({ pickedAssets, handleSelect }: AssetsPickerBase) => {
     const { loading, assets } = useMediaLibrary('video')
+
     if (loading) return <LoaderView />
     if (assets.length == 0) return <Typography variant="p2" color="gray">Видео не найдены.</Typography>
     return <AssetsView pickedAssets={pickedAssets} assets={assets} handleSelect={handleSelect} />
@@ -163,9 +155,11 @@ const AssetItem = ({ asset, handleSelect, pickedAssets }: AssetItemProps & Asset
 const useMediaLibrary = (mediaType: MediaLibrary.MediaTypeValue) => {
     const [assets, setAssets] = useState<MediaLibrary.Asset[]>([])
     const [loading, setLoading] = useState(true)
+
     useEffect(() => {
-        getAssets(mediaType, (a) => setAssets(a))
-        setLoading(false)
+        getAssets(mediaType, (a) => setAssets(a)).then(() => {
+            setLoading(false)
+        })
     }, [])
     return { assets, loading }
 }

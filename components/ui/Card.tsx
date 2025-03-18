@@ -1,6 +1,6 @@
 import { Typography } from "@/components/ui/Typography";
 import { Colors } from "@/constants/Colors";
-import { rV } from "@/utils";
+import { getFileType, rV } from "@/utils";
 import { Entypo } from "@expo/vector-icons";
 import { Link, LinkProps } from "expo-router";
 import { Image, StyleSheet, View, ViewProps } from "react-native";
@@ -16,9 +16,11 @@ interface CardProps extends ViewProps {
 }
 
 export const Card = ({ variant = 'base', link, title, color, img, subtitle, desc, style, ...props }: CardProps) => {
+
     const isHorizontal = variant == 'horizontal'
+    const isVideo = img && getFileType(img) == 'video'
     return <Link href={link}><View style={[style, styles[variant], { backgroundColor: color }, styles.container,]} {...props}>
-        <Image fadeDuration={100} defaultSource={require('../../assets/fallback.png')} style={[{ width: "100%", height: '100%', borderRadius: 10, flex: 2 }, isHorizontal && styles.horizontalImg]} source={{ uri: img }} />
+        <Image fadeDuration={100} defaultSource={require('../../assets/fallback.png')} style={[{ width: "100%", height: '100%', borderRadius: 10, flex: 2 }, isHorizontal && styles.horizontalImg]} source={isVideo ? require('../../assets/video.png') : { uri: img }} />
         <View style={[styles.textContainer, isHorizontal && styles.horizontalText]}>
             <Typography center={!isHorizontal} variant="h3">{title}</Typography>
             <Typography center={!isHorizontal} variant="span">{subtitle}</Typography>

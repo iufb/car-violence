@@ -15,6 +15,7 @@ export default function Add() {
     const [medias, setMedias] = useState<MediaLibrary.Asset[]>([])
     const [isActive, setIsActive] = useState(true)
     const [permission, requestPermission] = useCameraPermissions();
+    const { appState } = useAppState()
     const router = useRouter()
     const path = usePathname()
     useEffect(() => {
@@ -25,6 +26,7 @@ export default function Add() {
             setIsActive(true)
         }
     }, [path])
+
 
     const deleteMedia = (value: string) => {
 
@@ -38,13 +40,7 @@ export default function Add() {
     const closeCameraOnEnd = () => {
         setIsActive(false)
     }
-    // if (appState !== 'active') {
-    //     return <View style={{ flex: 1, backgroundColor: 'black', justifyContent: 'center', alignItems: 'center' }}>
-    //         <Tabs.Screen options={{ headerShown: false }} />
-    //         <ActivityIndicator size="large" color={Colors.light.primary} />
-    //     </View>
-    //
-    // }
+
     if (!permission) return <View style={{ flex: 1, backgroundColor: 'black', justifyContent: 'center', alignItems: 'center' }}>
         <Tabs.Screen options={{ headerShown: false }} />
         <ActivityIndicator size="large" color={Colors.light.primary} />

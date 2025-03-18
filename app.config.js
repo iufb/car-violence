@@ -8,9 +8,11 @@ export default {
         "scheme": "myapp",
         "userInterfaceStyle": "automatic",
         "newArchEnabled": true,
+
         "ios": {
-            "supportsTablet": true
+            "bundleIdentifier": "com.ispark.oko"
         },
+
         "android": {
             "adaptiveIcon": {
                 "foregroundImage": "./assets/images/adaptive-icon.png",
@@ -23,6 +25,7 @@ export default {
                 "android.permission.CAMERA"
             ]
         },
+
         "web": {
             "bundler": "metro",
             "output": "static",
