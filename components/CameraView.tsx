@@ -1,7 +1,7 @@
 import { Button, Typography } from '@/components/ui';
 
 import { Colors } from '@/constants/Colors';
-import { pickAssets, rS, rV } from '@/utils';
+import { rS, rV } from '@/utils';
 import { Entypo, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Camera as ExpoCamera } from 'expo-camera';
 import Constants from "expo-constants";
@@ -224,7 +224,7 @@ interface ImportBtnProps {
     save: (value: MediaLibrary.Asset[]) => void
 }
 const ImportBtn = ({ save }: ImportBtnProps) => {
-    return <Pressable style={[styles.btn]} onPress={() => pickAssets(save)}><Entypo name='image' size={24} color={Colors.light.background} /></Pressable>
+    return <Pressable style={[styles.btn]} onPress={() => DeviceEventEmitter.emit('openAssetsPicker', { saveSelected: save })}><Entypo name='image' size={24} color={Colors.light.background} /></Pressable>
 }
 
 const modes: { label: string, value: CameraModeType }[] = [

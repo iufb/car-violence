@@ -7,7 +7,7 @@ import { useAppState } from "@/hooks";
 import { useCameraPermissions } from "expo-camera";
 import * as MediaLibrary from 'expo-media-library';
 import { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator, DeviceEventEmitter, StyleSheet, View } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 
 
@@ -32,21 +32,19 @@ export default function Add() {
         }
     }, [path])
 
-    useEffect(() => {
-        if (appState == 'background') {
-            if (medias.length > 0) {
-                setActiveView('form')
-            } else {
-                setActiveView('initial')
-            }
-        }
 
-        if (appState == 'active') {
-            if (medias.length > 0) {
-                setActiveView('form')
-            } else {
-                setActiveView('camera')
-            }
+    useEffect(() => {
+        if (activeView == 'camera' && appState == 'background') {
+            setActiveView('initial')
+            return
+        }
+        if (appState == 'active' && medias.length > 0) {
+            setActiveView('form')
+            return;
+        }
+        if (appState == 'active' && medias.length == 0) {
+            setActiveView('camera')
+            return;
         }
 
     }, [appState])
@@ -79,15 +77,24 @@ export default function Add() {
 
     </View>
 }
-const PermissionsPage = ({ requestPermission }: { requestPermission: () => void }) => {
+const PermissionsPage = ({ requestPermission }: {
+    requestPermission: () => Promise<MediaLibrary.EXPermissionResponse>
+}) => {
     const router = useRouter()
+    const getAccess = () => {
+        requestPermission().then(res => {
+            if (res.status == 'denied') {
+                DeviceEventEmitter.emit('openPermissionAlert')
+            }
+        })
+    }
     return <View style={[styles.permissionsContainer]}>
         <Tabs.Screen options={{ headerTitle: "Запрос разрешений", headerShown: true }} />
         <View style={[styles.permissionForm]}>
             <Typography color={Colors.light.primary} center variant='h2'>Запрос разрешений</Typography>
             <Typography center variant='p1'>Для корректной работы приложения необходимо разрешение на доступ к камере и микрофону.</Typography>
             <Typography variant='p2'>Нажмите "Разрешить", чтобы продолжить использование приложения.</Typography>
-            <Button onPress={requestPermission}>Разрешить</Button>
+            <Button onPress={getAccess}>Разрешить</Button>
             <Button onPress={() => router.back()}>Назад</Button>
         </View>
     </View>

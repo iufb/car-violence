@@ -8,7 +8,7 @@ import { Video } from "@/components/Video";
 import { Colors } from "@/constants/Colors";
 import { errorMsgs } from "@/consts";
 import { useBackgroundUpload } from "@/hooks/useBackgroundUpload";
-import { GetDate, GetTime, pickAssets } from "@/utils";
+import { GetDate, GetTime } from "@/utils";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
 import Constants from "expo-constants";
@@ -200,7 +200,7 @@ const AddNewButton = ({ openCamera, medias, setMedias }: AddNewButtonProps) => {
     const handlePress = () => {
         DeviceEventEmitter.emit('showImportVariants', {
             openCamera, openGallery: () => {
-                pickAssets((newMedias) => setMedias([...medias, ...newMedias]))
+                DeviceEventEmitter.emit('openAssetsPicker', (newMedias: MediaLibrary.Asset[]) => setMedias([...medias, ...newMedias]))
             }
         })
 

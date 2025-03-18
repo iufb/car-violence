@@ -1,21 +1,13 @@
 import { Button, Typography, ViewModal } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
+import { useCreateModal } from "@/hooks/useCreateModal";
 import { DeviceHeigth } from "@/utils";
 import * as Linking from 'expo-linking';
-import { useEffect, useState } from "react";
-import { DeviceEventEmitter, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 export const PermissionAlert = () => {
-    const [visible, setVisible] = useState(false);
-
-    useEffect(() => {
-        const listener = DeviceEventEmitter.addListener("openPermissionAlert", (callback: () => void) => {
-            setVisible(true);
-        });
-
-        return () => listener.remove();
-    }, []);
-    return <ViewModal visible={visible} modalOffset={DeviceHeigth - 300} handleClose={() => setVisible(false)}>
+    const { y, visible, callbacks, handleClose } = useCreateModal({ event: 'openPermissionAlert' })
+    return <ViewModal y={y} visible={visible} modalOffset={DeviceHeigth - 220} handleClose={handleClose}>
         <View style={[styles.form]}>
             <Typography center color={Colors.light.primary} variant="h2">Требуется разрешение</Typography>
             <Typography variant="p1">Для продолжения работы приложения необходимо разрешение на доступ.</Typography>
@@ -23,7 +15,7 @@ export const PermissionAlert = () => {
 
             <View style={[styles.btns]}>
                 <Button onPress={() => Linking.openSettings()} style={[styles.btn]} >Открыть настройки</Button>
-                <Button onPress={() => setVisible(false)} style={[styles.btn]} variant="outline">Закрыть</Button>
+                <Button onPress={handleClose} style={[styles.btn]} variant="outline">Закрыть</Button>
             </View>
         </View>
     </ViewModal>

@@ -1,5 +1,7 @@
+import { DeviceHeigth } from "@/utils";
 import { useEffect, useState } from "react";
 import { DeviceEventEmitter } from "react-native";
+import { runOnJS, useSharedValue, withTiming } from "react-native-reanimated";
 
 interface useCreateModalProps {
     event: string;
@@ -7,8 +9,11 @@ interface useCreateModalProps {
 export const useCreateModal = <T>({ event }: useCreateModalProps) => {
     const [visible, setVisible] = useState(false);
     const [callbacks, setCallbacks] = useState<T | null>(null)
+    const y = useSharedValue(0)
     const handleClose = () => {
-        setVisible(false)
+        y.value = withTiming(DeviceHeigth, { duration: 300 }, () => {
+            runOnJS(setVisible)(false)
+        })
     };
     useEffect(() => {
         const listener = DeviceEventEmitter.addListener(event, (callbacks: T) => {
@@ -18,5 +23,5 @@ export const useCreateModal = <T>({ event }: useCreateModalProps) => {
         return () => listener.remove();
     }, []);
 
-    return { visible, callbacks, handleClose }
+    return { y, visible, callbacks, handleClose }
 }

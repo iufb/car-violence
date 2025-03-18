@@ -1,61 +1,53 @@
 import { DeviceHeigth, DeviceWidth, rS, rV } from '@/utils';
-import React, { cloneElement, forwardRef, ReactElement, ReactNode, useEffect, useImperativeHandle } from 'react';
+import React, { cloneElement, ReactElement, ReactNode, useEffect } from 'react';
 import { Dimensions, PressableProps, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler';
-import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { runOnJS, SharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 interface ViewModalProps {
+    y: SharedValue<number>
     visible: boolean, handleClose: () => void
     children: ReactNode
     modalOffset: number
     doneBtn?: ReactElement<PressableProps>
 }
-const ViewModal = forwardRef(({ visible, handleClose, doneBtn, children, modalOffset }: ViewModalProps, ref) => {
-    const translateY = useSharedValue(0);
+export const ViewModal = ({ y, visible, handleClose, doneBtn, children, modalOffset }: ViewModalProps) => {
 
-    const onClose = () => {
-        translateY.value = withTiming(DeviceHeigth, { duration: 300 }, () => {
-            runOnJS(handleClose)()
-        })
-    }
-    useImperativeHandle(ref, () => ({
-        close: onClose,
-    }));
     const pan = Gesture.Pan()
         .onUpdate(e => {
-            translateY.value = e.translationY
+            y.value = e.translationY
         })
         .onEnd(e => {
             if (e.translationY < 0) {
-                translateY.value = withTiming(0, { duration: 100 })
+                y.value = withTiming(0, { duration: 100 })
             }
             if (e.translationY > (DeviceHeigth - modalOffset) / 2) {
-                runOnJS(onClose)()
+                runOnJS(handleClose)()
             } else {
 
-                translateY.value = withTiming(0, { duration: 100 })
+                y.value = withTiming(0, { duration: 100 })
             }
 
         })
     const animatedStyles = useAnimatedStyle(() => {
         return {
             transform: [
-                { translateY: translateY.value },
+                { translateY: y.value },
             ],
         }
     }
     );
     useEffect(() => {
         if (!visible) {
-            translateY.value = withTiming(DeviceHeigth - modalOffset, { duration: 300 })
+            y.value = withTiming(DeviceHeigth - modalOffset, { duration: 300 })
         }
         if (visible) {
-            translateY.value = withTiming(0, { duration: 300 })
+            y.value = withTiming(0, { duration: 300 })
         }
     }, [visible])
 
-    return visible && <View style={[styles.overlay]}>
+    return visible ? <View style={[styles.overlay]}>
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <TouchableOpacity onPress={onClose} style={[{ height: modalOffset }]} />
+            <TouchableOpacity onPress={handleClose} style={[{ height: modalOffset }]} />
             <GestureDetector gesture={pan}>
                 <Animated.View style={[styles.container, animatedStyles]}>
                     <View style={[styles.top]} />
@@ -68,17 +60,16 @@ const ViewModal = forwardRef(({ visible, handleClose, doneBtn, children, modalOf
                                         onPress(e)
                                     }
                                 }
-                                onClose()
+                                handleClose()
                             }
                         }) : doneBtn}
                     {children}
                 </Animated.View>
             </GestureDetector>
         </GestureHandlerRootView>
-    </View>
+    </View> : <View />
 
-});
-export default ViewModal
+};
 const styles = StyleSheet.create({
     overlay: {
         position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,.3)', zIndex: 1, elevation: 1

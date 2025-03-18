@@ -8,6 +8,6 @@ export { ImageInput } from './ImageInput';
 export { Input } from './Input';
 export { Select } from './Select';
 export { Typography } from './Typography';
-export { default as ViewModal } from './ViewModal';
+export { ViewModal } from './ViewModal';
 
 

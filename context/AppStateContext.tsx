@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useEffect, useState } from "react";
+import { createContext, ReactNode, useEffect, useRef, useState } from "react";
 import { AppState, AppStateStatus } from "react-native";
 
 interface AppstateContext {
@@ -11,7 +11,8 @@ export const AppStateContext = createContext<AppstateContext>({ appState: AppSta
 
 export const AppStateContextProvider = ({ children }: { children: ReactNode }) => {
     const [appState, setAppState] = useState(AppState.currentState);
-    console.log(appState, 'APPSTATE')
+    const lastChangeRef = useRef(null);
+    console.log(appState, "APPSTGATE")
 
     useEffect(() => {
         const handleAppStateChange = (nextAppState: AppStateStatus) => {

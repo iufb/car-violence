@@ -2,10 +2,11 @@ import { Typography, ViewModal } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
 import { DeviceWidth, rS, rV } from "@/utils";
 import { useEffect, useState } from "react";
-import { DeviceEventEmitter, FlatList, Image, Pressable, StyleSheet, View } from "react-native";
+import { FlatList, Image, Pressable, StyleSheet, View } from "react-native";
 import Animated, { Easing, ReduceMotion, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import { LoaderView } from "@/components/LoaderView";
+import { useCreateModal } from "@/hooks/useCreateModal";
 import { FontAwesome } from "@expo/vector-icons";
 import * as MediaLibrary from 'expo-media-library';
 interface AssetsPickerBase {
@@ -25,31 +26,9 @@ const getAssets = async (mediaType: MediaLibrary.MediaTypeValue, save: (assets: 
 }
 
 export const AssetsPicker = () => {
-    const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
-    const [visible, setVisible] = useState(false);
-    const [saveCb, setSaveCb] = useState<((assets: MediaLibrary.Asset[]) => void) | null>(null)
+    const { y, handleClose, callbacks, visible } = useCreateModal<{ saveSelected: (assets: MediaLibrary.Asset[]) => void }>({ event: "openAssetsPicker" })
     const [activeTab, setActiveTab] = useState(tabs[0])
     const [pickedAssets, setSelectedMap] = useState<Map<string, MediaLibrary.Asset>>(new Map())
-    const handleClose = () => {
-        setVisible(false)
-    };
-    useEffect(() => {
-        const listener = DeviceEventEmitter.addListener("openAssetsPicker", (callback: (assets: MediaLibrary.Asset[]) => void) => {
-            requestPermission().then(res => {
-                if (!res) return;
-                if (res.status == 'denied') {
-                    handleClose()
-                    DeviceEventEmitter.emit('openPermissionAlert')
-                    return;
-                } else {
-                    setVisible(true);
-                }
-            })
-            setSaveCb(() => callback)
-        });
-
-        return () => listener.remove();
-    }, []);
     const handleSelect = (asset: MediaLibrary.Asset) => {
         setSelectedMap(prev => {
             const newMap = new Map(prev)
@@ -62,11 +41,11 @@ export const AssetsPicker = () => {
         })
     }
     const handleDone = () => {
-        if (!saveCb) return;
-        saveCb(Array.from(pickedAssets.values()))
+        if (!callbacks?.saveSelected) return;
+        callbacks.saveSelected(Array.from(pickedAssets.values()))
         setSelectedMap(new Map())
     }
-    return <ViewModal doneBtn={
+    return <ViewModal y={y} doneBtn={
         <Pressable disabled={pickedAssets.size == 0} onPress={handleDone}>
             <Typography style={{ textAlign: 'right' }} color={pickedAssets.size == 0 ? 'gray' : Colors.light.primary} variant="p2">Выбрать</Typography>
         </Pressable>

@@ -1,6 +1,6 @@
 import { rGetMediaList } from "@/api/violence";
 import { LoaderView, NewsList, ScreenContainer, Search } from "@/components";
-import { Button, Card, Typography } from "@/components/ui";
+import { Card, Typography } from "@/components/ui";
 import { Error } from "@/components/ui/Error";
 import { NotFound } from "@/components/ui/NotFound";
 import { rS, rV } from "@/utils";
@@ -8,7 +8,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Tabs } from "expo-router";
 import React from 'react';
 import { Dimensions, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
-import Toast from "react-native-toast-message";
 
 
 export default function HomeScreen() {
@@ -17,9 +16,6 @@ export default function HomeScreen() {
             <Tabs.Screen options={{ header: () => <Search /> }} />
             <SafeAreaView >
                 <ScrollView contentContainerStyle={[styles.container]} showsVerticalScrollIndicator={false}>
-                    <Button onPress={() => {
-                        Toast.show({ type: 'error', text1: "Message sent", text2: "YYour message has been sent.We'll get back to you soonYour message has been sent.We'll get back to you soonour message has been sent.We'll get back to you soon" })
-                    }} >toast</Button>
                     <NewsList />
                     <Typography center variant="h2">Последние нарушения</Typography>
                     <LastViolenceList />
