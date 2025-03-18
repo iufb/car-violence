@@ -65,6 +65,7 @@ export function Tabbar({ state, descriptors, navigation }: BottomTabBarProps) {
                         navigation.emit({
                             type: 'tabLongPress',
                             target: route.key,
+
                         });
                     };
                     //animations

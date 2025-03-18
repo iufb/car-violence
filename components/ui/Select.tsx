@@ -66,7 +66,7 @@ export const Select = ({ error, withSearch, required = true, label, value, place
         <Typography color={Colors.light.background} variant="span">{label}{required && <Typography color="red" variant="span"> *</Typography>}
         </Typography>
         <Pressable onPress={toggle} style={[styles.label]}>
-            <Typography color={value ? Colors.light.primary : Colors.light.borderColor} variant="span">{value ? value : placeholder}</Typography>
+            <Typography color={value ? Colors.light.text : Colors.light.borderColor} variant="p2">{value ? value : placeholder}</Typography>
             <Animated.View style={[iconStyle]} ><Entypo color={Colors.light.primary} name="chevron-right" size={28} /></Animated.View>
         </Pressable>
         <Animated.View style={[animatedStyle, styles.content]}>
@@ -103,9 +103,9 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         borderWidth: 1,
         borderColor: Colors.light.borderColor,
-        paddingLeft: rS(30),
+        paddingLeft: 10
     },
-    searchIcon: { position: 'absolute', left: 10, top: 14 },
+    searchIcon: { position: 'absolute', right: 20, top: 14 },
     label: {
         height: 48,
         borderColor: Colors.light.borderColor,
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
         left: 10,
         right: 10,
         top: 75,
-        backgroundColor: '#ededed',
+        backgroundColor: '#fff',
         overflow: 'hidden',
     },
     item: {

@@ -79,7 +79,7 @@ export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...prop
                     const updated = { ...value, [key]: newValue }
                     onChange(updated)
                 }} bg="dark" label="Дата и время" />} />
-                <Link href={'/'}><Typography color={Colors.light.primary} variant="span">Правила размещения фото/видео</Typography></Link>
+                <Link href={'/settings/rules'}><Typography color={Colors.light.primary} variant="span">Правила размещения фото/видео</Typography></Link>
                 <Button disabled={isPending || medias.length == 0} loading={isPending} variant="primary" onPress={handleSubmit(submit)}>Отправить</Button>
             </ScrollView>
         </TouchableOpacity>

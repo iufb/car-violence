@@ -4,7 +4,7 @@ import { LinkProps, Tabs } from "expo-router";
 const menuItems: { title: string, href: LinkProps['href'] }[] = [
     { title: "Правила дорожного движения РК", href: "/" },
     { title: "Таблица штрафов", href: "/" },
-    { title: "Новости", href: "/" },
+    { title: "Новости", href: "/news" },
     { title: "Отзывы и предложения", href: "/" },
 ];
 export default function Services() {
