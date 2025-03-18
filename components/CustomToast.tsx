@@ -25,6 +25,25 @@ export const CustomToast = ({ props: { fileName, progress, cancel } }: ToastConf
     );
 };
 export const toastConfig = {
+    success: (params: ToastConfigParams<any>) => <View style={[styles.container, styles.row, { backgroundColor: Colors.light.status[2] }]}>
+        <View style={[styles.iconOverlay, { backgroundColor: 'green' }]}>
+            <FontAwesome name='close' color={'white'} size={14} />
+        </View>
+        <View style={[styles.textContainer]}>
+            <Typography variant='h3'>{params.text1}</Typography>
+            <Typography numberOfLines={3} ellipsizeMode='tail' variant='span'>{params.text2}</Typography>
+        </View>
+    </View>,
+    error: (params: ToastConfigParams<any>) => <View style={[styles.container, styles.row, { backgroundColor: Colors.light.status[0] }]}>
+        <View style={[styles.iconOverlay, { backgroundColor: 'red' }]}>
+            <FontAwesome name='close' color={'white'} size={14} />
+        </View>
+        <View style={[styles.textContainer]}>
+            <Typography variant='h3'>{params.text1}</Typography>
+            <Typography numberOfLines={3} ellipsizeMode='tail' variant='span'>{params.text2}</Typography>
+        </View>
+    </View>,
+
     upload: (params: ToastConfigParams<CustomToastProps>) => {
         return <CustomToast {...params} />
     }
@@ -48,6 +67,19 @@ const styles = StyleSheet.create({
 
         elevation: 21,
     },
+    row: {
+        padding: 20,
+        gap: 20,
+        flexDirection: 'row',
+    },
+    iconOverlay: {
+        width: 25, height: 25, borderRadius: 5, justifyContent: 'center', alignItems: 'center'
+    },
+    textContainer: {
+        marginTop: -5,
+        width: DeviceWidth - DeviceWidth / 3,
+    },
+    text: {},
     close: {
         elevation: 22,
         zIndex: 22,

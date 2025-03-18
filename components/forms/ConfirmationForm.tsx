@@ -2,7 +2,6 @@ import { rConfirmCode, rConfirmPasswordReset, rPasswordReset, rVerifyCode } from
 import { Button, Typography } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
 import { ConfirmationType, RegisterDTO, ResetPasswordDTO } from "@/types";
-import { showToast } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -13,6 +12,7 @@ import {
     useBlurOnFulfill,
     useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
+import Toast from "react-native-toast-message";
 
 const CELL_COUNT = 6;
 interface ConfirmationFormProps {
@@ -31,11 +31,11 @@ export const ConfirmationForm = ({ type, userData }: ConfirmationFormProps) => {
         mutationKey: ['verifyCode'], mutationFn: rVerifyCode,
         onSuccess: (data) => {
             console.log(data)
-            showToast({ type: 'success', title: "Успешно", desc: "Вы зарегистрировались успешно" })
+            Toast.show({ type: 'success', text1: "Успешно", text2: "Вы зарегистрировались успешно" })
             router.push('/(auth)/login')
         },
         onError: (e) => {
-            showToast({ type: 'error', title: "Ошибка", desc: "Неверный код" })
+            Toast.show({ type: 'error', text1: "Ошибка", text2: "Неверный код" })
             console.log(e)
         }
     })
@@ -43,11 +43,11 @@ export const ConfirmationForm = ({ type, userData }: ConfirmationFormProps) => {
         mutationKey: ['verifyCode'], mutationFn: rConfirmPasswordReset,
         onSuccess: (data) => {
             console.log(data)
-            showToast({ type: 'success', title: "Успешно", desc: "Пароль обновлен успешно" })
+            Toast.show({ type: 'success', text1: "Успешно", text2: "Пароль обновлен успешно" })
             router.push('/(auth)/login')
         },
         onError: (e) => {
-            showToast({ type: 'error', title: "Ошибка", desc: "Неверный код" })
+            Toast.show({ type: 'error', text1: "Ошибка", text2: "Неверный код" })
             console.log(e)
         }
     })

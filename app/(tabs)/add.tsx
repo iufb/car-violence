@@ -13,19 +13,43 @@ import { Colors } from "react-native/Libraries/NewAppScreen";
 
 export default function Add() {
     const [medias, setMedias] = useState<MediaLibrary.Asset[]>([])
-    const [isActive, setIsActive] = useState(true)
+    const [activeView, setActiveView] = useState<'camera' | 'form' | 'initial'>('initial')
     const [permission, requestPermission] = useCameraPermissions();
     const { appState } = useAppState()
     const router = useRouter()
     const path = usePathname()
     useEffect(() => {
         if (path !== '/add') {
-            setIsActive(false)
+            if (medias.length > 0) {
+                setActiveView('form')
+            } else {
+                setActiveView('initial')
+            }
+
         }
         if (path == '/add' && medias.length === 0) {
-            setIsActive(true)
+            setActiveView('camera')
         }
     }, [path])
+
+    useEffect(() => {
+        if (appState == 'background') {
+            if (medias.length > 0) {
+                setActiveView('form')
+            } else {
+                setActiveView('initial')
+            }
+        }
+
+        if (appState == 'active') {
+            if (medias.length > 0) {
+                setActiveView('form')
+            } else {
+                setActiveView('camera')
+            }
+        }
+
+    }, [appState])
 
 
     const deleteMedia = (value: string) => {
@@ -34,11 +58,11 @@ export default function Add() {
     }
     useEffect(() => {
         if (medias.length == 0) {
-            setIsActive(true)
+            setActiveView('camera')
         }
     }, [medias])
     const closeCameraOnEnd = () => {
-        setIsActive(false)
+        setActiveView('form')
     }
 
     if (!permission) return <View style={{ flex: 1, backgroundColor: 'black', justifyContent: 'center', alignItems: 'center' }}>
@@ -49,10 +73,10 @@ export default function Add() {
     if (!permission.granted) return <PermissionsPage requestPermission={requestPermission} />
     return <View style={[styles.container]}>
         <Tabs.Screen options={{ headerShown: false }} />
-        {isActive ? <Camera medias={medias} isActive={isActive} setMedias={media => setMedias([...medias, ...media])} closeCameraOnEnd={closeCameraOnEnd} />
-            :
-            <SendViolenceForm setMedias={(m) => setMedias(m)} medias={medias} openCamera={() => setIsActive(true)} />
-        }
+        {activeView == 'camera' && <Camera medias={medias} isActive={activeView == 'camera'} setMedias={media => setMedias([...medias, ...media])} closeCameraOnEnd={closeCameraOnEnd} />}
+
+        {activeView == 'form' && <SendViolenceForm setMedias={(m) => setMedias(m)} medias={medias} openCamera={() => setActiveView('camera')} />}
+
     </View>
 }
 const PermissionsPage = ({ requestPermission }: { requestPermission: () => void }) => {

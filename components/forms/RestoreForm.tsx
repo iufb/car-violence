@@ -4,12 +4,12 @@ import { Button, Input } from "@/components/ui"
 import { Colors } from "@/constants/Colors"
 import { errorMsgs } from "@/consts"
 import { ResetPasswordDTO } from "@/types"
-import { showToast } from "@/utils"
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
 import { useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { StyleSheet, View } from "react-native"
+import Toast from "react-native-toast-message"
 
 export const RestoreForm = () => {
     const { mutateAsync: sendCode, isPending } = useMutation({
@@ -18,10 +18,10 @@ export const RestoreForm = () => {
 
             console.log(e)
             if (e.cause == 404) {
-                showToast({ type: 'error', title: "Ошибка", desc: "Пользователь с таким номером не существует." })
+                Toast.show({ type: 'error', text1: "Ошибка", text2: "Пользователь с таким номером не существует." })
             } else {
 
-                showToast({ type: 'error', title: "Ошибка", desc: "Что-то пошло не так." })
+                Toast.show({ type: 'error', text1: "Ошибка", text2: "Что-то пошло не так." })
             }
         }
     })

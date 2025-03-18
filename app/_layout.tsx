@@ -7,6 +7,7 @@ import { ImportVariantsModal } from '@/components';
 import { AssetsPicker } from '@/components/AssetsPicker';
 import { toastConfig } from '@/components/CustomToast';
 import { PermissionAlert } from '@/components/PermissionAlert';
+import { AppStateContextProvider } from '@/context/AppStateContext';
 import { usePushNotifications } from '@/hooks';
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -86,7 +87,9 @@ const InitialLayout = () => {
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
         </Stack>
+
         <StatusBar style="auto" />
+
     </>
 }
 function RootLayout() {
@@ -111,13 +114,15 @@ function RootLayout() {
 
     return (
         <ThemeProvider value={DefaultTheme}>
-            <QueryClientProvider client={client}>
-                <InitialLayout />
-            </QueryClientProvider>
-            <Toast config={toastConfig} />
-            <AssetsPicker />
-            <PermissionAlert />
-            <ImportVariantsModal />
+            <AppStateContextProvider>
+                <QueryClientProvider client={client}>
+                    <InitialLayout />
+                    <Toast config={toastConfig} />
+                    <AssetsPicker />
+                    <PermissionAlert />
+                    <ImportVariantsModal />
+                </QueryClientProvider>
+            </AppStateContextProvider>
         </ThemeProvider>
     );
 }

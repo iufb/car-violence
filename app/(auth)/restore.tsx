@@ -1,13 +1,15 @@
-import { ScreenContainer } from "@/components";
+import { CustomHeader, ScreenContainer } from "@/components";
 import { RestoreForm } from "@/components/forms";
+
 import { Typography } from "@/components/ui";
+import Contants from 'expo-constants';
 import { Tabs } from "expo-router";
 import { StyleSheet } from "react-native";
 
 export default function Restore() {
 
     return <ScreenContainer style={[styles.container]}>
-        <Tabs.Screen options={{ headerShown: true }} />
+        <Tabs.Screen options={{ header: () => <CustomHeader title="Восстановление пароля" /> }} />
         <Typography variant="h2">Обновление пароля</Typography>
         <RestoreForm />
     </ScreenContainer>
@@ -15,6 +17,7 @@ export default function Restore() {
 
 const styles = StyleSheet.create({
     container: {
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginTop: -Contants.statusBarHeight,
     }
 })

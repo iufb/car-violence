@@ -4,12 +4,12 @@ import { Button, Input, Typography } from "@/components/ui"
 import { Colors } from "@/constants/Colors"
 import { errorMsgs } from "@/consts"
 import { LoginDTO } from "@/types"
-import { showToast } from "@/utils"
 import { useMutation } from "@tanstack/react-query"
 import { Link, useRouter } from "expo-router"
 import * as SecureStorage from 'expo-secure-store'
 import { SubmitHandler, useForm } from "react-hook-form"
 import { StyleSheet, View } from "react-native"
+import Toast from "react-native-toast-message"
 
 export const LoginForm = () => {
     const router = useRouter()
@@ -25,7 +25,7 @@ export const LoginForm = () => {
             console.log(data)
         },
         onError: (e) => {
-            showToast({ type: 'error', title: "Ошибка", desc: "Произошла ошибка при входе" })
+            Toast.show({ type: 'error', text1: "Ошибка", text2: "Произошла ошибка при входе" })
             console.log(e)
         }
     })

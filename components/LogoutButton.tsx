@@ -1,11 +1,11 @@
-import { CustomModal as Modal } from "./Modal";
 import { Button, Typography } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
-import { showToast } from "@/utils";
 import { useRouter } from "expo-router";
 import { deleteItemAsync } from "expo-secure-store";
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
+import Toast from "react-native-toast-message";
+import { CustomModal as Modal } from "./Modal";
 
 export const LogoutButton = () => {
     const [modalVisible, setModalVisible] = useState(false);
@@ -17,7 +17,7 @@ export const LogoutButton = () => {
             router.replace('/(auth)/login')
         }).catch(e => {
             console.log(e)
-            showToast({ type: 'error', title: "Ошибка", desc: "Что-то пошло не так" })
+            Toast.show({ type: 'error', text1: "Ошибка", text2: "Что-то пошло не так" })
         })
     }
     return <View style={[styles.container]}>

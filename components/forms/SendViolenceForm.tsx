@@ -8,7 +8,7 @@ import { Video } from "@/components/Video";
 import { Colors } from "@/constants/Colors";
 import { errorMsgs } from "@/consts";
 import { useBackgroundUpload } from "@/hooks/useBackgroundUpload";
-import { GetDate, GetTime, pickAssets, showToast } from "@/utils";
+import { GetDate, GetTime, pickAssets } from "@/utils";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
 import Constants from "expo-constants";
@@ -17,6 +17,7 @@ import { Link } from "expo-router";
 import React, { useCallback, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { DeviceEventEmitter, Dimensions, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, ViewProps, ViewToken } from "react-native";
+import Toast from "react-native-toast-message";
 interface SendViolenceFormProps extends ViewProps {
     medias: MediaLibrary.Asset[]
     setMedias: (value: MediaLibrary.Asset[]) => void;
@@ -37,13 +38,13 @@ export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...prop
                 reset()
                 client.invalidateQueries({ queryKey: ['myVideos'] })
                 setMedias([])
-                showToast({ type: 'success', title: "Отправлено", desc: "Нарушение было отправлено!" })
+                Toast.show({ type: 'success', text1: "Отправлено", text2: "Нарушение было отправлено!" })
             } catch (e) {
-                showToast({ type: 'error', title: "Ошибка", desc: "Нарушение не было отправлено!" })
+                Toast.show({ type: 'error', text1: "Ошибка", text2: "Нарушение не было отправлено!" })
             }
 
         }, onError: (e) => {
-            showToast({ type: 'error', title: "Ошибка", desc: "Произошла ошибка" })
+            Toast.show({ type: 'error', text1: "Ошибка", text2: "Произошла ошибка" })
             console.log(e)
         }
     })
