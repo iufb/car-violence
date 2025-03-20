@@ -8,7 +8,7 @@ import Constants from "expo-constants";
 import { Tabs, usePathname, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Dimensions, Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
-import Animated, { interpolate, interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut, interpolate, interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useAppState } from '@/hooks';
@@ -117,14 +117,22 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
             }
         }
     }
+    const handleClose = () => {
+        if (medias.length > 0) {
+            closeCameraOnEnd()
+            return;
+        }
+        router.back()
+    }
 
     if (device == null) return <NoDeviceView />
+
     return (
         <View style={[{ paddingBottom: insets.bottom, paddingTop: Constants.statusBarHeight }]}>
-            <View style={[styles.container]}>
+            <Animated.View entering={FadeIn.duration(300)} exiting={FadeOut.duration(100)} style={[styles.container]}>
                 <CameraView style={[{ width, height: height - CONTROLS_HEIGHT - Constants.statusBarHeight }]} format={format} ref={cameraRef} device={device} isActive={isActive} photo video audio preview />
 
-                <Pressable onPress={medias.length > 0 ? () => closeCameraOnEnd() : () => router.back()} style={[styles.close]}>
+                <Pressable onPress={handleClose} style={[styles.close]}>
                     <MaterialCommunityIcons name='close' size={32} color='white' />
                 </Pressable>
 
@@ -137,7 +145,7 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
                         stopRecord()
                     }
                 }} capture={fn} />
-            </View>
+            </Animated.View>
 
         </View>
     );

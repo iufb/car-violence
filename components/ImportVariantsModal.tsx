@@ -1,6 +1,6 @@
 import { Typography, ViewModal } from "@/components/ui"
 import { useCreateModal } from "@/hooks/useCreateModal"
-import { DeviceHeigth } from "@/utils"
+import { DeviceHeigth, Modals } from "@/utils"
 import { Pressable, StyleSheet } from "react-native"
 type CallbacksType = {
     openCamera: () => void,
@@ -8,7 +8,7 @@ type CallbacksType = {
 
 }
 export const ImportVariantsModal = () => {
-    const { y, visible, callbacks, handleClose } = useCreateModal<CallbacksType>({ event: 'showImportVariants' })
+    const { y, visible, callbacks, handleClose } = useCreateModal<CallbacksType>({ event: Modals.importVariants })
     const handleCameraPress = () => {
         callbacks?.openCamera()
         handleClose()

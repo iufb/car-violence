@@ -11,6 +11,12 @@ export const pickAssets = async (handleSave: (assets: MediaLibrary.Asset[]) => v
     DeviceEventEmitter.emit('openAssetsPicker', handleSave)
 }
 
+export const Modals = {
+    assetPicker: 'openAssetsPicker',
+    permission: 'openPermissionAlert',
+    importVariants: 'showImportVariants'
+
+}
 export const mimeTypes = {
     jpeg: "image/jpeg",
     jpg: "image/jpeg",

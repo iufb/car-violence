@@ -8,7 +8,7 @@ import { Video } from "@/components/Video";
 import { Colors } from "@/constants/Colors";
 import { errorMsgs } from "@/consts";
 import { useBackgroundUpload } from "@/hooks/useBackgroundUpload";
-import { GetDate, GetTime } from "@/utils";
+import { GetDate, GetTime, Modals } from "@/utils";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
 import Constants from "expo-constants";
@@ -21,9 +21,9 @@ import Toast from "react-native-toast-message";
 interface SendViolenceFormProps extends ViewProps {
     medias: MediaLibrary.Asset[]
     setMedias: (value: MediaLibrary.Asset[]) => void;
-    openCamera: () => void
+    handleCamera: (state: boolean) => void
 }
-export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...props }: SendViolenceFormProps) => {
+export const SendViolenceForm = ({ medias, handleCamera, setMedias, style, ...props }: SendViolenceFormProps) => {
     const { control, formState: { errors }, handleSubmit, reset } = useForm({
         defaultValues
     })
@@ -58,7 +58,7 @@ export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...prop
         send(body)
     }
     return <FormContainer style={[style, styles.container]} {...props}>
-        <MediasView medias={medias} setMedias={setMedias} openCamera={openCamera} />
+        <MediasView medias={medias} setMedias={setMedias} handleCamera={handleCamera} />
         <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={() => Keyboard.dismiss()}>
             <ScrollView contentContainerStyle={[styles.form]}>
                 <Input
@@ -90,10 +90,10 @@ export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...prop
 interface MediasViewProps {
     medias: MediaLibrary.Asset[]
     setMedias: (value: MediaLibrary.Asset[]) => void;
-    openCamera: () => void
+    handleCamera: (state: boolean) => void
 }
 
-const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
+const MediasView = ({ medias, setMedias, handleCamera }: MediasViewProps) => {
     const [currentItem, setCurrentItem] = useState<MediaLibrary.Asset | null>(null);
     const isManuallyScrolling = useRef(false);
     const viewabilityConfig = useRef({
@@ -141,7 +141,6 @@ const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
     const deleteMedia = (itemToDelete: string) => {
         const newMedias = medias.filter((item) => item.id !== itemToDelete); // Remove the item
         setMedias(newMedias);
-
         if (currentItem?.id === itemToDelete) {
             if (newMedias.length > 0) {
                 const nextIndex = Math.min(
@@ -185,7 +184,7 @@ const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
                 </View>
             } />
 
-            <AddNewButton medias={medias} setMedias={setMedias} openCamera={openCamera} />
+            <AddNewButton medias={medias} setMedias={setMedias} openCamera={() => handleCamera(true)} />
         </View>
         </View>
     </View>
@@ -198,9 +197,9 @@ interface AddNewButtonProps {
 const AddNewButton = ({ openCamera, medias, setMedias }: AddNewButtonProps) => {
     const [visible, setVisible] = useState(false)
     const handlePress = () => {
-        DeviceEventEmitter.emit('showImportVariants', {
+        DeviceEventEmitter.emit(Modals.importVariants, {
             openCamera, openGallery: () => {
-                DeviceEventEmitter.emit('openAssetsPicker', (newMedias: MediaLibrary.Asset[]) => setMedias([...medias, ...newMedias]))
+                DeviceEventEmitter.emit(Modals.assetPicker, { save: (newMedias: MediaLibrary.Asset[]) => setMedias([...medias, ...newMedias]) })
             }
         })
 

@@ -1,6 +1,6 @@
 import { Typography, ViewModal } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
-import { DeviceWidth, rS, rV } from "@/utils";
+import { DeviceWidth, Modals, rS, rV } from "@/utils";
 import { useEffect, useState } from "react";
 import { FlatList, Image, Pressable, StyleSheet, View } from "react-native";
 import Animated, { Easing, ReduceMotion, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
@@ -26,7 +26,7 @@ const getAssets = async (mediaType: MediaLibrary.MediaTypeValue, save: (assets: 
 }
 
 export const AssetsPicker = () => {
-    const { y, handleClose, callbacks, visible } = useCreateModal<{ saveSelected: (assets: MediaLibrary.Asset[]) => void }>({ event: "openAssetsPicker" })
+    const { y, handleClose, callbacks, visible } = useCreateModal<{ saveSelected: (assets: MediaLibrary.Asset[]) => void }>({ event: Modals.assetPicker })
     const [activeTab, setActiveTab] = useState(tabs[0])
     const [pickedAssets, setSelectedMap] = useState<Map<string, MediaLibrary.Asset>>(new Map())
     const handleSelect = (asset: MediaLibrary.Asset) => {
