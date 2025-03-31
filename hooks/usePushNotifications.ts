@@ -1,4 +1,5 @@
 
+import { rRegisterDevice } from "@/api/auth";
 import messaging from "@react-native-firebase/messaging";
 import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
@@ -34,16 +35,13 @@ async function registerForPushNotificationsAsync() {
     }
 }
 export const usePushNotifications = () => {
-    //getToken + permission
     useEffect(() => {
         const fetchFCMToken = async () => {
             try {
                 await messaging().registerDeviceForRemoteMessages();
                 const fcmToken = await messaging().getToken();
-                console.log("FCM Token:", fcmToken);
                 await registerForPushNotificationsAsync()
-
-                // TODO: Save token to your backend, if needed
+                const a = await rRegisterDevice({ registration_id: fcmToken, type: Platform.OS })
             } catch (error) {
                 console.error("Error fetching FCM token:", error);
             }
@@ -51,7 +49,6 @@ export const usePushNotifications = () => {
         fetchFCMToken();
     }, []);
 
-    //Lister foreground
     useEffect(() => {
         Notifications.setNotificationHandler({
             handleNotification: async () => ({
@@ -61,24 +58,21 @@ export const usePushNotifications = () => {
             }),
         });
 
-        // Handle foreground notifications (when the app is active)
         const unsubscribeOnMessage = messaging().onMessage(
             async (remoteMessage) => {
                 console.log("Foreground notification received:", remoteMessage);
                 const notificationContent = remoteMessage.notification;
 
-                // Display a notification or handle the message while the app is in the foreground
                 Notifications.scheduleNotificationAsync({
                     content: {
                         title: notificationContent?.title + "Foreground",
                         body: notificationContent?.body,
                     },
-                    trigger: null, // Show immediately
+                    trigger: null,
                 });
             },
         );
 
-        // Clean up subscriptions
         return () => {
             unsubscribeOnMessage();
         };
