@@ -199,7 +199,11 @@ const AddNewButton = ({ openCamera, medias, setMedias }: AddNewButtonProps) => {
     const handlePress = () => {
         DeviceEventEmitter.emit(Modals.importVariants, {
             openCamera, openGallery: () => {
-                DeviceEventEmitter.emit(Modals.assetPicker, { save: (newMedias: MediaLibrary.Asset[]) => setMedias([...medias, ...newMedias]) })
+                DeviceEventEmitter.emit(Modals.assetPicker, {
+                    saveSelected: (newMedias: MediaLibrary.Asset[]) => {
+                        setMedias([...medias, ...newMedias])
+                    }
+                })
             }
         })
 

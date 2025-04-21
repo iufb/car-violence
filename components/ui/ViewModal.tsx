@@ -14,7 +14,9 @@ export const ViewModal = ({ y, visible, handleClose, doneBtn, children, modalOff
 
     const pan = Gesture.Pan()
         .onUpdate(e => {
-            y.value = e.translationY
+            if (e.translationY > 0) {
+                y.value = e.translationY
+            }
         })
         .onEnd(e => {
             if (e.translationY < 0) {
@@ -48,24 +50,27 @@ export const ViewModal = ({ y, visible, handleClose, doneBtn, children, modalOff
     return visible ? <View style={[styles.overlay]}>
         <GestureHandlerRootView style={{ flex: 1 }}>
             <TouchableOpacity onPress={handleClose} style={[{ height: modalOffset }]} />
-            <GestureDetector gesture={pan}>
-                <Animated.View style={[styles.container, animatedStyles]}>
-                    <View style={[styles.top]} />
-                    {React.isValidElement(doneBtn)
-                        ? cloneElement(doneBtn, {
-                            onPress: (e) => {
-                                if (doneBtn) {
-                                    const { onPress } = doneBtn.props
-                                    if (onPress) {
-                                        onPress(e)
-                                    }
+            <Animated.View style={[styles.container, animatedStyles]}>
+
+                <GestureDetector gesture={pan} >
+                    <View style={[styles.topContainer]}>
+                        <View style={[styles.top]} />
+                    </View>
+                </GestureDetector>
+                {React.isValidElement(doneBtn)
+                    ? cloneElement(doneBtn, {
+                        onPress: (e) => {
+                            if (doneBtn) {
+                                const { onPress } = doneBtn.props
+                                if (onPress) {
+                                    onPress(e)
                                 }
-                                handleClose()
                             }
-                        }) : doneBtn}
-                    {children}
-                </Animated.View>
-            </GestureDetector>
+                            handleClose()
+                        }
+                    }) : doneBtn}
+                {children}
+            </Animated.View>
         </GestureHandlerRootView>
     </View> : <View />
 
@@ -79,7 +84,10 @@ const styles = StyleSheet.create({
     },
     container: {
         position: 'relative',
-        backgroundColor: "white", gap: rS(15), width: Dimensions.get("window").width, height: DeviceHeigth * 2, borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: 'hidden', padding: 10,
+        backgroundColor: "white", gap: rS(15), width: Dimensions.get("window").width, flex: 1, borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: 'hidden', padding: 10,
+    },
+    topContainer: {
+        paddingVertical: rS(10)
     },
     top: {
         width: DeviceWidth - DeviceWidth / 1.5,

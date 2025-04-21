@@ -12,8 +12,7 @@ import * as MediaLibrary from 'expo-media-library';
 interface AssetsPickerBase {
     handleSelect: (asset: MediaLibrary.Asset) => void
     pickedAssets: Map<string, MediaLibrary.Asset>
-}
-const getAssets = async (mediaType: MediaLibrary.MediaTypeValue, save: (assets: MediaLibrary.Asset[]) => void) => {
+} const getAssets = async (mediaType: MediaLibrary.MediaTypeValue, save: (assets: MediaLibrary.Asset[]) => void) => {
     const fetchedAlbums = await MediaLibrary.getAlbumsAsync({
         includeSmartAlbums: true,
     });
@@ -110,9 +109,10 @@ const VideosView = ({ pickedAssets, handleSelect }: AssetsPickerBase) => {
 }
 const AssetsView = ({ assets, handleSelect, pickedAssets }: { assets: MediaLibrary.Asset[] } & AssetsPickerBase) => {
     return <FlatList
+        style={{ flex: 1 }}
         data={assets}
         numColumns={4}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, idx) => idx.toString()}
         renderItem={({ item: asset }) =>
             <AssetItem asset={asset} pickedAssets={pickedAssets} handleSelect={handleSelect} />
         }

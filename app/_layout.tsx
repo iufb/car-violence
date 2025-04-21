@@ -9,6 +9,7 @@ import { toastConfig } from '@/components/CustomToast';
 import { PermissionAlert } from '@/components/PermissionAlert';
 import { AppStateContextProvider } from '@/context/AppStateContext';
 import { usePushNotifications } from '@/hooks';
+import { AntDesign, Entypo, Feather, FontAwesome, FontAwesome5, FontAwesome6, Ionicons, MaterialCommunityIcons, MaterialIcons, Octicons } from '@expo/vector-icons';
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { isRunningInExpoGo } from 'expo';
@@ -51,7 +52,6 @@ const InitialLayout = () => {
     const segments = useSegments();
     const pathname = usePathname();
 
-    usePushNotifications()
 
 
     useEffect(() => {
@@ -94,7 +94,9 @@ const InitialLayout = () => {
 }
 function RootLayout() {
     const [loaded] = useFonts({
-        SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+        'Rubik': require('../assets/fonts/Rubik-VariableFont_wght.ttf'),
+        ...Ionicons.font,
+        ...FontAwesome5.font, ...Entypo.font, ...FontAwesome6.font, ...MaterialCommunityIcons.font, ...FontAwesome.font, ...Octicons.font, ...MaterialIcons.font, ...AntDesign.font, ...Feather.font
     });
     const ref = useNavigationContainerRef();
     useEffect(() => {

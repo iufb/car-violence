@@ -1,5 +1,5 @@
 import { Colors } from "@/constants/Colors";
-import { FontAwesome, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome5, MaterialCommunityIcons, Octicons } from "@expo/vector-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { PlatformPressable } from '@react-navigation/elements';
 import { useLinkBuilder, useTheme } from '@react-navigation/native';
@@ -15,8 +15,8 @@ const tabs = {
         href: '/home',
     },
     myVideos: {
-        label: 'Мои Видео',
-        icon: (color: string) => <MaterialCommunityIcons color={color} name="video-image" size={28} />,
+        label: 'Мои видео',
+        icon: (color: string) => <Octicons color={color} name="video" size={28} />,
         href: '/myVideos',
     },
     add: {
@@ -77,7 +77,7 @@ export function Tabbar({ state, descriptors, navigation }: BottomTabBarProps) {
                     }, [scale, isFocused])
                     const animatedTextStyle = useAnimatedStyle(() => {
                         const opacity = interpolate(scale.value, [0, 1], [1, 0])
-                        return { opacity }
+                        return { opacity, fontSize: 12 }
                     })
 
                     const animatedIconStyle = useAnimatedStyle(() => {

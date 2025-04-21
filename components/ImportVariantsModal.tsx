@@ -1,6 +1,6 @@
 import { Typography, ViewModal } from "@/components/ui"
 import { useCreateModal } from "@/hooks/useCreateModal"
-import { DeviceHeigth, Modals } from "@/utils"
+import { DeviceHeigth, Modals, rS } from "@/utils"
 import { Pressable, StyleSheet } from "react-native"
 type CallbacksType = {
     openCamera: () => void,
@@ -17,7 +17,7 @@ export const ImportVariantsModal = () => {
         callbacks?.openGallery()
         handleClose()
     }
-    return <ViewModal y={y} visible={visible} handleClose={handleClose} modalOffset={DeviceHeigth - 120}>
+    return <ViewModal y={y} visible={visible} handleClose={handleClose} modalOffset={DeviceHeigth - rS(150)}>
         <Pressable style={[styles.btn]} onPress={handleCameraPress}><Typography variant="p2">Открыть камеру</Typography></Pressable>
         <Pressable style={[styles.btn]} onPress={handleGalleryPress}><Typography variant="p2">Открыть галерею</Typography></Pressable>
     </ViewModal>

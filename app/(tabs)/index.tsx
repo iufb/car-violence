@@ -3,6 +3,7 @@ import { LoaderView, NewsList, ScreenContainer, Search } from "@/components";
 import { Card, Typography } from "@/components/ui";
 import { Error } from "@/components/ui/Error";
 import { NotFound } from "@/components/ui/NotFound";
+import { usePushNotifications } from "@/hooks";
 import { rS, rV } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs } from "expo-router";
@@ -11,6 +12,7 @@ import { Dimensions, SafeAreaView, ScrollView, StyleSheet, View } from "react-na
 
 
 export default function HomeScreen() {
+    usePushNotifications()
     return (
         <ScreenContainer style={[styles.container]} >
             <Tabs.Screen options={{ header: () => <Search /> }} />

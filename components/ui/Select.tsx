@@ -70,12 +70,15 @@ export const Select = ({ error, withSearch, required = true, label, value, place
             <Animated.View style={[iconStyle]} ><Entypo color={Colors.light.primary} name="chevron-right" size={28} /></Animated.View>
         </Pressable>
         <Animated.View style={[animatedStyle, styles.content]}>
+
+            {withSearch &&
+                <View style={[styles.search]}>
+                    <TextInput style={[styles.searchInput]} value={searchTerm} onChangeText={value => setSearchTerm(value)} />
+                    <FontAwesome5 style={[styles.searchIcon]} name="search" size={20} color={Colors.light.primary} />
+                </View>}
+
             <Animated.ScrollView contentContainerStyle={[innerStyle]}>
-                {withSearch &&
-                    <View style={[styles.search]}>
-                        <TextInput style={[styles.searchInput]} value={searchTerm} onChangeText={value => setSearchTerm(value)} />
-                        <FontAwesome5 style={[styles.searchIcon]} name="search" size={20} color={Colors.light.primary} />
-                    </View>}
+
                 {searchItems.length > 0 ? searchItems.map((item, idx) => <Pressable style={[{ borderBottomWidth: idx == items.length - 1 ? 0 : 1 }, styles.item]} onPress={() => {
                     onSelect(item);
                     toggle()
