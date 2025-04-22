@@ -8,7 +8,6 @@ import { AssetsPicker } from '@/components/AssetsPicker';
 import { toastConfig } from '@/components/CustomToast';
 import { PermissionAlert } from '@/components/PermissionAlert';
 import { AppStateContextProvider } from '@/context/AppStateContext';
-import { usePushNotifications } from '@/hooks';
 import { AntDesign, Entypo, Feather, FontAwesome, FontAwesome5, FontAwesome6, Ionicons, MaterialCommunityIcons, MaterialIcons, Octicons } from '@expo/vector-icons';
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';

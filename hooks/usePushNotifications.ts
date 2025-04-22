@@ -1,4 +1,3 @@
-
 import { rRegisterDevice } from "@/api/auth";
 import messaging from "@react-native-firebase/messaging";
 import * as Notifications from "expo-notifications";

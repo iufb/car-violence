@@ -158,7 +158,7 @@ const MediasView = ({ medias, setMedias, handleCamera }: MediasViewProps) => {
         <FlatList
             initialNumToRender={1}
             removeClippedSubviews={true}
-            ref={flatListRef} keyExtractor={(item, idx) => `${item.id}`} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.mediasViews]} data={medias} renderItem={({ item }: { item: MediaLibrary.Asset }) => {
+            ref={flatListRef} keyExtractor={(item, idx) => `${item.id}${idx}`} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.mediasViews]} data={medias} renderItem={({ item }: { item: MediaLibrary.Asset }) => {
                 if (item.uri.includes('mp4') || item.uri.includes('mov') || item.uri.includes('mkv')) {
                     return <Video source={item.uri} style={[styles.previewItem]} />
                 }
@@ -168,7 +168,7 @@ const MediasView = ({ medias, setMedias, handleCamera }: MediasViewProps) => {
             viewabilityConfig={viewabilityConfig}
         />
         <View style={[styles.bottom]}><View style={[styles.mediasControls]}>
-            <FlatList ref={controlsFlatListRef} keyExtractor={(item, idx) => `${item.uri}`} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.controlsList]} data={medias} renderItem={({ item, index }) =>
+            <FlatList ref={controlsFlatListRef} keyExtractor={(item, idx) => `${item.id}${idx} `} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.controlsList]} data={medias} renderItem={({ item, index }) =>
                 <View style={[styles.controlItem]}>
                     {currentItem == item ?
                         <Pressable style={[styles.deleteItem]} onPress={() => deleteMedia(item.id)}>
