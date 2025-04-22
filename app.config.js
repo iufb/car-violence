@@ -10,7 +10,10 @@ export default {
         "newArchEnabled": true,
 
         "ios": {
-            "bundleIdentifier": "com.ispark.oko"
+            "bundleIdentifier": "com.ispark.oko",
+            "config": {
+                "usesNonExemptEncryption": false
+            }
         },
 
         "android": {
