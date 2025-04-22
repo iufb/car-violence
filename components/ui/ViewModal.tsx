@@ -1,7 +1,7 @@
 import { DeviceHeigth, DeviceWidth, rS, rV } from '@/utils';
 import React, { cloneElement, ReactElement, ReactNode, useEffect } from 'react';
-import { Dimensions, PressableProps, StyleSheet, View } from 'react-native';
-import { Gesture, GestureDetector, GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler';
+import { Dimensions, PressableProps, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { runOnJS, SharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 interface ViewModalProps {
     y: SharedValue<number>
@@ -49,7 +49,9 @@ export const ViewModal = ({ y, visible, handleClose, doneBtn, children, modalOff
 
     return visible ? <View style={[styles.overlay]}>
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <TouchableOpacity onPress={handleClose} style={[{ height: modalOffset }]} />
+            <TouchableWithoutFeedback onPress={handleClose}>
+                <View style={{ height: modalOffset }} pointerEvents="box-only" />
+            </TouchableWithoutFeedback>
             <Animated.View style={[styles.container, animatedStyles]}>
 
                 <GestureDetector gesture={pan} >

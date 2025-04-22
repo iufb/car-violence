@@ -65,7 +65,7 @@ export const Select = ({ error, withSearch, required = true, label, value, place
     return <View style={[styles.container]}>
         <Typography color={Colors.light.background} variant="span">{label}{required && <Typography color="red" variant="span"> *</Typography>}
         </Typography>
-        <Pressable onPress={toggle} style={[styles.label]}>
+        <Pressable hitSlop={10} onPress={toggle} style={[styles.label]}>
             <Typography color={value ? Colors.light.text : Colors.light.borderColor} variant="p2">{value ? value : placeholder}</Typography>
             <Animated.View style={[iconStyle]} ><Entypo color={Colors.light.primary} name="chevron-right" size={28} /></Animated.View>
         </Pressable>
@@ -79,7 +79,7 @@ export const Select = ({ error, withSearch, required = true, label, value, place
 
             <Animated.ScrollView contentContainerStyle={[innerStyle]}>
 
-                {searchItems.length > 0 ? searchItems.map((item, idx) => <Pressable style={[{ borderBottomWidth: idx == items.length - 1 ? 0 : 1 }, styles.item]} onPress={() => {
+                {searchItems.length > 0 ? searchItems.map((item, idx) => <Pressable hitSlop={10} style={[{ borderBottomWidth: idx == items.length - 1 ? 0 : 1 }, styles.item]} onPress={() => {
                     onSelect(item);
                     toggle()
                 }} key={idx}>
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     },
     content: {
         borderRadius: 10,
-        zIndex: 20,
+        zIndex: 100,
         maxHeight: 200,
         position: 'absolute',
         left: 10,

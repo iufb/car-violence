@@ -8,7 +8,7 @@ export const ScreenContainer = ({ style, children, keyDismiss = true }: { childr
     </KeyboardFeedback>
 }
 const KeyboardFeedback = ({ dismiss, children }: { dismiss: boolean, children: ReactNode }) => {
-    return dismiss ? <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+    return dismiss ? <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} style={{ pointerEvents: 'box-none', backgroundColor: 'red' }}>
         {children}
     </TouchableWithoutFeedback> : children
 }

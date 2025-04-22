@@ -1,7 +1,9 @@
 import { Typography, ViewModal } from "@/components/ui"
+import { Colors } from "@/constants/Colors"
 import { useCreateModal } from "@/hooks/useCreateModal"
 import { DeviceHeigth, Modals, rS } from "@/utils"
-import { Pressable, StyleSheet } from "react-native"
+import { StyleSheet } from "react-native"
+import { Pressable } from "react-native-gesture-handler"
 type CallbacksType = {
     openCamera: () => void,
     openGallery: () => void
@@ -18,14 +20,17 @@ export const ImportVariantsModal = () => {
         handleClose()
     }
     return <ViewModal y={y} visible={visible} handleClose={handleClose} modalOffset={DeviceHeigth - rS(150)}>
-        <Pressable style={[styles.btn]} onPress={handleCameraPress}><Typography variant="p2">Открыть камеру</Typography></Pressable>
-        <Pressable style={[styles.btn]} onPress={handleGalleryPress}><Typography variant="p2">Открыть галерею</Typography></Pressable>
+        <Pressable hitSlop={10} style={[styles.btn]} onPress={handleCameraPress}><Typography variant="p2">Открыть камеру</Typography></Pressable>
+        <Pressable hitSlop={10} style={[styles.btn]} onPress={handleGalleryPress}><Typography variant="p2">Открыть галерею</Typography></Pressable>
     </ViewModal>
 }
 
 const styles = StyleSheet.create({
     btn: {
         padding: 10,
-
+        pointerEvents: 'auto',
+        zIndex: 100,
+        backgroundColor: Colors.light.slate200,
+        borderRadius: 10
     }
 })
