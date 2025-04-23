@@ -132,7 +132,7 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
             <Animated.View entering={FadeIn.duration(300)} exiting={FadeOut.duration(100)} style={[styles.container]}>
                 <CameraView style={[{ width, height: height - CONTROLS_HEIGHT - Constants.statusBarHeight }]} format={format} ref={cameraRef} device={device} isActive={isActive} photo video audio preview />
 
-                <Pressable onPress={handleClose} style={[styles.close]}>
+                <Pressable hitSlop={20} onPress={handleClose} style={[styles.close]}>
                     <MaterialCommunityIcons name='close' size={32} color='white' />
                 </Pressable>
 

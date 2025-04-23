@@ -39,11 +39,10 @@ export const ViewModal = ({ y, visible, handleClose, doneBtn, children, modalOff
     }
     );
     useEffect(() => {
-        if (!visible) {
-            y.value = withTiming(DeviceHeigth - modalOffset, { duration: 300 })
-        }
         if (visible) {
             y.value = withTiming(0, { duration: 300 })
+        } else {
+            y.value = withTiming(DeviceHeigth - modalOffset, { duration: 300 })
         }
     }, [visible])
 

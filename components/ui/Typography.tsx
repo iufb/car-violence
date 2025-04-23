@@ -1,11 +1,11 @@
 import { Colors } from "@/constants/Colors"
 import { rMS } from "@/utils"
-import { StyleSheet, Text, TextProps, View } from "react-native"
+import { StyleSheet, Text, TextProps } from "react-native"
 
 export const Typography = ({ color, variant, children, center, style, ...props }: TextProps & { variant: "h1" | "h2" | "h3" | "p1" | 'p2' | "span", center?: boolean, color?: string }) => {
-    return <View pointerEvents="none"><Text style={[styles[variant], { color, fontFamily: "Rubik" }, style, center && styles.center,]} {...props} >
+    return <Text style={[styles[variant], { color, fontFamily: "Rubik" }, style, center && styles.center,]} {...props} >
         {children}
-    </Text></View>
+    </Text>
 }
 
 const styles = StyleSheet.create({

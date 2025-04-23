@@ -19,7 +19,7 @@ export const ImportVariantsModal = () => {
         callbacks?.openGallery()
         handleClose()
     }
-    return <ViewModal y={y} visible={visible} handleClose={handleClose} modalOffset={DeviceHeigth - rS(150)}>
+    return <ViewModal key={'importvariants'} y={y} visible={visible} handleClose={handleClose} modalOffset={DeviceHeigth - rS(150)}>
         <Pressable hitSlop={10} style={[styles.btn]} onPress={handleCameraPress}><Typography variant="p2">Открыть камеру</Typography></Pressable>
         <Pressable hitSlop={10} style={[styles.btn]} onPress={handleGalleryPress}><Typography variant="p2">Открыть галерею</Typography></Pressable>
     </ViewModal>

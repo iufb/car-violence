@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     content: {
         borderRadius: 10,
         zIndex: 100,
-        maxHeight: 200,
+        maxHeight: rS(200),
         position: 'absolute',
         left: 10,
         right: 10,
@@ -136,8 +136,9 @@ const styles = StyleSheet.create({
     item: {
         justifyContent: 'center',
         paddingLeft: 10,
+        paddingVertical: 10,
         borderBottomColor: Colors.light.borderColor,
-        height: 40
+        height: 60
 
     },
 
