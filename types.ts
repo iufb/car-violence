@@ -1,4 +1,7 @@
-
+export type ConfirmationType = 'register' | 'reset'
+export interface ResetPasswordDTO {
+    phone: string, code: string, new_password: string
+}
 export interface RegisterDTO {
     name: string,
     tel: string,

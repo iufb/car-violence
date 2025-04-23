@@ -1,22 +1,28 @@
-import { customFetch } from "@/api"
 import { Button, ImageInput, Input } from "@/components/ui"
 import { Colors } from "@/constants/Colors"
 import { useRouter } from "expo-router"
-import { useState } from "react"
+import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { StyleSheet, View } from "react-native"
+interface FormProps {
+    photo: string;
+    name: string
 
+}
 export const EditProfileForm = () => {
     const router = useRouter()
-    const [formData, setFormData] = useState({
-        photo: "",
-        name: "",
-    })
+    const { register, control, formState: { errors }, handleSubmit, reset } = useForm<FormProps>()
+    const onSubmit: SubmitHandler<FormProps> = (data) => {
+        console.log(data)
+    }
     return <View style={[styles.container]}>
-        <ImageInput label="Фото" value={formData.photo} setImage={(img) => setFormData({ ...formData, photo: img })} />
-        <Input value={formData.name} onChangeText={value => setFormData({ ...formData, name: value })} label="ФИО" placeholder="Ваше ФИО" />
-        <Button onPress={() => {
-            customFetch({ method: "GET", path: "todos/1" })
-        }}>Сохранить</Button>
+        <Controller
+            name="photo"
+            control={control}
+            render={({ field: { onChange, value, onBlur } }) =>
+                <ImageInput label="Фото" value={value} setImage={(img) => onChange(img[0])} />}
+        />
+        <Input name="name" control={control} input={{ placeholder: "Ваше ФИО" }} required={false} label="ФИО" />
+        <Button onPress={handleSubmit(onSubmit)}>Сохранить</Button>
     </View>
 }
 const styles = StyleSheet.create({

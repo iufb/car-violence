@@ -19,7 +19,7 @@ export const Checkbox = ({ checked, onCheck, style, ...props }: CheckboxProps) =
     })
 
     return <View style={[style, styles.container, checked && styles.checked]} {...props}>
-        <Pressable onPress={onCheck}>
+        <Pressable hitSlop={20} onPress={onCheck}>
             <Animated.View style={[animatedIconStyle]}>
                 <Entypo name="check" size={20} color={Colors.light.primary} />
             </Animated.View>

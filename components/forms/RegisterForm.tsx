@@ -24,7 +24,7 @@ export const RegisterForm = () => {
     const submit: SubmitHandler<any> = (data) => {
         console.log(data)
         sendCode(data.tel).then(() => {
-            router.push(`/(auth)/confirmation?info=${JSON.stringify(data)}`)
+            router.push(`/(auth)/confirmation?info=${JSON.stringify(data)}&type=register`)
         })
     }
     const isDisabled = Object.keys(errors).length !== 0 || !rulesConfirm;
@@ -60,7 +60,7 @@ export const RegisterForm = () => {
 
         <View style={[styles.rulesContainer]}>
             <Checkbox checked={rulesConfirm} onCheck={() => setRulesConfirm(!rulesConfirm)} />
-            <Typography variant="p2" style={[styles.rulesText]}>
+            <Typography lineBreakMode="tail" variant="p2" style={[styles.rulesText]}>
                 Я прочитал(а) и согласен(на) с <Link style={[styles.link]} href={'/'}>Условиями использования</Link> и <Link style={[styles.link]} href={'/'}>Политикой конфиденциальности</Link>.
             </Typography>
         </View>
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
         gap: 12
     },
     rulesText: {
-        width: '90%'
+
     },
     link: {
         color: Colors.light.primary

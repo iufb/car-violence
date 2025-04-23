@@ -65,18 +65,21 @@ export const Select = ({ error, withSearch, required = true, label, value, place
     return <View style={[styles.container]}>
         <Typography color={Colors.light.background} variant="span">{label}{required && <Typography color="red" variant="span"> *</Typography>}
         </Typography>
-        <Pressable onPress={toggle} style={[styles.label]}>
-            <Typography color={value ? Colors.light.primary : Colors.light.borderColor} variant="span">{value ? value : placeholder}</Typography>
+        <Pressable hitSlop={10} onPress={toggle} style={[styles.label]}>
+            <Typography color={value ? Colors.light.text : Colors.light.borderColor} variant="p2">{value ? value : placeholder}</Typography>
             <Animated.View style={[iconStyle]} ><Entypo color={Colors.light.primary} name="chevron-right" size={28} /></Animated.View>
         </Pressable>
         <Animated.View style={[animatedStyle, styles.content]}>
+
+            {withSearch &&
+                <View style={[styles.search]}>
+                    <TextInput style={[styles.searchInput]} value={searchTerm} onChangeText={value => setSearchTerm(value)} />
+                    <FontAwesome5 style={[styles.searchIcon]} name="search" size={20} color={Colors.light.primary} />
+                </View>}
+
             <Animated.ScrollView contentContainerStyle={[innerStyle]}>
-                {withSearch &&
-                    <View style={[styles.search]}>
-                        <TextInput style={[styles.searchInput]} value={searchTerm} onChangeText={value => setSearchTerm(value)} />
-                        <FontAwesome5 style={[styles.searchIcon]} name="search" size={20} color={Colors.light.primary} />
-                    </View>}
-                {searchItems.length > 0 ? searchItems.map((item, idx) => <Pressable style={[{ borderBottomWidth: idx == items.length - 1 ? 0 : 1 }, styles.item]} onPress={() => {
+
+                {searchItems.length > 0 ? searchItems.map((item, idx) => <Pressable hitSlop={10} style={[{ borderBottomWidth: idx == items.length - 1 ? 0 : 1 }, styles.item]} onPress={() => {
                     onSelect(item);
                     toggle()
                 }} key={idx}>
@@ -103,9 +106,9 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         borderWidth: 1,
         borderColor: Colors.light.borderColor,
-        paddingLeft: rS(30),
+        paddingLeft: 10
     },
-    searchIcon: { position: 'absolute', left: 10, top: 14 },
+    searchIcon: { position: 'absolute', right: 20, top: 14 },
     label: {
         height: 48,
         borderColor: Colors.light.borderColor,
@@ -121,20 +124,21 @@ const styles = StyleSheet.create({
     },
     content: {
         borderRadius: 10,
-        zIndex: 20,
-        maxHeight: 200,
+        zIndex: 100,
+        maxHeight: rS(200),
         position: 'absolute',
         left: 10,
         right: 10,
         top: 75,
-        backgroundColor: '#ededed',
+        backgroundColor: '#fff',
         overflow: 'hidden',
     },
     item: {
         justifyContent: 'center',
         paddingLeft: 10,
+        paddingVertical: 10,
         borderBottomColor: Colors.light.borderColor,
-        height: 40
+        height: 60
 
     },
 

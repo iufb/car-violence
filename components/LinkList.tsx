@@ -1,8 +1,8 @@
 import { Typography } from "@/components/ui"
 import { Colors } from "@/constants/Colors"
 import { Entypo } from "@expo/vector-icons"
-import { Link, LinkProps } from "expo-router"
-import { SafeAreaView, ScrollView, StyleSheet, View, ViewProps } from "react-native"
+import { LinkProps, useRouter } from "expo-router"
+import { Pressable, SafeAreaView, ScrollView, StyleSheet, View, ViewProps } from "react-native"
 interface LinkListItemProps {
     href: LinkProps["href"],
     title: string
@@ -21,11 +21,16 @@ export const LinkList = ({ items, style, ...props }: LinkListProps) => {
 
 
 export const ListItem = ({ href, title }: LinkListItemProps) => {
-    return <Link href={href}>
+    const router = useRouter()
+    const onPress = () => {
+        router.push(href)
+    }
+
+    return <Pressable onPress={onPress} >
         <View style={[styles.link]}><Typography style={[{ fontWeight: 'normal' }]} variant="h3">{title}</Typography>
             <Entypo name="chevron-right" size={32} color={Colors.light.notSelected} />
         </View>
-    </Link>
+    </Pressable>
 }
 
 const styles = StyleSheet.create({

@@ -2,60 +2,64 @@ import { rSendViolence } from "@/api/violence";
 
 import { client } from "@/app/_layout";
 import { FormContainer } from "@/components/forms/FormContainer";
+import { MediaViewer } from "@/components/MediaViewer";
 import { Button, DateTimePicker, Input, Select, Typography } from "@/components/ui";
 import { Video } from "@/components/Video";
 import { Colors } from "@/constants/Colors";
 import { errorMsgs } from "@/consts";
-import { GetDate, getFileDetails, GetTime, showToast } from "@/utils";
+import { useBackgroundUpload } from "@/hooks/useBackgroundUpload";
+import { GetDate, GetTime, Modals } from "@/utils";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
 import Constants from "expo-constants";
+import * as MediaLibrary from 'expo-media-library';
 import { Link } from "expo-router";
 import React, { useCallback, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Dimensions, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, ViewProps, ViewToken } from "react-native";
+import { DeviceEventEmitter, Dimensions, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableWithoutFeedback, View, ViewProps, ViewToken } from "react-native";
+import Toast from "react-native-toast-message";
 interface SendViolenceFormProps extends ViewProps {
-    medias: string[]
-    setMedias: (value: string[]) => void;
-    openCamera: () => void
+    medias: MediaLibrary.Asset[]
+    setMedias: (value: MediaLibrary.Asset[]) => void;
+    handleCamera: (state: boolean) => void
 }
-export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...props }: SendViolenceFormProps) => {
+export const SendViolenceForm = ({ medias, handleCamera, setMedias, style, ...props }: SendViolenceFormProps) => {
     const { control, formState: { errors }, handleSubmit, reset } = useForm({
         defaultValues
     })
+    const { startUpload } = useBackgroundUpload()
     const { mutate: send, isPending } = useMutation({
-        mutationKey: ['sendViolence'], mutationFn: rSendViolence, onSuccess: (data) => {
-            console.log(data)
-            showToast({ type: 'success', title: "Отправлено", desc: "Нарушение было отправлено!" })
-            reset()
-            client.invalidateQueries({ queryKey: ['myVideos'] })
-            setMedias([])
+        mutationKey: ['sendViolence'], mutationFn: rSendViolence, onSuccess: async (violence) => {
+            if (!violence) return;
+            try {
+                for (const i of medias) {
+                    await startUpload(i, violence.id.toString())
+                }
+                reset()
+                client.invalidateQueries({ queryKey: ['myVideos'] })
+                setMedias([])
+                Toast.show({ type: 'success', text1: "Отправлено", text2: "Нарушение было отправлено!" })
+            } catch (e) {
+                Toast.show({ type: 'error', text1: "Ошибка", text2: "Нарушение не было отправлено!" })
+            }
+
         }, onError: (e) => {
-            showToast({ type: 'error', title: "Ошибка", desc: "Произошла ошибка" })
+            Toast.show({ type: 'error', text1: "Ошибка", text2: "Произошла ошибка" })
             console.log(e)
         }
     })
-    const submit = (data: typeof defaultValues) => {
+    const submit = async (data: typeof defaultValues) => {
         const body = new FormData()
-        medias.forEach(media => {
-            const details = getFileDetails(media)
-            body.append('videos', {
-                uri: media,
-                name: details?.fileName,
-                type: details?.mimeType
-            } as any)
-        })
         body.append('city', data.city)
         body.append('street', data.street)
         body.append('description', data.description)
         body.append('was_at_date', GetDate(data.dateTime.date))
         body.append('was_at_time', GetTime(data.dateTime.time) + ":00")
-        console.log(body)
         send(body)
     }
     return <FormContainer style={[style, styles.container]} {...props}>
-        <MediasView medias={medias} setMedias={setMedias} openCamera={openCamera} />
-        <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={() => Keyboard.dismiss()}>
+        <MediasView medias={medias} setMedias={setMedias} handleCamera={handleCamera} />
+        <TouchableWithoutFeedback style={{ flex: 1 }} onPress={() => Keyboard.dismiss()}>
             <ScrollView contentContainerStyle={[styles.form]}>
                 <Input
                     rules={{ required: errorMsgs.required }}
@@ -76,21 +80,21 @@ export const SendViolenceForm = ({ medias, openCamera, setMedias, style, ...prop
                     const updated = { ...value, [key]: newValue }
                     onChange(updated)
                 }} bg="dark" label="Дата и время" />} />
-                <Link href={'/'}><Typography color={Colors.light.primary} variant="span">Правила размещения фото/видео</Typography></Link>
+                <Link href={'/settings/rules'}><Typography color={Colors.light.primary} variant="span">Правила размещения фото/видео</Typography></Link>
                 <Button disabled={isPending || medias.length == 0} loading={isPending} variant="primary" onPress={handleSubmit(submit)}>Отправить</Button>
             </ScrollView>
-        </TouchableOpacity>
+        </TouchableWithoutFeedback>
     </FormContainer>
 }
 
 interface MediasViewProps {
-    medias: string[]
-    setMedias: (value: string[]) => void;
-    openCamera: () => void
+    medias: MediaLibrary.Asset[]
+    setMedias: (value: MediaLibrary.Asset[]) => void;
+    handleCamera: (state: boolean) => void
 }
 
-const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
-    const [currentItem, setCurrentItem] = useState<string | null>(null);
+const MediasView = ({ medias, setMedias, handleCamera }: MediasViewProps) => {
+    const [currentItem, setCurrentItem] = useState<MediaLibrary.Asset | null>(null);
     const isManuallyScrolling = useRef(false);
     const viewabilityConfig = useRef({
         viewAreaCoveragePercentThreshold: 50, // Item is considered "in view" if at least 50% is visible
@@ -135,13 +139,12 @@ const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
     }, [medias]);
 
     const deleteMedia = (itemToDelete: string) => {
-        const newMedias = medias.filter((item) => item !== itemToDelete); // Remove the item
+        const newMedias = medias.filter((item) => item.id !== itemToDelete); // Remove the item
         setMedias(newMedias);
-
-        if (currentItem === itemToDelete) {
+        if (currentItem?.id === itemToDelete) {
             if (newMedias.length > 0) {
                 const nextIndex = Math.min(
-                    medias.indexOf(itemToDelete),
+                    medias.findIndex(item => item.id == itemToDelete),
                     newMedias.length - 1
                 ); // Choose the next valid index
                 setCurrentItem(newMedias[nextIndex]);
@@ -155,20 +158,20 @@ const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
         <FlatList
             initialNumToRender={1}
             removeClippedSubviews={true}
-            ref={flatListRef} keyExtractor={(item, idx) => `${item}*idx`} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.mediasViews]} data={medias} renderItem={({ item }: { item: string }) => {
-                if (item.includes('mp4') || item.includes('mov')) {
-                    return <Video source={item} style={[styles.previewItem]} />
+            ref={flatListRef} keyExtractor={(item, idx) => `${item.id}${idx}`} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.mediasViews]} data={medias} renderItem={({ item }: { item: MediaLibrary.Asset }) => {
+                if (item.uri.includes('mp4') || item.uri.includes('mov') || item.uri.includes('mkv')) {
+                    return <Video source={item.uri} style={[styles.previewItem]} />
                 }
-                return <Image source={{ uri: item }} style={[styles.previewItem]} />
+                return <MediaViewer itemStyle={[styles.previewItem]} media={item.uri} />
             }}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
         />
         <View style={[styles.bottom]}><View style={[styles.mediasControls]}>
-            <FlatList ref={controlsFlatListRef} keyExtractor={(item, idx) => `${item}***idx`} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.controlsList]} data={medias} renderItem={({ item, index }) =>
+            <FlatList ref={controlsFlatListRef} keyExtractor={(item, idx) => `${item.id}${idx} `} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.controlsList]} data={medias} renderItem={({ item, index }) =>
                 <View style={[styles.controlItem]}>
                     {currentItem == item ?
-                        <Pressable style={[styles.deleteItem]} onPress={() => deleteMedia(item)}>
+                        <Pressable style={[styles.deleteItem]} onPress={() => deleteMedia(item.id)}>
                             <MaterialIcons name="delete" color={Colors.light.background} size={23} />
                         </Pressable>
                         :
@@ -177,16 +180,39 @@ const MediasView = ({ medias, setMedias, openCamera }: MediasViewProps) => {
                             scrollToSelected(index)
                         }} style={[styles.selectItem]}>
                         </Pressable>}
-                    <Image source={{ uri: item }} style={{ width: '100%', height: '100%' }} />
+                    <Image source={{ uri: item.uri }} style={{ width: '100%', height: '100%' }} />
                 </View>
             } />
-            <Pressable style={[styles.controlItem, styles.addNew]} onPress={openCamera}>
-                <Entypo name="plus" size={32} color={Colors.light.primary} />
-            </Pressable>
+
+            <AddNewButton medias={medias} setMedias={setMedias} openCamera={() => handleCamera(true)} />
         </View>
         </View>
     </View>
 }
+interface AddNewButtonProps {
+    openCamera: () => void
+    medias: MediaLibrary.Asset[],
+    setMedias: (value: MediaLibrary.Asset[]) => void
+}
+const AddNewButton = ({ openCamera, medias, setMedias }: AddNewButtonProps) => {
+    const [visible, setVisible] = useState(false)
+    const handlePress = () => {
+        DeviceEventEmitter.emit(Modals.importVariants, {
+            openCamera, openGallery: () => {
+                DeviceEventEmitter.emit(Modals.assetPicker, {
+                    saveSelected: (newMedias: MediaLibrary.Asset[]) => {
+                        setMedias([...medias, ...newMedias])
+                    }
+                })
+            }
+        })
+
+    }
+    return <Pressable style={[styles.controlItem, styles.addNew]} onPress={handlePress}>
+        <Entypo name="plus" size={32} color={Colors.light.primary} />
+    </Pressable>
+}
+
 
 const width = Dimensions.get('window').width
 const styles = StyleSheet.create({
@@ -223,7 +249,7 @@ const styles = StyleSheet.create({
         width: width - 20, height: width * 9 / 16, borderRadius: 10,
     },
     controlItem: {
-        width: 60, height: 40, borderRadius: 10, overflow: 'hidden', position: 'relative',
+        width: 60, height: 40, borderRadius: 10, overflow: 'hidden',
         borderWidth: 2,
         borderColor: Colors.light.borderColor
     },
@@ -239,12 +265,41 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0)',
         zIndex: 20,
     },
+    addNewContainer: {
+        position: 'relative'
+    },
+    overlay: {
+        position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,.5)', zIndex: 9, flex: 1
+    },
+    addNewContent: {
+        paddingHorizontal: 10,
+        width: 'auto',
+        minWidth: 44,
+        justifyContent: 'space-around',
+        position: 'absolute',
+        backgroundColor: 'white',
+        borderRadius: 20,
+        elevation: 10,
+        right: 0,
+        top: 40,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 10,
+        },
+        shadowOpacity: 0.53,
+        shadowRadius: 13.97,
+
+        zIndex: 10,
+    },
+
     addNew: {
         alignItems: 'center',
         justifyContent: 'center',
         borderColor: Colors.light.primary,
         borderWidth: 1,
     },
+
     bottom: {
         paddingHorizontal: 15,
         gap: 8

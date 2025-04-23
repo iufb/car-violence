@@ -2,6 +2,7 @@ import { rGetNewsById } from "@/api/violence";
 import { CustomHeader, LoaderView, ScreenContainer } from "@/components";
 import { MediaViewer } from "@/components/MediaViewer";
 import { Typography } from "@/components/ui";
+import { NotFound } from "@/components/ui/NotFound";
 import { Colors } from "@/constants/Colors";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs, useLocalSearchParams } from "expo-router";
@@ -21,12 +22,12 @@ export default function NewsScreen() {
         <Tabs.Screen options={{ header: () => <CustomHeader title="Новости" /> }} />
         <SafeAreaView>
             {isLoading && <LoaderView />}
-            {error?.cause == 404 && <Typography variant="p2" color="green">Не найдено</Typography>}
+            {error?.cause == 404 && <NotFound />}
             {error && <Typography variant="p2" color="red">Ошибка</Typography>}
             {data ?
                 <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.container]}>
                     <FlatList removeClippedSubviews contentContainerStyle={[styles.medias]} showsHorizontalScrollIndicator={false} keyExtractor={item => `${item.id}`} horizontal data={data.media} renderItem={({ item }) =>
-                        <MediaViewer media={item.video_file} itemStyle={styles.media} style={[styles.mediaContainer]} />
+                        <MediaViewer media={item?.video_file} itemStyle={styles.media} style={[styles.mediaContainer]} />
                     } />
                     <View style={[styles.textContainer]}>
                         <Typography color={Colors.light.primary} variant="h2">{data.title}</Typography>

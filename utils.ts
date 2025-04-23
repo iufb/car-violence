@@ -1,10 +1,47 @@
 import * as ImagePicker from 'expo-image-picker';
 
+import * as MediaLibrary from 'expo-media-library';
 import * as SecureStore from 'expo-secure-store';
+import { DeviceEventEmitter, Dimensions } from 'react-native';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import Toast, { ToastType } from 'react-native-toast-message';
-export const pickImage = async (saveSelected: (value: string[]) => void) => {
-    // No permissions request is necessary for launching the image library
+export const DeviceWidth = Dimensions.get('window').width
+export const DeviceHeigth = Dimensions.get('window').height
+export const pickAssets = async (handleSave: (assets: MediaLibrary.Asset[]) => void) => {
+    DeviceEventEmitter.emit('openAssetsPicker', handleSave)
+}
+
+export const Modals = {
+    assetPicker: 'openAssetsPicker',
+    permission: 'openPermissionAlert',
+    importVariants: 'showImportVariants'
+
+}
+export const mimeTypes = {
+    jpeg: "image/jpeg",
+    jpg: "image/jpeg",
+    png: "image/png",
+    gif: "image/gif",
+    bmp: "image/bmp",
+    webp: "image/webp",
+    tiff: "image/tiff",
+    svg: "image/svg+xml",
+    ico: "image/x-icon",
+
+    mp4: "video/mp4",
+    webm: "video/webm",
+    ogg: "video/ogg",
+    avi: "video/x-msvideo",
+    mkv: "video/x-matroska",
+    mov: "video/quicktime",
+};
+export const pickImage = async ({
+    saveAsUri,
+    saveAsFile
+}: {
+    saveAsUri?: (value: string[]) => void,
+    saveAsFile?: (value: ImagePicker.ImagePickerAsset[]) => void
+}) => {    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images', 'videos'],
         allowsMultipleSelection: true,
@@ -15,7 +52,11 @@ export const pickImage = async (saveSelected: (value: string[]) => void) => {
 
 
     if (!result.canceled) {
-        saveSelected(result.assets.map(asset => asset.uri));
+        if (saveAsUri)
+            saveAsUri(result.assets.map(asset => asset.uri));
+        if (saveAsFile) {
+            saveAsFile(result.assets)
+        }
     }
 };
 

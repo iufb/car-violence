@@ -3,7 +3,7 @@ import { rMS } from "@/utils"
 import { StyleSheet, Text, TextProps } from "react-native"
 
 export const Typography = ({ color, variant, children, center, style, ...props }: TextProps & { variant: "h1" | "h2" | "h3" | "p1" | 'p2' | "span", center?: boolean, color?: string }) => {
-    return <Text style={[styles[variant], { color }, style, center && styles.center,]} {...props} >
+    return <Text style={[styles[variant], { color, fontFamily: "Rubik" }, style, center && styles.center,]} {...props} >
         {children}
     </Text>
 }

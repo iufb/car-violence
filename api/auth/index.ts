@@ -3,6 +3,19 @@ import { customFetch } from "../"
 export const rConfirmCode = ({ tel }: { tel: string }) => {
     return customFetch({ method: "POST", path: 'send-code/', data: { phone_number: '+' + tel } })
 }
+export const rPasswordReset = (phone: string) => {
+    return customFetch({ method: "POST", path: 'auth/request_password_reset/', data: { phone_number: phone } })
+}
+export const rConfirmPasswordReset = (data: { phone_number: string, code: string, new_password: string }) => {
+    return customFetch({ method: "POST", path: 'auth/confirm_password_reset/', data })
+}
+
+export const rRegisterDevice = (data: {
+    "registration_id": string, "type": string
+}) => {
+    return customFetch({ method: "POST", path: 'register-device/', data, withAuth: true })
+}
+
 export const rVerifyCode = (data: {
     phone_number: string,
     code: string,
@@ -11,6 +24,7 @@ export const rVerifyCode = (data: {
 }) => {
     return customFetch({ method: "POST", path: 'verify-code/', data })
 }
+
 export const rLogin = (data: { phone_number: string, password: string }): Promise<{ access: string, refresh: string } | undefined> => {
     return customFetch({ method: "POST", path: 'login/', data })
 }

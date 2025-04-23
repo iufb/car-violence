@@ -1,6 +1,6 @@
-{
+export default {
     "expo": {
-        "name": "Oko",
+        "name": "OKO",
         "slug": "car-violence",
         "version": "1.0.0",
         "orientation": "portrait",
@@ -8,20 +8,27 @@
         "scheme": "myapp",
         "userInterfaceStyle": "automatic",
         "newArchEnabled": true,
+
         "ios": {
-            "supportsTablet": true
+            "bundleIdentifier": "com.ispark.oko",
+            "config": {
+                "usesNonExemptEncryption": false
+            }
         },
+
         "android": {
             "adaptiveIcon": {
                 "foregroundImage": "./assets/images/adaptive-icon.png",
                 "backgroundColor": "#ffffff"
             },
-            "package": "com.iufb2.carviolence",
+            "googleServicesFile": process.env.GOOGLE_SERVICES_JSON ?? './google-services.json',
+            "package": "com.ispark.oko",
             "permissions": [
                 "android.permission.RECORD_AUDIO",
                 "android.permission.CAMERA"
             ]
         },
+
         "web": {
             "bundler": "metro",
             "output": "static",
@@ -42,14 +49,6 @@
                 "expo-image-picker",
                 {
                     "photosPermission": "The app accesses your photos to let you share them with your friends."
-                }
-            ],
-            [
-                "react-native-vision-camera",
-                {
-                    "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
-                    "enableMicrophonePermission": true,
-                    "microphonePermissionText": "$(PRODUCT_NAME) needs access to your Microphone."
                 }
             ],
             [
@@ -74,7 +73,22 @@
                     "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
                 }
             ],
-            "react-native-vision-camera"
+            [
+                "expo-media-library",
+                {
+                    "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
+                    "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
+                    "isAccessMediaLocationEnabled": true
+                }
+            ],
+            [
+                "react-native-vision-camera",
+                {
+                    "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
+                    "enableMicrophonePermission": true,
+                    "microphonePermissionText": "$(PRODUCT_NAME) needs access to your Microphone."
+                }
+            ]
         ],
         "experiments": {
             "typedRoutes": true

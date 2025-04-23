@@ -10,7 +10,7 @@ export default function Profile() {
         <ScrollView contentContainerStyle={[styles.container]} showsVerticalScrollIndicator={false}>
             <ProfileSection />
             <UserBalance />
-            <ListItem href={'/'} title="Настройки" />
+            <ListItem href={'/settings'} title="Настройки" />
             <LogoutButton />
         </ScrollView>
     </ScreenContainer>

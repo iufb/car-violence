@@ -3,7 +3,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import React from 'react';
 
+import { ImportVariantsModal } from '@/components';
+import { AssetsPicker } from '@/components/AssetsPicker';
+import { toastConfig } from '@/components/CustomToast';
 import { PermissionAlert } from '@/components/PermissionAlert';
+import { AppStateContextProvider } from '@/context/AppStateContext';
+import { AntDesign, Entypo, Feather, FontAwesome, FontAwesome5, FontAwesome6, Ionicons, MaterialCommunityIcons, MaterialIcons, Octicons } from '@expo/vector-icons';
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { isRunningInExpoGo } from 'expo';
@@ -13,9 +18,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -23,6 +28,8 @@ SplashScreen.preventAutoHideAsync();
 const navigationIntegration = Sentry.reactNavigationIntegration({
     enableTimeToInitialDisplay: !isRunningInExpoGo(),
 });
+
+
 
 export const client = new QueryClient()
 Sentry.init({
@@ -43,6 +50,8 @@ const InitialLayout = () => {
     const { isLoaded, isSignedIn, isFirstBoot } = useAuth();
     const segments = useSegments();
     const pathname = usePathname();
+
+
 
     useEffect(() => {
         const redirect = async () => {
@@ -77,12 +86,16 @@ const InitialLayout = () => {
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
         </Stack>
+
         <StatusBar style="auto" />
+
     </>
 }
 function RootLayout() {
     const [loaded] = useFonts({
-        SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+        'Rubik': require('../assets/fonts/Rubik-VariableFont_wght.ttf'),
+        ...Ionicons.font,
+        ...FontAwesome5.font, ...Entypo.font, ...FontAwesome6.font, ...MaterialCommunityIcons.font, ...FontAwesome.font, ...Octicons.font, ...MaterialIcons.font, ...AntDesign.font, ...Feather.font
     });
     const ref = useNavigationContainerRef();
     useEffect(() => {
@@ -101,15 +114,17 @@ function RootLayout() {
     }
 
     return (
-        <GestureHandlerRootView>
-            <ThemeProvider value={DefaultTheme}>
+        <ThemeProvider value={DefaultTheme}>
+            <AppStateContextProvider>
                 <QueryClientProvider client={client}>
                     <InitialLayout />
+                    <Toast config={toastConfig} />
+                    <AssetsPicker />
+                    <PermissionAlert />
+                    <ImportVariantsModal />
                 </QueryClientProvider>
-                <Toast />
-                <PermissionAlert />
-            </ThemeProvider>
-        </GestureHandlerRootView>
+            </AppStateContextProvider>
+        </ThemeProvider>
     );
 }
 export default Sentry.wrap(RootLayout)

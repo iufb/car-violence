@@ -1,6 +1,9 @@
 import { rGetMediaList } from "@/api/violence";
 import { LoaderView, NewsList, ScreenContainer, Search } from "@/components";
 import { Card, Typography } from "@/components/ui";
+import { Error } from "@/components/ui/Error";
+import { NotFound } from "@/components/ui/NotFound";
+import { usePushNotifications } from "@/hooks";
 import { rS, rV } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs } from "expo-router";
@@ -9,7 +12,7 @@ import { Dimensions, SafeAreaView, ScrollView, StyleSheet, View } from "react-na
 
 
 export default function HomeScreen() {
-
+    usePushNotifications()
     return (
         <ScreenContainer style={[styles.container]} >
             <Tabs.Screen options={{ header: () => <Search /> }} />
@@ -37,16 +40,16 @@ const LastViolenceList = () => {
     return isLoading ? <View >
         <LoaderView />
     </View> : isError && error?.cause !== 404 ?
-        <Typography center variant="span" color="red">Ошибка</Typography> :
+        <Error /> :
         medias && medias.length > 0 ?
             <View style={[styles.violenceContainer]}>
                 {medias.map(item => <Card link={`/(tabs)/video/${item.id}`} style={[styles.violences]} subtitle={item.city} key={item.id} variant="base"
-                    title={item.id.toString()} desc={item.description} img={item.videos[0].video_file}
+                    title={item.id.toString()} desc={item.description} img={item.videos[0]?.video_file}
                 />)
                 }
             </View>
             :
-            <Typography center variant="span" color="green">Не найдено</Typography>
+            <NotFound />
 }
 
 
