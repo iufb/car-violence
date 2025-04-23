@@ -4,7 +4,8 @@ import useDebounce from "@/hooks/useDebounce";
 import { rS, rV } from "@/utils";
 import { Entypo, FontAwesome5 } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, TextInput, View, ViewProps } from "react-native";
+import { Pressable, ScrollView, StyleSheet, TextInput, View, ViewProps } from "react-native";
+import { GestureHandlerRootView, Pressable as GPressable } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 interface SelectProps extends ViewProps {
     items: string[];
@@ -24,7 +25,7 @@ export const Select = ({ error, withSearch, required = true, label, value, place
 
     useEffect(() => {
         if (debouncedQuery) {
-            setSearchItems(prev => prev.filter(v => v.toLowerCase().includes(debouncedQuery.toLowerCase())))
+            setSearchItems(prev => prev.filter(v => v.toLowerCase().includes(debouncedQuery.toLowerCase().replace(/\s+/g, ''))))
         } else {
             setSearchItems(items)
         }
@@ -77,15 +78,21 @@ export const Select = ({ error, withSearch, required = true, label, value, place
                     <FontAwesome5 style={[styles.searchIcon]} name="search" size={20} color={Colors.light.primary} />
                 </View>}
 
-            <Animated.ScrollView contentContainerStyle={[innerStyle]}>
 
-                {searchItems.length > 0 ? searchItems.map((item, idx) => <Pressable hitSlop={10} style={[{ borderBottomWidth: idx == items.length - 1 ? 0 : 1 }, styles.item]} onPress={() => {
-                    onSelect(item);
-                    toggle()
-                }} key={idx}>
-                    <Typography variant="p2">{item}</Typography>
-                </Pressable>) : <Typography center variant="p2">Нет результатов</Typography>}
-            </Animated.ScrollView>
+            <GestureHandlerRootView>
+                <Animated.View style={[innerStyle]} pointerEvents={'box-none'}>
+                    <ScrollView
+                        keyboardShouldPersistTaps="handled"
+                        contentContainerStyle={[{ paddingBottom: 20, }]}>
+                        {searchItems.length > 0 ? searchItems.map((item, idx) => <GPressable style={[{ borderBottomWidth: idx == items.length - 1 ? 0 : 1, }, styles.item]} onPress={() => {
+                            onSelect(item);
+                            toggle()
+                        }} key={idx}>
+                            <Typography variant="p2" >{item}</Typography>
+                        </GPressable>) : <Typography center variant="p2">Нет результатов</Typography>}
+                    </ScrollView>
+                </Animated.View>
+            </GestureHandlerRootView>
         </Animated.View>
         {error && <Typography variant="span" color="red">{error}</Typography>}
     </View>
@@ -124,7 +131,7 @@ const styles = StyleSheet.create({
     },
     content: {
         borderRadius: 10,
-        zIndex: 100,
+        zIndex: 20,
         maxHeight: rS(200),
         position: 'absolute',
         left: 10,
@@ -134,11 +141,11 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     item: {
+        width: '100%',
         justifyContent: 'center',
-        paddingLeft: 10,
-        paddingVertical: 10,
+        zIndex: 110,
+        padding: 10,
         borderBottomColor: Colors.light.borderColor,
-        height: 60
 
     },
 
