@@ -1,4 +1,5 @@
 import { rRegisterDevice } from "@/api/auth";
+import { useAuth } from "@/hooks/useAuth";
 import messaging from "@react-native-firebase/messaging";
 import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
@@ -34,6 +35,7 @@ async function registerForPushNotificationsAsync() {
     }
 }
 export const usePushNotifications = () => {
+    const { isSignedIn } = useAuth()
     useEffect(() => {
         const fetchFCMToken = async () => {
             try {
@@ -45,8 +47,10 @@ export const usePushNotifications = () => {
                 console.error("Error fetching FCM token:", error);
             }
         };
-        fetchFCMToken();
-    }, []);
+        if (isSignedIn)
+            fetchFCMToken();
+
+    }, [isSignedIn]);
 
     useEffect(() => {
         Notifications.setNotificationHandler({

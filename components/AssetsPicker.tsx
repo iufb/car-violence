@@ -44,12 +44,12 @@ export const AssetsPicker = () => {
         callbacks.saveSelected(Array.from(pickedAssets.values()))
         setSelectedMap(new Map())
     }
-    return <ViewModal y={y} doneBtn={
+    return <ViewModal key={'assetspicker'} y={y} doneBtn={
         <Pressable disabled={pickedAssets.size == 0} onPress={handleDone}>
             <Typography style={{ textAlign: 'right' }} color={pickedAssets.size == 0 ? 'gray' : Colors.light.primary} variant="p2">Выбрать</Typography>
         </Pressable>
 
-    } visible={visible} handleClose={handleClose} modalOffset={rS(100)}>
+    } visible={visible} handleClose={handleClose} modalOffset={100}>
         <View style={{ flex: 1 }}>
             <View style={[styles.topView]}>
                 <Tabs activeTab={activeTab} setActiveTab={(tab) => setActiveTab(tab)} />

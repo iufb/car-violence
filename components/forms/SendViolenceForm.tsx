@@ -16,7 +16,7 @@ import * as MediaLibrary from 'expo-media-library';
 import { Link } from "expo-router";
 import React, { useCallback, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { DeviceEventEmitter, Dimensions, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, ViewProps, ViewToken } from "react-native";
+import { DeviceEventEmitter, Dimensions, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableWithoutFeedback, View, ViewProps, ViewToken } from "react-native";
 import Toast from "react-native-toast-message";
 interface SendViolenceFormProps extends ViewProps {
     medias: MediaLibrary.Asset[]
@@ -59,7 +59,7 @@ export const SendViolenceForm = ({ medias, handleCamera, setMedias, style, ...pr
     }
     return <FormContainer style={[style, styles.container]} {...props}>
         <MediasView medias={medias} setMedias={setMedias} handleCamera={handleCamera} />
-        <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={() => Keyboard.dismiss()}>
+        <TouchableWithoutFeedback style={{ flex: 1 }} onPress={() => Keyboard.dismiss()}>
             <ScrollView contentContainerStyle={[styles.form]}>
                 <Input
                     rules={{ required: errorMsgs.required }}
@@ -83,7 +83,7 @@ export const SendViolenceForm = ({ medias, handleCamera, setMedias, style, ...pr
                 <Link href={'/settings/rules'}><Typography color={Colors.light.primary} variant="span">Правила размещения фото/видео</Typography></Link>
                 <Button disabled={isPending || medias.length == 0} loading={isPending} variant="primary" onPress={handleSubmit(submit)}>Отправить</Button>
             </ScrollView>
-        </TouchableOpacity>
+        </TouchableWithoutFeedback>
     </FormContainer>
 }
 
