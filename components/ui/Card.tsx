@@ -22,7 +22,7 @@ export const Card = ({ variant = 'base', link, title, color, img, subtitle, desc
     return <Link href={link}><View style={[style, styles[variant], { backgroundColor: color }, styles.container,]} {...props}>
         <Image fadeDuration={100} defaultSource={require('../../assets/fallback.png')} style={[{ width: "100%", height: '100%', borderRadius: 10, flex: 2 }, isHorizontal && styles.horizontalImg]} source={isVideo ? require('../../assets/video.png') : { uri: img }} />
         <View style={[styles.textContainer, isHorizontal && styles.horizontalText]}>
-            <Typography center={!isHorizontal} variant="h3">{title}</Typography>
+            <Typography center={!isHorizontal} variant="h3" numberOfLines={2}>{title}</Typography>
             <Typography center={!isHorizontal} variant="span">{subtitle}</Typography>
             <Typography numberOfLines={1} ellipsizeMode="tail" variant="p2">{desc}</Typography>
         </View>

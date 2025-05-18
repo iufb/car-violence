@@ -11,6 +11,7 @@ import { Dimensions, FlatList, StyleSheet, View } from "react-native"
 
 export const NewsList = () => {
     const { data, isLoading, error } = useQuery({ queryKey: ["news"], queryFn: async () => rGetNewsList(5) })
+    console.log(data, "NEWS")
     return <View>
         <Typography style={[styles.title]} variant="h2">Последние новости</Typography>
         {isLoading &&
@@ -20,7 +21,8 @@ export const NewsList = () => {
         {error && <Error />}
         {data?.length == 0 && <NotFound />}
         {data && data.length !== 0 &&
-            <FlatList showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.newsContainer]} horizontal data={data} renderItem={({ item }) => <Card link={`/(tabs)/news/${item.id}`} style={[styles.news]} variant="base" title={item.title} desc={item.text} img={item.media[0]?.video_file} />}
+            <FlatList showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.newsContainer]} horizontal data={data} renderItem={({ item }) => <Card link={`/(tabs)/news/${item.id}`} style={[styles.news]} variant="base" title={item.title} desc={''} img={`http://10.0.2.2:3000/${item.image}`
+            } />}
                 keyExtractor={(item) => item.id.toString()}
             />}
     </View>
@@ -37,7 +39,7 @@ const styles = StyleSheet.create({
     newsContainer: {
 
         display: 'flex',
-        minHeight: rV(230),
+        minHeight: rV(130),
         gap: rS(20)
     },
     news: {

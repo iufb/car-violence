@@ -31,7 +31,5 @@ export interface MediaDTO {
 export interface News {
     id: number;
     title: string;
-    text: string;
-    createdAt: string;
-    media: MediaList
+    image: string;
 }

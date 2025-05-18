@@ -15,6 +15,7 @@ interface customFetchProps {
     withAuth?: boolean,
     query?: Record<string, any>
     data?: dataType
+    baseurl?: string
 
 }
 const BASE_URL = 'https://m.foxminded.space'
@@ -24,10 +25,11 @@ export const customFetch = async <T>({
     query,
     data,
     withAuth = false,
+    baseurl
 }: customFetchProps): Promise<T | undefined> => {
     try {
         // Construct URL with query parameters
-        const url = new URL(`/api/v1/${path}`, BASE_URL);
+        const url = baseurl ? new URL(`/${path}`, baseurl) : new URL(`/api/v1/${path}`, BASE_URL);
         if (query) {
             Object.entries(query).forEach(([key, value]) => {
                 url.searchParams.append(key, value);
