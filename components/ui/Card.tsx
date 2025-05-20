@@ -1,6 +1,6 @@
 import { Typography } from "@/components/ui/Typography";
 import { Colors } from "@/constants/Colors";
-import { getFileType, rV } from "@/utils";
+import { getFileType, rS, rV } from "@/utils";
 import { Entypo } from "@expo/vector-icons";
 import { Link, LinkProps } from "expo-router";
 import { Image, StyleSheet, View, ViewProps } from "react-native";
@@ -22,8 +22,8 @@ export const Card = ({ variant = 'base', link, title, color, img, subtitle, desc
     return <Link href={link}><View style={[style, styles[variant], { backgroundColor: color }, styles.container,]} {...props}>
         <Image fadeDuration={100} defaultSource={require('../../assets/fallback.png')} style={[{ width: "100%", height: '100%', borderRadius: 10, flex: 2 }, isHorizontal && styles.horizontalImg]} source={isVideo ? require('../../assets/video.png') : { uri: img }} />
         <View style={[styles.textContainer, isHorizontal && styles.horizontalText]}>
-            <Typography center={!isHorizontal} variant="h3" numberOfLines={2}>{title}</Typography>
-            <Typography center={!isHorizontal} variant="span">{subtitle}</Typography>
+            <Typography variant="h3" numberOfLines={2}>{title}</Typography>
+            <Typography variant="span">{subtitle}</Typography>
             <Typography numberOfLines={1} ellipsizeMode="tail" variant="p2">{desc}</Typography>
         </View>
         {variant == 'horizontal' &&
@@ -33,6 +33,9 @@ export const Card = ({ variant = 'base', link, title, color, img, subtitle, desc
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
+        borderWidth: 1,
+        borderRadius: 10,
+        borderColor: "#cbd5e1",
     },
     base: {
         flexDirection: 'column',
@@ -42,15 +45,14 @@ const styles = StyleSheet.create({
     horizontal: {
         flexDirection: 'row',
         backgroundColor: Colors.light.slate200,
-        paddingVertical: 10,
-        paddingHorizontal: 10,
+        paddingVertical: rS(10),
+        paddingHorizontal: rS(10),
         borderRadius: 10,
-        gap: 2,
         height: rV(70)
     },
     horizontalImg: {
         flex: 4,
-        marginRight: 20
+        marginRight: rS(5)
     },
     horizontalText: {
         flex: 9
@@ -61,7 +63,8 @@ const styles = StyleSheet.create({
     textContainer: {
         width: '100%',
         gap: 5,
-        paddingLeft: 5,
+        paddingLeft: rS(10),
         flex: 1,
+
     },
 })

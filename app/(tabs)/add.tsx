@@ -29,7 +29,11 @@ function Add() {
         if (appState == 'background') {
             setActiveView('loader')
         } else {
-            setActiveView('camera')
+            if (medias.length > 0) {
+                setActiveView('form')
+            } else {
+                setActiveView('camera')
+            }
         }
     }, [appState])
     useEffect(() => {

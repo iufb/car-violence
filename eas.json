@@ -20,9 +20,11 @@
         }
     },
     "submit": {
-        "production": {
+        "development": {
             "ios": {
-                "ascAppId": "6746081579"
+                "ascApiKeyPath": "./ApiKey_DY516PFKAFJ0.p8",
+                "ascAppId": "6746081579",
+                "appleTeamId": "LHL7CQ9L5N"
             }
         }
     }

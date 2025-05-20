@@ -39,12 +39,13 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
     const [cameraMode, setCameraMode] = useState<CameraModeType>('picture')
     const [facing, setFacing] = useState<CameraPosition>('back');
     const device = useCameraDevice(facing)
+    const screen = Dimensions.get('screen')
     const [isRecording, setIsRecording] = useState(false);
     const format = useCameraFormat(device, [
         { videoAspectRatio: 16 / 9 },
-        { videoResolution: { width: 1920, height: 1080 } },
+        { videoResolution: { width: 3048, height: 2160 } },
         { fps: 60 }
-    ])
+    ]);
     const { width, height } = useWindowDimensions()
     const insets = useSafeAreaInsets()
     const path = usePathname()
@@ -54,11 +55,14 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
     const capturePhoto = async () => {
         try {
             if (cameraRef.current) {
+                console.log(cameraRef.current, 'CAMERA REF')
                 const photo = await cameraRef.current.takePhoto()
                 const asset = await saveToGallery(photo.path)
                 if (!asset) return;
                 setMedias([asset])
                 closeCameraOnEnd()
+            } else {
+                console.error('Camera ref is null')
             }
         } catch (e) {
             console.log(e)
@@ -69,12 +73,13 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
     }
     async function recordMedia() {
         try {
+            // const microPermissions = await ExpoCamera.requestMicrophonePermissionsAsync()
+            // if (microPermissions.status === 'denied') {
+            //     DeviceEventEmitter.emit('openPermissionAlert')
+            //     return;
+            // }
             if (cameraRef.current) {
-                const microPermissions = await ExpoCamera.requestMicrophonePermissionsAsync()
-                if (microPermissions.status === 'denied') {
-                    DeviceEventEmitter.emit('openPermissionAlert')
-                    return;
-                }
+                console.log(cameraRef.current, "VIDEO REF")
                 setIsRecording(true)
                 cameraRef.current.startRecording({
                     onRecordingFinished: async (video) => {
@@ -90,7 +95,11 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
 
                     }
                 })
+            } else {
+                console.error('Camera ref is null')
             }
+
+
         } catch (e) {
             console.log(e)
         }
@@ -125,12 +134,17 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
         router.back()
     }
 
-    if (device == null) return <NoDeviceView />
+    const [isInitialized, setIsInitialized] = useState(false);
+    if (!device) return <NoDeviceView />
 
     return (
         <View style={[{ paddingBottom: insets.bottom, paddingTop: Constants.statusBarHeight }]}>
             <Animated.View entering={FadeIn.duration(300)} exiting={FadeOut.duration(100)} style={[styles.container]}>
-                <CameraView style={[{ width, height: height - CONTROLS_HEIGHT - Constants.statusBarHeight }]} format={format} ref={cameraRef} device={device} isActive={isActive} photo video audio preview />
+                <CameraView
+                    format={format}
+                    onInitialized={() => setIsInitialized(true)}
+                    onError={() => setIsInitialized(false)}
+                    style={[{ width, height: height - CONTROLS_HEIGHT - Constants.statusBarHeight }]} ref={cameraRef} device={device} isActive={isActive} photo={true} video={true} audio={true} preview={true} />
 
                 <Pressable hitSlop={20} onPress={handleClose} style={[styles.close]}>
                     <MaterialCommunityIcons name='close' size={32} color='white' />
