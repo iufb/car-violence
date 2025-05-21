@@ -1,5 +1,5 @@
 import { rGetMediaList } from "@/api/violence";
-import { LoaderView, NewsList, ScreenContainer, Search } from "@/components";
+import { LoaderView, ScreenContainer, Search } from "@/components";
 import { Card, Typography } from "@/components/ui";
 import { Error } from "@/components/ui/Error";
 import { NotFound } from "@/components/ui/NotFound";
@@ -18,7 +18,7 @@ export default function HomeScreen() {
             <Tabs.Screen options={{ header: () => <Search /> }} />
             <SafeAreaView >
                 <ScrollView contentContainerStyle={[styles.container]} showsVerticalScrollIndicator={false}>
-                    <NewsList />
+                    {/* <NewsList /> */}
                     <Typography center variant="h2">Последние нарушения</Typography>
                     <LastViolenceList />
                 </ScrollView>

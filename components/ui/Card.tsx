@@ -24,7 +24,7 @@ export const Card = ({ variant = 'base', link, title, color, img, subtitle, desc
         <View style={[styles.textContainer, isHorizontal && styles.horizontalText]}>
             <Typography variant="h3" numberOfLines={2}>{title}</Typography>
             <Typography variant="span">{subtitle}</Typography>
-            <Typography numberOfLines={1} ellipsizeMode="tail" variant="p2">{desc}</Typography>
+            <Typography numberOfLines={isHorizontal ? 1 : 2} ellipsizeMode="tail" variant="p2">{desc}</Typography>
         </View>
         {variant == 'horizontal' &&
             <Entypo name="chevron-right" size={32} color={Colors.light.notSelected} style={[styles.icon]} />}
@@ -34,13 +34,16 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         borderWidth: 1,
-        borderRadius: 10,
+        borderRadius: 20,
         borderColor: "#cbd5e1",
     },
     base: {
         flexDirection: 'column',
         gap: 10,
         backgroundColor: Colors.light.slate200,
+        padding: 10,
+        paddingBottom: 0
+
     },
     horizontal: {
         flexDirection: 'row',

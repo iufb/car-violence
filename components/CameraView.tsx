@@ -3,7 +3,6 @@ import { Button, Typography } from '@/components/ui';
 import { Colors } from '@/constants/Colors';
 import { rS, rV } from '@/utils';
 import { Entypo, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Camera as ExpoCamera } from 'expo-camera';
 import Constants from "expo-constants";
 import { Tabs, usePathname, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';

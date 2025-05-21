@@ -18,6 +18,7 @@ export const Modals = {
 
 }
 export const mimeTypes = {
+    heic: "image/jpeg",
     jpeg: "image/jpeg",
     jpg: "image/jpeg",
     png: "image/png",

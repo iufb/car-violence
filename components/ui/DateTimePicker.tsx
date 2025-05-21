@@ -16,7 +16,11 @@ interface DateTimePickerProps extends ViewProps {
 export const DateTimePicker = ({ required = true, dateValue, timeValue, setValue, label, bg = 'light', style, ...props }: DateTimePickerProps) => {
     const [mode, setMode] = useState<'date' | 'time'>('date');
     const [show, setShow] = useState(false);
+    const minTime = new Date();
+    minTime.setHours(9, 0, 0); // 09:00 AM
 
+    const maxTime = new Date();
+    maxTime.setHours(18, 0, 0); // 06:00 PM
     const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
         const currentDate = selectedDate;
         setShow(false);
@@ -69,6 +73,8 @@ export const DateTimePicker = ({ required = true, dateValue, timeValue, setValue
                     <Pressable onPress={showDatepicker} style={[styles.action]}><Entypo size={22} name="calendar" color={Colors.light.background} />
                         {show && mode == 'date' &&
                             <DateTimePickerLib
+                                minimumDate={new Date(2025, 0, 1)}
+                                maximumDate={new Date()}
                                 testID="dateTimePicker"
                                 value={dateValue}
                                 mode={'date'}
@@ -78,6 +84,8 @@ export const DateTimePicker = ({ required = true, dateValue, timeValue, setValue
                     <Pressable onPress={showTimepicker} style={[styles.action]}><MaterialIcons size={22} name="access-time" color={Colors.light.background} />
                         {show && mode == 'time' &&
                             <DateTimePickerLib
+                                minimumDate={minTime}
+                                maximumDate={maxTime}
                                 testID="dateTimePicker"
                                 value={dateValue}
                                 mode={'time'}

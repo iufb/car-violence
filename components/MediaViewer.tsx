@@ -23,16 +23,22 @@ export const MediaViewer = ({ media, itemStyle, ...props }: MediaViewerProps) =>
     console.log(uri)
     const closeModal = () => setModalVisible(false);
     return <View style={[props.style]} {...props}>
-        <Pressable onPress={() => setModalVisible(true)}>
+        <Pressable onPress={() => {
+            if (getFileType(media) == 'image') {
+                setModalVisible(true)
+            }
+        }}>
             <View style={itemStyle}>
                 {getFileType(media) == 'image' && <Image style={[styles.media]} source={{ uri }} onError={handleImgError} />}
                 {getFileType(media) == 'video' && <Video style={[styles.media]} source={uri} />}
             </View>
         </Pressable>
+
         <Modal visible={modalVisible} onRequestClose={closeModal} animationType="fade"  >
-            <Pressable onPress={closeModal}>
-                <AntDesign color={Colors.light.primary} size={32} name="close" style={[styles.close]} />
+            <Pressable onPress={closeModal} hitSlop={10} style={[styles.close]}>
+                <AntDesign color={Colors.light.primary} size={32} name="close" />
             </Pressable>
+
             <View style={[styles.modal]}>
                 {getFileType(media) == 'image' && <Image style={[styles.media]} source={{ uri }} onError={handleImgError} />}
             </View>
@@ -51,6 +57,7 @@ const styles = StyleSheet.create({
     close: {
         position: 'absolute',
         right: 10,
-        top: 10
+        zIndex: 10,
+        top: Constants.statusBarHeight
     }
 })
