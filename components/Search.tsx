@@ -7,31 +7,7 @@ import React, { useState } from "react";
 import { Dimensions, Pressable, StyleSheet, TextInput, View } from "react-native";
 
 
-// const read = async () => {
-//     const images: FileSystemUploadResult[] = []
-//     for (const i of image) {
-//         const data = await startUpload(i, (progress) => setRes({ ...res, progress }))
-//         if (data)
-//             images.push(data)
-//         setRes({ ...res, progress: 0 })
-//     }
-//     const final = await fetch('http://10.0.2.2:3000/final', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({
-//             images: images.map(i => JSON.parse(i?.body ?? '').file),
-//             firstParam: 'yourValue',
-//             secondParam: 'yourOtherValue',
-//         }),
-//     })
-//     Toast.show({ type: 'success', text1: "Загрузка завершена", text2: "Загрузка прошла успешна" })
-//
-//     const b = await final.json()
-//     console.log(b, "FINAL")
-// }
-//
+
 
 export const Search = () => {
     const [id, setId] = useState('')
@@ -53,8 +29,8 @@ export const Search = () => {
 const styles = StyleSheet.create({
     container: {
         width: Dimensions.get('window').width,
-        backgroundColor: Colors.light.slate200,
-        marginTop: Constants.statusBarHeight,
+        paddingTop: Constants.statusBarHeight,
+        backgroundColor: 'white',
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: rV(10),
@@ -62,18 +38,19 @@ const styles = StyleSheet.create({
         position: 'relative'
     },
     trigger: {
-        width: '100%',
-        backgroundColor: Colors.light.background,
-        borderColor: Colors.light.primary,
-        borderWidth: 1,
+        width: Dimensions.get('window').width - 20,
+        marginTop: rV(5),
+        marginHorizontal: 'auto',
+        backgroundColor: "#F1F5F9",
         borderRadius: 16,
-        paddingVertical: rS(8),
+        paddingVertical: rV(8),
         paddingHorizontal: rS(16),
         gap: rS(8),
         alignItems: 'center',
     },
     icon: {
         position: 'absolute',
+        top: Constants.statusBarHeight + rV(8),
         right: 30,
         elevation: 1,
         zIndex: 1

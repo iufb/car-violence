@@ -53,16 +53,17 @@ export default function Onbording() {
     }
     return <ScreenContainer style={[style.container]}>
         <Tabs.Screen options={{ headerShown: false }} />
-        <Animated.View key={'i' + step} entering={FadeInUp} >
+        <Animated.View key={step} style={[style.textContainer]} entering={FadeInRight} exiting={FadeOutLeft}>
+            <Typography variant="h1" style={{ textAlign: 'center' }} color={Colors.light.primary}>{steps[step].title}</Typography>
+            <Typography color={Colors.light.notSelected} variant="p1" style={{ textAlign: 'center' }}>{steps[step].desc}</Typography>
+        </Animated.View>
+        <Animated.View key={'i' + step} entering={FadeInUp} style={[style.ImageContainer]} >
             <Image source={steps[step].img} style={[style.image]} />
         </Animated.View>
+
         {step !== 4 && <Stepper current={step} handlePress={(step: number) => {
             setStep(step)
         }} />}
-        <Animated.View key={step} style={[style.textContainer]} entering={FadeInRight} exiting={FadeOutLeft}>
-            <Typography variant="h1" style={{ textAlign: 'center' }}>{steps[step].title}</Typography>
-            <Typography color={Colors.light.notSelected} variant="p1" style={{ textAlign: 'center' }}>{steps[step].desc}</Typography>
-        </Animated.View>
 
         <View style={[style.btnContainer]}>
             <Button variant="primary" onPress={handleNext} >{step == 4 ? "Создать аккаунт" : "Дальше"}</Button>
@@ -97,7 +98,7 @@ const Stepper = ({ current, handlePress }: { current: number, handlePress: (step
             zIndex: 10,
         }, animatedStyle]} />
 
-        {new Array(4).fill('.').map((step, idx) => <Pressable key={idx} onPress={() => handlePress(idx)} style={{ flex: 1 }}><View style={[{
+        {new Array(4).fill('.').map((step, idx) => <Pressable hitSlop={10} key={idx} onPress={() => handlePress(idx)} style={{ flex: 1 }}><View style={[{
             borderRadius: 10,
             height: rV(8),
             backgroundColor: Colors.light.gray,
@@ -113,8 +114,12 @@ const style = StyleSheet.create({
         alignItems: 'center',
         justifyContent: "space-evenly"
     },
+    ImageContainer: {
+        width: rS(300), height: rV(300),
+
+    },
     image: {
-        width: rS(300), height: rV(300)
+        width: '100%', height: '100%'
     },
     signin: {
         color: Colors.light.primary,
@@ -124,13 +129,15 @@ const style = StyleSheet.create({
         width: '100%',
     },
     textContainer: {
+        marginTop: rV(25),
         display: 'flex',
         justifyContent: 'center',
         gap: rS(20),
         marginBottom: rV(30),
+        height: rV(100),
     },
     stepper: {
-        width: '80%',
+        width: '20%',
         gap: rS(10),
         marginHorizontal: 'auto',
         height: rV(8),
