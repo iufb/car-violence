@@ -168,6 +168,13 @@ export const showToast = ({ type, title, desc }: { type: ToastType, title: strin
 
     });
 }
+export const formatDate = (date: string) => {
+    const d = new Date(date)
+    const day = String(d.getDate()).padStart(2, '0')
+    const month = String(d.getMonth() + 1).padStart(2, '0') // +1 потому что месяцы с 0
+    const year = d.getFullYear()
+    return `${day}.${month}.${year}`
+}
 
 export async function saveToStorage(key: string, value: any) {
     await SecureStore.setItemAsync(key, value);

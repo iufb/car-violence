@@ -18,9 +18,9 @@ export const Search = () => {
         setId('')
     }
     return <View style={[styles.container]}>
-        <TextInput value={id} onChangeText={text => setId(text)} placeholder='Введите номер нарушения...' style={[styles.trigger]} />
+        <TextInput keyboardType="numeric" value={id} onChangeText={text => setId(text)} placeholder='Введите номер нарушения...' style={[styles.trigger]} />
         <Pressable onPress={handleFind} style={[styles.icon]}>
-            <FontAwesome5 name="search" size={20} color={Colors.light.primary} />
+            <FontAwesome5 name="search" size={18} color={'white'} />
         </Pressable>
 
     </View>
@@ -33,30 +33,29 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: rV(10),
+        justifyContent: 'center',
         paddingHorizontal: rS(10),
-        position: 'relative'
+
+        marginTop: rV(5),
+        gap: rS(3),
     },
     trigger: {
-        width: Dimensions.get('window').width - 20,
-        marginTop: rV(5),
+        flex: 1,
         marginHorizontal: 'auto',
         backgroundColor: "#F1F5F9",
-        borderRadius: 16,
-        paddingVertical: rV(8),
-        paddingHorizontal: rS(16),
+        borderRadius: 5,
+        paddingLeft: rS(10),
         gap: rS(8),
+        height: rV(32),
         alignItems: 'center',
     },
     icon: {
-        position: 'absolute',
-        top: Constants.statusBarHeight + rV(8),
-        right: 30,
-        elevation: 1,
-        zIndex: 1
+        backgroundColor: Colors.light.primary,
+        borderRadius: 5,
+        height: rS(33),
+        width: rS(40),
+        alignItems: 'center',
+        justifyContent: 'center'
 
     },
-    modal: {
-        paddingTop: Constants.statusBarHeight
-    }
 })

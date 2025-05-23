@@ -45,7 +45,7 @@ export const AssetsPicker = () => {
         setSelectedMap(new Map())
     }
     return <ViewModal key={'assetspicker'} y={y} doneBtn={
-        <Pressable disabled={pickedAssets.size == 0} onPress={handleDone}>
+        <Pressable disabled={pickedAssets.size == 0} onPress={handleDone} hitSlop={10}>
             <Typography style={{ textAlign: 'right' }} color={pickedAssets.size == 0 ? 'gray' : Colors.light.primary} variant="p2">Выбрать</Typography>
         </Pressable>
 
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5,
         flexDirection: 'row',
         justifyContent: 'center',
-        backgroundColor: '#e2e2e2',
+        backgroundColor: '#F1F5F9',
         paddingVertical: rV(5),
         borderRadius: 10,
     },

@@ -48,12 +48,20 @@ export const Colors = {
         slate200: "#F1F5F9",
         gray: "#d4d4d4",
         borderColor: "#C5C6CC",
+        cardBg: "#E0F2FE",
         status: {
-            0: "#FFE2E4",
-            1: "#FFF4E4",
-            2: "#E7F4E8",
-            3: "#EAF2FF"
-        }
+            0: "#ffe2e4",
+            1: "#fff4e4",
+            2: "#e7f4e8",
+            3: "#eaf2ff"
+        },
+        statusText: {
+            0: "#B91C1C",
+            1: "#92400E",
+            2: "#065F46",
+            3: "#1D4ED8"
+
+        },
     },
     dark: {
         text: '#ECEDEE',

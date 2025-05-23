@@ -8,3 +8,9 @@ export const errorMsgs = {
         passwordsDoNotMatch: "Пароли не совпадают",
     },
 }
+export const status = {
+    0: "Не принято",
+    1: "Ожидается оплата",
+    2: "Оплачено",
+    3: "В обработке",
+}

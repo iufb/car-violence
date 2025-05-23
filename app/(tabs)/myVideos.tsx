@@ -3,7 +3,7 @@ import { CustomHeader, LoaderView, ScreenContainer } from "@/components";
 import { Card } from "@/components/ui";
 import { Error } from "@/components/ui/Error";
 import { NotFound } from "@/components/ui/NotFound";
-import { Colors } from "@/constants/Colors";
+import { formatDate } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs } from "expo-router";
 import { useCallback } from "react";
@@ -35,8 +35,8 @@ export default function MyVideos() {
                             <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
                         }
                     >
-                        {medias.map(item => <Card link={`/(tabs)/video/${item.id}`} subtitle={item.city} key={item.id} color={Colors.light.status['1']} variant="horizontal"
-                            title={item.id.toString()} desc={item.description} img={item.videos.length > 0 ? item.videos[0].video_file : ''}
+                        {medias.map(item => <Card link={`/(tabs)/video/${item.id}`} subtitle={formatDate(item.uploaded_at)} key={item.id} variant="horizontal"
+                            title={'№' + item.id.toString()} desc={item.description} img={item.videos.length > 0 ? item.videos[0].video_file : ''}
                         />)}
                     </ScrollView>
                 </SafeAreaView>

@@ -20,7 +20,7 @@ export default function HomeScreen() {
                 <Link href={'/onbording'}><Text>Onbording</Text></Link>
                 <ScrollView contentContainerStyle={[styles.container]} showsVerticalScrollIndicator={false}>
                     {/* <NewsList /> */}
-                    <Typography center variant="h2">Последние нарушения</Typography>
+                    <Typography variant="h2">Последние нарушения 🚦</Typography>
                     <LastViolenceList />
                 </ScrollView>
             </SafeAreaView>

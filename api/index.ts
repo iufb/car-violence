@@ -62,7 +62,7 @@ export const customFetch = async <T>({
         const executeFetch = async (): Promise<Response> => {
             console.log(url)
             const controller = new AbortController();
-            const timeout = 10000;
+            const timeout = 30000;
 
             // Wrap the abort call in an arrow function
             let timeoutId: NodeJS.Timeout | null = null

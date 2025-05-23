@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     container: {
         position: 'relative',
         width: DeviceWidth - 20,
-        gap: 10,
+        gap: 4,
         marginHorizontal: 'auto',
         backgroundColor: '#F5F5F5',
         borderRadius: 10,
