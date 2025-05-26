@@ -1,7 +1,7 @@
 import { Button, Typography } from '@/components/ui';
 
 import { Colors } from '@/constants/Colors';
-import { rS, rV } from '@/utils';
+import { Modals, rS, rV } from '@/utils';
 import { Entypo, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import Constants from "expo-constants";
 import { Tabs, usePathname, useRouter } from 'expo-router';
@@ -10,7 +10,7 @@ import { DeviceEventEmitter, Dimensions, Platform, Pressable, StyleSheet, useWin
 import Animated, { FadeIn, FadeOut, interpolate, interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useAppState } from '@/hooks';
+import { useMediaStore } from '@/context/useMediaStore';
 import * as MediaLibrary from 'expo-media-library';
 import { CameraPosition, Camera as CameraView, useCameraDevice, useCameraFormat } from 'react-native-vision-camera';
 
@@ -32,9 +32,14 @@ const saveToGallery = async (fileUri: string) => {
         console.error("Error creating asset:", error);
     }
 };
-export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isActive: boolean, medias: MediaLibrary.Asset[], setMedias: (media: MediaLibrary.Asset[]) => void, closeCameraOnEnd: () => void }) {
+export function Camera() {
+    const {
+        medias,
+        activeView,
+        setActiveView,
+        setMedias,
+    } = useMediaStore()
 
-    const { appState } = useAppState()
     const [cameraMode, setCameraMode] = useState<CameraModeType>('picture')
     const [facing, setFacing] = useState<CameraPosition>('back');
     const device = useCameraDevice(facing)
@@ -58,8 +63,8 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
                 const photo = await cameraRef.current.takePhoto()
                 const asset = await saveToGallery(photo.path)
                 if (!asset) return;
-                setMedias([asset])
-                closeCameraOnEnd()
+                setMedias([...medias, asset])
+                setActiveView('form')
             } else {
                 console.error('Camera ref is null')
             }
@@ -84,7 +89,7 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
                     onRecordingFinished: async (video) => {
                         const asset = await saveToGallery(video.path)
                         if (!asset) return
-                        setMedias([asset])
+                        setMedias([...medias, asset])
                         setIsRecording(false)
                     },
                     onRecordingError: async (error) => {
@@ -109,7 +114,7 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
             await cameraRef.current.stopRecording()
             setIsRecording(false)
             setTimeout(() => {
-                closeCameraOnEnd()
+                setActiveView('form')
             }, 1000)
         }
     }
@@ -127,7 +132,7 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
     }
     const handleClose = () => {
         if (medias.length > 0) {
-            closeCameraOnEnd()
+            setActiveView('form')
             return;
         }
         router.back()
@@ -143,16 +148,13 @@ export function Camera({ setMedias, closeCameraOnEnd, medias, isActive }: { isAc
                     format={format}
                     onInitialized={() => setIsInitialized(true)}
                     onError={() => setIsInitialized(false)}
-                    style={[{ width, height: height - CONTROLS_HEIGHT - Constants.statusBarHeight }]} ref={cameraRef} device={device} isActive={isActive} photo={true} video={true} audio={true} preview={true} />
+                    style={[{ width, height: height - CONTROLS_HEIGHT - Constants.statusBarHeight }]} ref={cameraRef} device={device} isActive={activeView == 'camera'} photo={true} video={true} audio={true} preview={true} />
 
                 <Pressable hitSlop={20} onPress={handleClose} style={[styles.close]}>
                     <MaterialCommunityIcons name='close' size={32} color='white' />
                 </Pressable>
 
-                <Controls facing={facing} toggleCameraFacing={toggleCameraFacing} save={(value) => {
-                    setMedias(value)
-                    closeCameraOnEnd()
-                }} isRecording={isRecording} mode={cameraMode} selectMode={mode => {
+                <Controls facing={facing} toggleCameraFacing={toggleCameraFacing} isRecording={isRecording} mode={cameraMode} selectMode={mode => {
                     setCameraMode(mode)
                     if (isRecording) {
                         stopRecord()
@@ -174,10 +176,10 @@ const CameraNotFound = ({ requestPermission }: { requestPermission: () => void }
     </View>
 }
 
-const Controls = ({ facing, mode, selectMode, capture, save, isRecording, toggleCameraFacing }: CaptureBtnProps & FlipBtnProps & ImportBtnProps & ModeSelectorProps) => {
+const Controls = ({ facing, mode, selectMode, capture, isRecording, toggleCameraFacing }: CaptureBtnProps & FlipBtnProps & ImportBtnProps & ModeSelectorProps) => {
     return <View style={[styles.controls]}>
         <View style={[styles.topControls]}>
-            <ImportBtn save={save} />
+            <ImportBtn />
             <CaptureBtn mode={mode} capture={capture} isRecording={isRecording} />
             <FlipBtn facing={facing} toggleCameraFacing={toggleCameraFacing} />
         </View>
@@ -242,10 +244,9 @@ const FlipBtn = ({ facing, toggleCameraFacing }: FlipBtnProps) => {
 
 }
 interface ImportBtnProps {
-    save: (value: MediaLibrary.Asset[]) => void
 }
-const ImportBtn = ({ save }: ImportBtnProps) => {
-    return <Pressable style={[styles.btn]} onPress={() => DeviceEventEmitter.emit('openAssetsPicker', { saveSelected: save })}><Entypo name='image' size={24} color={Colors.light.background} /></Pressable>
+const ImportBtn = () => {
+    return <Pressable style={[styles.btn]} onPress={() => DeviceEventEmitter.emit(Modals.assetPicker)}><Entypo name='image' size={24} color={Colors.light.background} /></Pressable>
 }
 
 const modes: { label: string, value: CameraModeType }[] = [

@@ -7,6 +7,7 @@ import { Button, DateTimePicker, Input, Select, Typography } from "@/components/
 import { Video } from "@/components/Video";
 import { Colors } from "@/constants/Colors";
 import { errorMsgs } from "@/consts";
+import { useMediaStore } from "@/context/useMediaStore";
 import { useBackgroundUpload } from "@/hooks/useBackgroundUpload";
 import { GetDate, GetTime, Modals } from "@/utils";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
@@ -18,12 +19,14 @@ import React, { useCallback, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { DeviceEventEmitter, Dimensions, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TouchableWithoutFeedback, View, ViewProps, ViewToken } from "react-native";
 import Toast from "react-native-toast-message";
-interface SendViolenceFormProps extends ViewProps {
-    medias: MediaLibrary.Asset[]
-    setMedias: (value: MediaLibrary.Asset[]) => void;
-    handleCamera: (state: boolean) => void
-}
-export const SendViolenceForm = ({ medias, handleCamera, setMedias, style, ...props }: SendViolenceFormProps) => {
+interface SendViolenceFormProps extends ViewProps { }
+export const SendViolenceForm = () => {
+    const {
+        medias,
+        setMedias,
+        setActiveView
+    } = useMediaStore()
+
     const { control, formState: { errors }, handleSubmit, reset } = useForm({
         defaultValues
     })
@@ -57,8 +60,8 @@ export const SendViolenceForm = ({ medias, handleCamera, setMedias, style, ...pr
         body.append('was_at_time', GetTime(data.dateTime.time) + ":00")
         send(body)
     }
-    return <FormContainer style={[style, styles.container]} {...props}>
-        <MediasView medias={medias} setMedias={setMedias} handleCamera={handleCamera} />
+    return <FormContainer style={[styles.container]} >
+        <MediasView medias={medias} setMedias={setMedias} />
         <TouchableWithoutFeedback style={{ flex: 1 }} onPress={() => Keyboard.dismiss()}>
             <ScrollView contentContainerStyle={[styles.form]}>
                 <Input
@@ -90,10 +93,9 @@ export const SendViolenceForm = ({ medias, handleCamera, setMedias, style, ...pr
 interface MediasViewProps {
     medias: MediaLibrary.Asset[]
     setMedias: (value: MediaLibrary.Asset[]) => void;
-    handleCamera: (state: boolean) => void
 }
 
-const MediasView = ({ medias, setMedias, handleCamera }: MediasViewProps) => {
+const MediasView = ({ medias, setMedias }: MediasViewProps) => {
     const [currentItem, setCurrentItem] = useState<MediaLibrary.Asset | null>(null);
     const isManuallyScrolling = useRef(false);
     const viewabilityConfig = useRef({
@@ -184,28 +186,17 @@ const MediasView = ({ medias, setMedias, handleCamera }: MediasViewProps) => {
                 </View>
             } />
 
-            <AddNewButton medias={medias} setMedias={setMedias} openCamera={() => handleCamera(true)} />
+            <AddNewButton />
         </View>
         </View>
     </View>
 }
 interface AddNewButtonProps {
-    openCamera: () => void
-    medias: MediaLibrary.Asset[],
-    setMedias: (value: MediaLibrary.Asset[]) => void
 }
-const AddNewButton = ({ openCamera, medias, setMedias }: AddNewButtonProps) => {
+const AddNewButton = () => {
     const [visible, setVisible] = useState(false)
     const handlePress = () => {
-        DeviceEventEmitter.emit(Modals.importVariants, {
-            openCamera, openGallery: () => {
-                DeviceEventEmitter.emit(Modals.assetPicker, {
-                    saveSelected: (newMedias: MediaLibrary.Asset[]) => {
-                        setMedias([...medias, ...newMedias])
-                    }
-                })
-            }
-        })
+        DeviceEventEmitter.emit(Modals.importVariants)
 
     }
     return <Pressable style={[styles.controlItem, styles.addNew]} onPress={handlePress}>

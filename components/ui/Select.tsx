@@ -3,6 +3,7 @@ import { Colors } from "@/constants/Colors";
 import useDebounce from "@/hooks/useDebounce";
 import { rS, rV } from "@/utils";
 import { Entypo, FontAwesome5 } from "@expo/vector-icons";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, TextInput, View, ViewProps } from "react-native";
 import { GestureHandlerRootView, Pressable as GPressable } from "react-native-gesture-handler";
@@ -74,7 +75,8 @@ export const Select = ({ error, withSearch, required = true, label, value, place
 
             {withSearch &&
                 <View style={[styles.search]}>
-                    <TextInput style={[styles.searchInput]} value={searchTerm} onChangeText={value => setSearchTerm(value)} />
+
+                    <TextInput placeholder="Поиск..." style={[styles.searchInput]} value={searchTerm} onChangeText={value => setSearchTerm(value)} />
                     <FontAwesome5 style={[styles.searchIcon]} name="search" size={20} color={Colors.light.primary} />
                 </View>}
 
@@ -87,8 +89,10 @@ export const Select = ({ error, withSearch, required = true, label, value, place
                         {searchItems.length > 0 ? searchItems.map((item, idx) => <GPressable style={[{ borderBottomWidth: idx == items.length - 1 ? 0 : 1, }, styles.item]} onPress={() => {
                             onSelect(item);
                             toggle()
+                            setSearchTerm('')
                         }} key={idx}>
-                            <Typography variant="p2" >{item}</Typography>
+                            {item == value && <MaterialIcons name="place" size={24} color={Colors.light.primary} />}
+                            <Typography style={[item !== value && { paddingLeft: 34 }]} variant="p2" >{item}</Typography>
                         </GPressable>) : <Typography center variant="p2">Нет результатов</Typography>}
                     </ScrollView>
                 </Animated.View>
@@ -102,20 +106,21 @@ const styles = StyleSheet.create({
         gap: 7,
     },
     search: {
-        position: 'relative',
         margin: rS(8),
-        marginBottom: rS(15)
+        marginBottom: rS(15),
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: "#F1F5F9",
+        borderRadius: 5,
+        paddingHorizontal: rS(10),
 
     },
     searchInput: {
         fontSize: rS(14),
-        height: rV(38),
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: Colors.light.borderColor,
-        paddingLeft: 10
+        height: rV(35),
+        flex: 1,
     },
-    searchIcon: { position: 'absolute', right: 20, top: 14 },
+    searchIcon: {},
     label: {
         height: 48,
         borderColor: Colors.light.borderColor,
@@ -136,15 +141,19 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 10,
         right: 10,
-        top: 75,
+        top: 80,
         backgroundColor: '#fff',
         overflow: 'hidden',
     },
     item: {
         width: '100%',
-        justifyContent: 'center',
         zIndex: 110,
+        alignItems: 'center',
         padding: 10,
+        borderBottomWidth: 1,
+        flexDirection: 'row',
+        gap: 10,
+
         borderBottomColor: Colors.light.borderColor,
 
     },

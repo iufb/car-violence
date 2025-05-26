@@ -4,10 +4,10 @@ import { Stack, Tabs, usePathname, useRouter } from "expo-router";
 import { SendViolenceForm } from "@/components/forms";
 import { Button, Typography } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
+import { useMediaStore } from "@/context/useMediaStore";
 import { useAppState } from "@/hooks";
 import { usePermissions } from "@/hooks/usePermissions";
-import * as MediaLibrary from 'expo-media-library';
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 export default function EntryPoint() {
     const { cameraPermission, mediaPermission, microPermissions, requestAllPermissions, loading } = usePermissions()
@@ -19,14 +19,18 @@ export default function EntryPoint() {
 }
 
 function Add() {
-    const [medias, setMedias] = useState<MediaLibrary.Asset[]>([])
     const { appState } = useAppState()
-    const [activeView, setActiveView] = useState<'camera' | 'form' | 'loader'>('camera')
     const router = useRouter()
     const path = usePathname()
 
+    const {
+        medias,
+        activeView,
+        setActiveView,
+        setMedias,
+    } = useMediaStore()
     useEffect(() => {
-        if (appState == 'background') {
+        if (appState === 'background') {
             setActiveView('loader')
         } else {
             if (medias.length > 0) {
@@ -36,15 +40,14 @@ function Add() {
             }
         }
     }, [appState])
+
+
     useEffect(() => {
-        if (medias.length == 0) {
+        if (medias.length === 0) {
             setActiveView('camera')
         }
     }, [medias])
 
-    const closeCameraOnEnd = () => {
-        setActiveView('form')
-    }
 
     if (activeView == 'loader') {
         return <View style={[{ flex: 1, backgroundColor: 'black' }]} />
@@ -52,8 +55,8 @@ function Add() {
 
     return <View style={[styles.container]}>
         <Tabs.Screen options={{ headerShown: false }} />
-        {activeView == 'camera' && <Camera medias={medias} isActive={activeView == 'camera'} setMedias={media => setMedias([...medias, ...media])} closeCameraOnEnd={closeCameraOnEnd} />}
-        {activeView == 'form' && <SendViolenceForm setMedias={(m) => setMedias(m)} medias={medias} handleCamera={(state) => setActiveView(state ? 'camera' : 'form')} />}
+        {activeView == 'camera' && <Camera />}
+        {activeView == 'form' && <SendViolenceForm />}
     </View>
 }
 const PermissionsPage = ({ requestPermission }: {

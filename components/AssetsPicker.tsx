@@ -6,6 +6,7 @@ import { FlatList, Image, Pressable, StyleSheet, View } from "react-native";
 import Animated, { Easing, ReduceMotion, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import { LoaderView } from "@/components/LoaderView";
+import { useMediaStore } from "@/context/useMediaStore";
 import { useCreateModal } from "@/hooks/useCreateModal";
 import { FontAwesome } from "@expo/vector-icons";
 import * as MediaLibrary from 'expo-media-library';
@@ -27,6 +28,12 @@ interface AssetsPickerBase {
 export const AssetsPicker = () => {
     const { y, handleClose, callbacks, visible } = useCreateModal<{ saveSelected: (assets: MediaLibrary.Asset[]) => void }>({ event: Modals.assetPicker })
     const [activeTab, setActiveTab] = useState(tabs[0])
+    const {
+        medias,
+        setMedias,
+        setActiveView
+    } = useMediaStore()
+
     const [pickedAssets, setSelectedMap] = useState<Map<string, MediaLibrary.Asset>>(new Map())
     const handleSelect = (asset: MediaLibrary.Asset) => {
         setSelectedMap(prev => {
@@ -40,8 +47,8 @@ export const AssetsPicker = () => {
         })
     }
     const handleDone = () => {
-        if (!callbacks?.saveSelected) return;
-        callbacks.saveSelected(Array.from(pickedAssets.values()))
+        setMedias([...medias, ...Array.from(pickedAssets.values())])
+        setActiveView('form')
         setSelectedMap(new Map())
     }
     return <ViewModal key={'assetspicker'} y={y} doneBtn={
