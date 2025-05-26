@@ -6,25 +6,21 @@ import { NotFound } from "@/components/ui/NotFound";
 import { formatDate } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs } from "expo-router";
-import { useCallback } from "react";
 import { RefreshControl, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 
 
 export default function MyVideos() {
-    const { data: medias, isLoading, isError, error, refetch } = useQuery({
+    const { data: medias, isFetching, isError, error, refetch } = useQuery({
         queryKey: ['myVideos'], queryFn: async () => {
             const data = await rGetMediaList({ type: 'user', limit: 100 })
             return data
         }
     })
 
-    const onRefresh = useCallback(() => {
-        refetch()
 
-    }, []);
     return <ScreenContainer>
         <Tabs.Screen options={{ header: (props) => <CustomHeader showBack={false} title="Мои видео" /> }} />
-        {isLoading ? <View>
+        {isFetching ? <View>
             <LoaderView />
         </View> : isError && error?.cause !== 404 ?
             <Error /> :
@@ -32,7 +28,7 @@ export default function MyVideos() {
                 <SafeAreaView>
                     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.container]}
                         refreshControl={
-                            <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
+                            <RefreshControl refreshing={isFetching} onRefresh={refetch} />
                         }
                     >
                         {medias.map(item => <Card link={`/(tabs)/video/${item.id}`} subtitle={formatDate(item.uploaded_at)} key={item.id} variant="horizontal"

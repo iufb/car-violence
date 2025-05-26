@@ -8,12 +8,12 @@ import { Colors } from "@/constants/Colors";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs, useLocalSearchParams } from "expo-router";
 import React from 'react';
-import { Dimensions, FlatList, RefreshControl, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
+import { Dimensions, FlatList, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 
 const width = Dimensions.get('window').width
 export default function VideoScreen() {
     const { id } = useLocalSearchParams()
-    const { data, isPending, error, refetch } = useQuery({
+    const { data, isRefetching, error } = useQuery({
         queryKey: [`violence`, id], queryFn: async () => {
             const data = await rGetMediaById(parseInt(id as string))
             return data
@@ -23,16 +23,12 @@ export default function VideoScreen() {
     return <ScreenContainer keyDismiss={false}>
         <Tabs.Screen options={{ header: () => <CustomHeader title={`Нарушение № ${id}`} /> }} />
         <SafeAreaView>
-            {isPending && <LoaderView />
+            {isRefetching && <LoaderView />
             }
             {error?.cause == 404 && <NotFound />}
             {error && <Error />}
             {data ?
                 <ScrollView
-                    refreshControl={
-                        <RefreshControl refreshing={isPending} onRefresh={() => refetch()} />
-                    }
-
                     showsVerticalScrollIndicator={false} contentContainerStyle={[styles.container]}>
                     <Alert title="Ожидается оплата" subtitle="Выплата будет отправлена на ваш счет" variant="rejected" />
                     <FlatList removeClippedSubviews contentContainerStyle={[styles.medias]} showsHorizontalScrollIndicator={false} keyExtractor={item => `${item.id}`} horizontal data={data.videos} renderItem={({ item, index }) =>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Dimensions, Image, Modal, Pressable, StyleSheet, View, ViewProps } from "react-native";
 
+
 import { Video } from "@/components/Video";
 import { Colors } from "@/constants/Colors";
 import { AntDesign } from "@expo/vector-icons";
@@ -39,7 +40,7 @@ export const LocalMediaViewer = ({ medias, current, itemStyle, ...props }: Media
 
                 {media.mediaType == 'video' ?
                     <Video style={[styles.media]} source={uri} /> :
-                    <Image style={[styles.media]} source={{ uri }} onError={handleImgError} />
+                    <Image style={[styles.media]} source={{ uri }} onError={handleImgError} resizeMode={'contain'} />
                 }
 
             </View>

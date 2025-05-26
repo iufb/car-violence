@@ -1,10 +1,12 @@
 import { Typography } from "@/components/ui/Typography";
+
 import { Colors } from "@/constants/Colors";
 import { status } from "@/consts";
 import { getFileType, rS, rV } from "@/utils";
 import { Entypo } from "@expo/vector-icons";
 import { Link, LinkProps } from "expo-router";
-import { Image, StyleSheet, Text, View, ViewProps } from "react-native";
+import { StyleSheet, Text, View, ViewProps } from "react-native";
+import FastImage from 'react-native-fast-image';
 
 interface CardProps extends ViewProps {
     variant: 'base' | 'horizontal',
@@ -22,7 +24,7 @@ export const Card = ({ variant = 'base', link, title, img, subtitle, desc, style
     return <Link href={link}><View style={[style, styles[variant], styles.container,]} {...props}>
         <View style={[isHorizontal ? styles.horizontalImg : styles.baseImg]}>
             {img ?
-                <Image fadeDuration={10} defaultSource={require('../../assets/fallback.png')} style={[{ width: '100%', height: '100%', borderRadius: 10 }]} source={isVideo ? require('../../assets/video.png') : { uri: img }} /> : <View style={[styles.skeleton]} />}</View>
+                <FastImage defaultSource={require('../../assets/fallback.png')} style={[{ width: '100%', height: '100%', borderRadius: 10 }]} source={isVideo ? require('../../assets/video.png') : { uri: img }} /> : <View style={[styles.skeleton]} />}</View>
         <View style={[styles.textContainer, isHorizontal && styles.horizontalText]}>
             <Typography variant="h3" numberOfLines={2}>{title}</Typography>
             <Typography numberOfLines={1} variant="span">{subtitle}</Typography>

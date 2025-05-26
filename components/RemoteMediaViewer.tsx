@@ -1,6 +1,7 @@
 import { getFileType } from "@/utils";
 import { useState } from "react";
-import { Dimensions, Image, Modal, Pressable, StyleSheet, View, ViewProps } from "react-native";
+import { Dimensions, Modal, Pressable, StyleSheet, View, ViewProps } from "react-native";
+import FastImage from 'react-native-fast-image';
 
 import { Video } from "@/components/Video";
 import { Colors } from "@/constants/Colors";
@@ -46,7 +47,7 @@ export const RemoteMediaViewer = ({ medias, current, itemStyle, ...props }: Medi
 
                 {getFileType(media) == 'video' ?
                     <Video style={[styles.media]} source={uri} /> :
-                    <Image style={[styles.media]} source={{ uri }} onError={handleImgError} />
+                    <FastImage style={[styles.media]} source={{ uri }} onError={handleImgError} resizeMode={FastImage.resizeMode.contain} />
                 }
 
             </View>
@@ -110,7 +111,7 @@ const ImageView = ({ current, medias }: ImageViewProps) => {
                     {medias.map((media, index) => (
                         <View key={index} style={styles.imageWrapper}>
                             {
-                                (getFileType(media) == 'image' ? <Image source={{ uri: media }} style={styles.image} resizeMode="contain" /> : <Video source={media} style={styles.video} />)
+                                (getFileType(media) == 'image' ? <FastImage source={{ uri: media }} style={styles.image} resizeMode="contain" /> : <Video source={media} style={styles.video} />)
                             }
 
                         </View>
