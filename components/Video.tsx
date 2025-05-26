@@ -1,31 +1,29 @@
-import { Button } from "@/components/ui";
-import { useEvent } from "expo";
-import { useVideoPlayer, VideoView } from "expo-video";
+import { Colors } from "@/constants/Colors";
 import React from "react";
+
 import { StyleSheet, View, ViewProps } from "react-native";
+import VideoPlayer from 'react-native-video-player';
 interface VideoProps extends ViewProps {
     source: string
 }
 export const Video = ({ source, style, ...props }: VideoProps) => {
-    const player = useVideoPlayer(source, player => {
-    });
-
-    const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });
 
     return (
         <View style={[style, styles.container]}>
-            <VideoView style={styles.video} player={player} allowsFullscreen allowsPictureInPicture />
-            <View style={styles.controlsContainer}>
-                <Button
-                    onPress={() => {
-                        if (isPlaying) {
-                            player.pause();
-                        } else {
-                            player.play();
-                        }
-                    }}
-                >{isPlaying ? 'Pause' : 'Play'}</Button>
-            </View>
+            <VideoPlayer
+                customStyles={{
+                    seekBarKnob: {
+                        backgroundColor: Colors.light.primary
+                    },
+                    seekBarProgress: {
+                        backgroundColor: Colors.light.primary
+                    },
+                }}
+                style={[styles.video]}
+                source={{ uri: source }}
+
+                thumbnail={{ uri: 'https://example.com/thumbnail.jpg' }}
+            />
         </View>
     );
 }

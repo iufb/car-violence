@@ -2,7 +2,7 @@ import { Typography, ViewModal } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
 import { DeviceWidth, Modals, rS, rV } from "@/utils";
 import { useEffect, useState } from "react";
-import { FlatList, Image, Pressable, StyleSheet, View } from "react-native";
+import { FlatList, Image, Platform, Pressable, StyleSheet, View } from "react-native";
 import Animated, { Easing, ReduceMotion, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import { LoaderView } from "@/components/LoaderView";
@@ -13,7 +13,8 @@ import * as MediaLibrary from 'expo-media-library';
 interface AssetsPickerBase {
     handleSelect: (asset: MediaLibrary.Asset) => void
     pickedAssets: Map<string, MediaLibrary.Asset>
-} const getAssets = async (mediaType: MediaLibrary.MediaTypeValue, save: (assets: MediaLibrary.Asset[]) => void) => {
+}
+const getAssets = async (mediaType: MediaLibrary.MediaTypeValue, save: (assets: MediaLibrary.Asset[]) => void) => {
     const fetchedAlbums = await MediaLibrary.getAlbumsAsync({
         includeSmartAlbums: true,
     });
@@ -21,8 +22,13 @@ interface AssetsPickerBase {
     fetchedAlbums.forEach(async (album) => {
         promises.push(MediaLibrary.getAssetsAsync({ album, mediaType }))
     })
-    const res = (await Promise.all(promises)).map(page => page.assets)
-    save(res.flat())
+    const res = (await Promise.all(promises)).map(page => page.assets).flat()
+    if (Platform.OS == 'ios') {
+        const unique = [...new Map(res.map(item => [item.id, item])).values()]
+        save(unique)
+        return;
+    }
+    save(res)
 }
 
 export const AssetsPicker = () => {

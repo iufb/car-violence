@@ -6,9 +6,9 @@ import { NotFound } from "@/components/ui/NotFound";
 import { usePushNotifications } from "@/hooks";
 import { rS, rV } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
-import { Link, Tabs } from "expo-router";
+import { Tabs } from "expo-router";
 import React from 'react';
-import { Dimensions, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Dimensions, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 
 
 export default function HomeScreen() {
@@ -17,7 +17,6 @@ export default function HomeScreen() {
         <ScreenContainer style={[styles.container]} >
             <Tabs.Screen options={{ header: () => <Search /> }} />
             <SafeAreaView >
-                <Link href={'/onbording'}><Text>Onbording</Text></Link>
                 <ScrollView contentContainerStyle={[styles.container]} showsVerticalScrollIndicator={false}>
                     {/* <NewsList /> */}
                     <Typography variant="h2">Последние нарушения 🚦</Typography>

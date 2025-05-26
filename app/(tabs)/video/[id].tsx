@@ -1,6 +1,6 @@
 import { rGetMediaById } from "@/api/violence";
 import { CustomHeader, LoaderView, ScreenContainer } from "@/components";
-import { MediaViewer } from "@/components/MediaViewer";
+import { RemoteMediaViewer } from "@/components/RemoteMediaViewer";
 import { Alert, Typography } from "@/components/ui";
 import { Error } from "@/components/ui/Error";
 import { NotFound } from "@/components/ui/NotFound";
@@ -19,6 +19,7 @@ export default function VideoScreen() {
             return data
         }
     })
+    console.log(data)
     return <ScreenContainer keyDismiss={false}>
         <Tabs.Screen options={{ header: () => <CustomHeader title={`Нарушение № ${id}`} /> }} />
         <SafeAreaView>
@@ -34,8 +35,8 @@ export default function VideoScreen() {
 
                     showsVerticalScrollIndicator={false} contentContainerStyle={[styles.container]}>
                     <Alert title="Ожидается оплата" subtitle="Выплата будет отправлена на ваш счет" variant="rejected" />
-                    <FlatList removeClippedSubviews contentContainerStyle={[styles.medias]} showsHorizontalScrollIndicator={false} keyExtractor={item => `${item.id}`} horizontal data={data.videos} renderItem={({ item }) =>
-                        <MediaViewer media={item?.video_file} itemStyle={styles.media} style={[styles.mediaContainer]} />
+                    <FlatList removeClippedSubviews contentContainerStyle={[styles.medias]} showsHorizontalScrollIndicator={false} keyExtractor={item => `${item.id}`} horizontal data={data.videos} renderItem={({ item, index }) =>
+                        <RemoteMediaViewer medias={data.videos.map(m => m.video_file)} current={index} itemStyle={styles.media} style={[styles.mediaContainer]} />
                     } />
                     <View style={[styles.textContainer]}>
                         <Typography color={Colors.light.primary} variant="h2">№ {data.id}</Typography>

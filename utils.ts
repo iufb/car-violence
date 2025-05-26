@@ -1,5 +1,3 @@
-import * as ImagePicker from 'expo-image-picker';
-
 import * as MediaLibrary from 'expo-media-library';
 import * as SecureStore from 'expo-secure-store';
 import { DeviceEventEmitter, Dimensions } from 'react-native';

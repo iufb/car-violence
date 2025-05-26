@@ -47,6 +47,8 @@ export function Tabbar({ state, descriptors, navigation }: BottomTabBarProps) {
                 routes.map((route, index) => {
                     const { options } = descriptors[route.key];
                     const label = tabs[route.name as keyof typeof tabs].label
+
+                    console.log(label, "-label", route.name, "-NAME")
                     const icon = tabs[route.name as keyof typeof tabs].icon
                     const isFocused = mapIndex(state.index) == index
 

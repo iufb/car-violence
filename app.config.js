@@ -66,13 +66,17 @@ export default {
                 },
             ],
             [
-                "expo-video",
+                "react-native-video",
                 {
-                    supportsBackgroundPlayback: true,
-                    supportsPictureInPicture: true,
-                },
-            ],
-            [
+                    "enableNotificationControls": true,
+                    "androidExtensions": {
+                        "useExoplayerRtsp": false,
+                        "useExoplayerSmoothStreaming": false,
+                        "useExoplayerHls": false,
+                        "useExoplayerDash": false
+                    }
+                }
+            ], [
                 "@sentry/react-native/expo",
                 {
                     organization: "bedroom-developers",

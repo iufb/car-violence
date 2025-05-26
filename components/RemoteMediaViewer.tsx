@@ -1,26 +1,25 @@
 import { getFileType } from "@/utils";
-import { useEffect, useState } from "react";
-import { Dimensions, Image, Modal, Platform, Pressable, StyleSheet, View, ViewProps } from "react-native";
+import { useState } from "react";
+import { Dimensions, Image, Modal, Pressable, StyleSheet, View, ViewProps } from "react-native";
 
 import { Video } from "@/components/Video";
 import { Colors } from "@/constants/Colors";
 import { AntDesign } from "@expo/vector-icons";
 import Constants from 'expo-constants';
 
-import * as MediaLibrary from 'expo-media-library';
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 const { width } = Dimensions.get('window');
 interface MediaViewerProps extends ViewProps {
-    medias: MediaLibrary.Asset[] | string[]
+    medias: string[]
     current: number;
     itemStyle: any
 }
-export const MediaViewer = ({ medias, current, itemStyle, ...props }: MediaViewerProps) => {
+export const RemoteMediaViewer = ({ medias, current, itemStyle, ...props }: MediaViewerProps) => {
     const media = medias[current]
     const isLocal = typeof media !== 'string'
-    const [uri, setUri] = useState(!isLocal ? media : media.uri)
+    const [uri, setUri] = useState(media)
     const [modalVisible, setModalVisible] = useState(false);
     const handleImgError = () => {
         setUri(
@@ -31,7 +30,7 @@ export const MediaViewer = ({ medias, current, itemStyle, ...props }: MediaViewe
     return <View style={[props.style]} {...props}>
         <Pressable onPress={() => {
             if (isLocal) {
-                if (media.mediaType == 'photo') {
+                if (getFileType(media) == 'image') {
                     setModalVisible(true)
                 }
             } else {
@@ -43,13 +42,9 @@ export const MediaViewer = ({ medias, current, itemStyle, ...props }: MediaViewe
         }}>
             <View style={itemStyle}>
 
-                {isLocal && media.mediaType == 'video' ?
 
-                    <Video style={[styles.media]} source={uri} /> :
-                    <Image style={[styles.media]} source={{ uri }} onError={handleImgError} />
-                }
 
-                {!isLocal && getFileType(media) == 'video' ?
+                {getFileType(media) == 'video' ?
                     <Video style={[styles.media]} source={uri} /> :
                     <Image style={[styles.media]} source={{ uri }} onError={handleImgError} />
                 }
@@ -66,44 +61,13 @@ export const MediaViewer = ({ medias, current, itemStyle, ...props }: MediaViewe
         </Modal>
     </View>
 }
-const isString = (media: unknown): media is string => {
-    return typeof media === 'string';
-};
-const getPlayableUri = async (phUri: string) => {
-    const assetInfo = await MediaLibrary.getAssetInfoAsync(phUri);
-    return assetInfo.localUri; // This is usually file:// or assets-library://
-};
+
 interface ImageViewProps {
     current: number;
-    medias: MediaLibrary.Asset[] | string[]
+    medias: string[]
 }
 
 const ImageView = ({ current, medias }: ImageViewProps) => {
-    const [normalizedMedias, setNormalizedMedias] = useState<ImageViewProps['medias']>([])
-    useEffect(() => {
-        const resolveUris = async () => {
-            const resolved = await Promise.all(
-                medias.map(async (media) => {
-                    if (isString(media)) {
-                        if (media.startsWith('ph')) {
-                            const newUri = await getPlayableUri(media);
-                            return newUri ?? media;
-                        }
-                        return media;
-                    } else {
-                        if (media.uri.startsWith('ph')) {
-                            const newUri = await getPlayableUri(media.uri);
-                            return { ...media, uri: newUri ?? media.uri }; // clone, don't mutate
-                        }
-                        return media;
-                    }
-                })
-            );
-            setNormalizedMedias(resolved);
-        };
-
-        resolveUris();
-    }, [medias]);
     const currentIndex = useSharedValue(current);
     console.log(medias)
     const translateX = useSharedValue(-current * width);
@@ -146,11 +110,9 @@ const ImageView = ({ current, medias }: ImageViewProps) => {
                     {medias.map((media, index) => (
                         <View key={index} style={styles.imageWrapper}>
                             {
-                                isString(media) && (getFileType(media) == 'image' ? <Image source={{ uri: media }} style={styles.image} resizeMode="contain" /> : <Video source={media} style={styles.video} />)
+                                (getFileType(media) == 'image' ? <Image source={{ uri: media }} style={styles.image} resizeMode="contain" /> : <Video source={media} style={styles.video} />)
                             }
-                            {
-                                !isString(media) && (media.mediaType == 'photo' ? <Image source={{ uri: media.uri }} style={styles.image} resizeMode="contain" /> : <Video source={Platform.OS == 'ios' ? getPlayableUri(media.uri) : media.uri} style={styles.video} />)
-                            }
+
                         </View>
                     ))}
                 </Animated.View>

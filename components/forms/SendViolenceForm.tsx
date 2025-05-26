@@ -2,14 +2,14 @@ import { rSendViolence } from "@/api/violence";
 
 import { client } from "@/app/_layout";
 import { FormContainer } from "@/components/forms/FormContainer";
-import { MediaViewer } from "@/components/MediaViewer";
+import { LocalMediaViewer } from "@/components/LocalMediaViewer";
 import { Button, DateTimePicker, Input, Select, Typography } from "@/components/ui";
 import { Video } from "@/components/Video";
 import { Colors } from "@/constants/Colors";
 import { errorMsgs } from "@/consts";
 import { useMediaStore } from "@/context/useMediaStore";
 import { useBackgroundUpload } from "@/hooks/useBackgroundUpload";
-import { GetDate, GetTime, Modals } from "@/utils";
+import { GetDate, GetTime, Modals, rS } from "@/utils";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
 import Constants from "expo-constants";
@@ -160,11 +160,11 @@ const MediasView = ({ medias, setMedias }: MediasViewProps) => {
         <FlatList
             initialNumToRender={1}
             removeClippedSubviews={true}
-            ref={flatListRef} keyExtractor={(item, idx) => `${item.id}${idx}`} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.mediasViews]} data={medias} renderItem={({ item }: { item: MediaLibrary.Asset }) => {
+            ref={flatListRef} keyExtractor={(item, idx) => `${item.id}${idx}`} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.mediasViews]} data={medias} renderItem={({ item, index }: { item: MediaLibrary.Asset, index: number }) => {
                 if (item.uri.includes('mp4') || item.uri.includes('mov') || item.uri.includes('mkv')) {
                     return <Video source={item.uri} style={[styles.previewItem]} />
                 }
-                return <MediaViewer itemStyle={[styles.previewItem]} media={item.uri} />
+                return <LocalMediaViewer itemStyle={[styles.previewItem]} current={index} medias={medias} />
             }}
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
@@ -199,8 +199,8 @@ const AddNewButton = () => {
         DeviceEventEmitter.emit(Modals.importVariants)
 
     }
-    return <Pressable style={[styles.controlItem, styles.addNew]} onPress={handlePress}>
-        <Entypo name="plus" size={32} color={Colors.light.primary} />
+    return <Pressable style={[styles.addNew]} onPress={handlePress}>
+        <Entypo name="plus" size={32} color={'white'} />
     </Pressable>
 }
 
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
         width: width - 20, height: width * 9 / 16, borderRadius: 10,
     },
     controlItem: {
-        width: 60, height: 40, borderRadius: 10, overflow: 'hidden',
+        width: 60, height: 40, borderRadius: 6, overflow: 'hidden',
         borderWidth: 2,
         borderColor: Colors.light.borderColor
     },
@@ -287,8 +287,10 @@ const styles = StyleSheet.create({
     addNew: {
         alignItems: 'center',
         justifyContent: 'center',
-        borderColor: Colors.light.primary,
-        borderWidth: 1,
+        borderRadius: 6,
+        paddingHorizontal: rS(10),
+        backgroundColor: Colors.light.primary,
+
     },
 
     bottom: {
