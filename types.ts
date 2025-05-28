@@ -31,5 +31,5 @@ export interface MediaDTO {
 export interface News {
     id: number;
     title: string;
-    image: string;
+    media: { id: string, video_file: string }[]
 }

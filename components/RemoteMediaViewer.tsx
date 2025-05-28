@@ -111,7 +111,7 @@ const ImageView = ({ current, medias }: ImageViewProps) => {
                     {medias.map((media, index) => (
                         <View key={index} style={styles.imageWrapper}>
                             {
-                                (getFileType(media) == 'image' ? <FastImage source={{ uri: media }} style={styles.image} resizeMode="contain" /> : <Video source={media} style={styles.video} />)
+                                (getFileType(media) == 'image' ? <FastImage source={{ uri: media }} style={styles.image} resizeMode={FastImage.resizeMode.contain} /> : <Video source={media} style={styles.video} />)
                             }
 
                         </View>

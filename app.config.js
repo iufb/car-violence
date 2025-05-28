@@ -4,12 +4,16 @@ export default {
         slug: "car-violence",
         version: "1.0.0",
         orientation: "portrait",
-        icon: "./assets/images/icon.png",
         scheme: "myapp",
         userInterfaceStyle: "automatic",
         newArchEnabled: true,
 
         ios: {
+            icon: {
+                dark: "./assets/images/ios-dark.png",
+                light: "./assets/images/ios-light.png",
+                tinted: "./assets/images/ios-tinted.png"
+            },
             bundleIdentifier: "com.ispark.oko",
             config: {
                 usesNonExemptEncryption: false,
@@ -52,7 +56,7 @@ export default {
             [
                 "expo-splash-screen",
                 {
-                    image: "./assets/images/splash-icon.png",
+                    image: "./assets/images/splash-icon-dark.png",
                     imageWidth: 200,
                     resizeMode: "contain",
                     backgroundColor: "#ffffff",

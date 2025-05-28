@@ -8,6 +8,7 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+
 const tabs = {
     index: {
         label: 'Главная',
@@ -48,7 +49,6 @@ export function Tabbar({ state, descriptors, navigation }: BottomTabBarProps) {
                     const { options } = descriptors[route.key];
                     const label = tabs[route.name as keyof typeof tabs].label
 
-                    console.log(label, "-label", route.name, "-NAME")
                     const icon = tabs[route.name as keyof typeof tabs].icon
                     const isFocused = mapIndex(state.index) == index
 

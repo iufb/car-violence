@@ -30,6 +30,7 @@ export const ViewModal = ({ y, visible, handleClose, doneBtn, children, modalOff
             }
 
         })
+
     const animatedStyles = useAnimatedStyle(() => {
         return {
             transform: [

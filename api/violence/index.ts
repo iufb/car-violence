@@ -19,7 +19,7 @@ export const rSendViolence = (body: FormData): Promise<{ id: number } | undefine
 }
 
 export const rGetNewsList = (limit: number): Promise<News[] | undefined> => {
-    return customFetch({ path: 'news', method: "GET", baseurl: "http://10.0.2.2:3000" })
+    return customFetch({ path: 'news/list/', method: "GET", withAuth: true, query: { limit } })
 }
 export const rGetNewsById = (id: number): Promise<News | undefined> => {
     return customFetch({ path: `news/detail/`, method: "GET", })

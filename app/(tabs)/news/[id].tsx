@@ -11,8 +11,8 @@ export default function NewsScreen() {
     return <ScreenContainer keyDismiss={false}>
         <Tabs.Screen options={{ header: () => <CustomHeader title="Новости" /> }} />
         <WebView
-            k style={[styles.webview]}
-            source={{ uri: `http://10.0.2.2:5173/news/${id}` }}
+            style={[styles.webview]}
+            source={{ uri: `https://kto-ubil-marka.foxminded.space/detail/${id}` }}
         />
     </ScreenContainer>
 }

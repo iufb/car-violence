@@ -6,10 +6,10 @@ import { getFileType, rS, rV } from "@/utils";
 import { Entypo } from "@expo/vector-icons";
 import { Link, LinkProps } from "expo-router";
 import { StyleSheet, Text, View, ViewProps } from "react-native";
-import FastImage from 'react-native-fast-image';
+import FastImage from "react-native-fast-image";
 
 interface CardProps extends ViewProps {
-    variant: 'base' | 'horizontal',
+    variant: 'base' | 'horizontal'
     img?: string,
     title: string,
     subtitle?: string,
@@ -39,6 +39,7 @@ export const Card = ({ variant = 'base', link, title, img, subtitle, desc, style
             <Entypo name="chevron-right" size={32} color={Colors.light.notSelected} style={[styles.icon]} />}
     </View></Link>
 }
+
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
